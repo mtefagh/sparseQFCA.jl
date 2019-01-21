@@ -1,6 +1,6 @@
 # sparseQFCA
+## Introduction
 *sparseQFCA* is a Julia package for the sparse [Quantitative Flux Coupling Analysis](https://mtefagh.github.io/qfca/).
-The example data files are extracted from the [core *E. coli* model](http://systemsbiology.ucsd.edu/Downloads/EcoliCore).
 
 ## Usage
 ### `certificates, blocked, fctable = QFCA(S, rev)`
@@ -13,6 +13,10 @@ The example data files are extracted from the [core *E. coli* model](http://syst
 * `certificates`: the fictitious metabolites for the **sparse positive certificates**
 * `blocked`: the boolean vector with trues corresponding to the **blocked reactions**
 * `fctable`: the resulting **flux coupling matrix**
+
+## Quick Start
+To get started, see [this Jupyter notebook](https://nbviewer.jupyter.org/github/mtefagh/sparseQFCA/blob/master/sparseQFCA.ipynb) for a demonstration on how to use the sparseQFCA package.
+The example data files `S.csv` and `rev.csv` are extracted from the [core *E. coli* model](http://systemsbiology.ucsd.edu/Downloads/EcoliCore).
 
 ## License
 sparseQFCA is distributed under the [GNU General Public License v3.0](http://www.gnu.org/copyleft/gpl.html).
