@@ -2,3 +2,10 @@
 *.jl.*.cov
 *.jl.mem
 deps/deps.jl
+blocked.txt
+certificates.txt
+S1.csv
+rev1.csv
+rev2.csv
+blocked1.csv
+fctable1.csv
