@@ -1,4 +1,5 @@
 # sparseQFCA
+[![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.svg?branch=master)](https://travis-ci.com/mtefagh/sparseQFCA)
 ## Introduction
 *sparseQFCA* is a Julia package for the sparse [Quantitative Flux Coupling Analysis](https://mtefagh.github.io/qfca/).
 
