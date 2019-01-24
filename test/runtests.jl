@@ -1,5 +1,5 @@
 include("../sparseQFCA.jl")
-using .sparseQFCA, SparseArrays, DelimitedFiles
+using .sparseQFCA, SparseArrays, DelimitedFiles, Test
 S = sparse(readdlm("S.csv", header = false))
 @assert typeof(S) == SparseMatrixCSC{Float64,Int64}
 rev = readdlm("rev.csv", header = false)[:, 1] .== 1
