@@ -1,3 +1,10 @@
 language: julia
 julia:
   - 1.1
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: master
