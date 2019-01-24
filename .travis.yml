@@ -8,5 +8,3 @@ deploy:
   keep-history: true
   on:
     branch: master
-after_success:
-- julia -e 'Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
