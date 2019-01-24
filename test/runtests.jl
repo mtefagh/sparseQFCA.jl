@@ -5,4 +5,4 @@ S = sparse(readdlm("S.csv", header = false))
 rev = readdlm("rev.csv", header = false)[:, 1] .== 1
 @assert typeof(rev) == BitArray{1}
 certificates, blocked, fctable = @time QFCA(S, rev)
-println("The answer is $(all(readdlm("fctable.csv", header = false) .== fctable) ? "correct" : "wrong").")
+@test all(readdlm("fctable.csv", header = false) .== fctable)
