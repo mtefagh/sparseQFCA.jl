@@ -45,8 +45,8 @@ and irreversible reactions and also returns the DCE positive certificates.
     status = solve(model)
     result = getvalue(z)[m+1:end]
     blocked = result .≈ -1
-    Z = nullspace(Array(S[:, .!blocked]))
     finalBlocked = copy(blocked)
+    Z = nullspace(Matrix(S[:, .!blocked]))
     blocked = [norm(Z[j, :]) < norm(S, 2)*eps(Float64) for j in 1:size(Z, 1)]
     finalBlocked[.!finalBlocked] = blocked
     S = S[:, .!finalBlocked]
@@ -94,16 +94,15 @@ and irreversible reactions and also returns the DCE positive certificates.
         end
         @objective(fullModel, Min, sum{x[j], j = [m + j for j in 1:n if !(in(j, indices) || rev[j])]})
         status = solve(fullModel)
-        certificate = getvalue(x)[1:m]
         result = getvalue(x)[m+1:end]
         blocked = [!in(j, indices) && result[j] ≈ -1 for j = 1:n]
         if any(blocked)
-            index = findmax(result[indices].^2)[2]
+            index = indices[findmax(result[indices].^2)[2]]
             if rev[index]
                 for j in indices
                     if j == index
-                        setupperbound(x[m + j], sign(result[indices[index]]))
-                        setlowerbound(x[m + j], sign(result[indices[index]]))
+                        setupperbound(x[m + j], sign(result[j]))
+                        setlowerbound(x[m + j], sign(result[j]))
                     else
                         setupperbound(x[m + j], 0)
                         setlowerbound(x[m + j], 0)
@@ -116,7 +115,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 sparseModel = Model(solver = GLPKSolverLP())
                 @variable(sparseModel, y[j=1:m])
                 for j in 1:n
-                    if j == indices[index]
+                    if j == index
                         @constraint(sparseModel, sum{y[k]*S[k,j], k=1:m} == sign(result[j]))
                     elseif blocked[j]
                         @constraint(sparseModel, sum{y[k]*S[k,j], k=1:m} <= 0)
@@ -128,8 +127,11 @@ and irreversible reactions and also returns the DCE positive certificates.
                 status = solve(sparseModel)
                 certificate = getvalue(y)
             end
-            Z = nullspace(Array(S[:, .!blocked]))
-            blocked[.!blocked] = [norm(Z[j, :]) < norm(S, 2)*eps(Float64) for j in 1:size(Z, 1)]
+            blocked = [in(j, indices) || result[j] ≈ -1 for j = 1:n]
+            temp = sum(.!blocked)
+            Y = sparse(I, temp, temp)/Matrix(S[:, .!blocked])
+            Y = Y*Matrix(S[:, .!blocked]) - sparse(I, temp, temp)
+            blocked[.!blocked] = [norm(Y[:, j]) < norm(S[:, .!blocked], 2)*eps(Float64) for j in 1:temp]
         else
             certificate = getvalue(x)[1:m]
         end
