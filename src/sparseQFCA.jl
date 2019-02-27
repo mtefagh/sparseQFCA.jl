@@ -43,7 +43,7 @@ and irreversible reactions and also returns the DCE positive certificates.
         set_lower_bound(z[m + j], rev[j] ? 0.0 : -1.0)
     end
     optimize!(model)
-    result = value(z[m+1:end])
+    result = [value(z[j]) for j in m+1:end]
     blocked = result .≈ -1
     finalBlocked = copy(blocked)
     Z = nullspace(Matrix(S[:, .!blocked]))
@@ -94,7 +94,7 @@ and irreversible reactions and also returns the DCE positive certificates.
         end
         @objective(fullModel, Min, sum(x[j] for j in [m + j for j in 1:n if !(in(j, indices) || rev[j])]))
         optimize!(fullModel)
-        result = value(x[m+1:end])
+        result = [value(x[j]) for j in m+1:end]
         blocked = [!in(j, indices) && result[j] ≈ -1 for j = 1:n]
         if any(blocked)
             index = indices[findmax(result[indices].^2)[2]]
@@ -110,7 +110,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 end
                 @objective(fullModel, Max, sum(x[k]*S[k,j] for k in 1:m, j=findall(blocked)))
                 optimize!(fullModel)
-                certificate = value(x[1:m])
+                certificate = [value(x[j]) for j in 1:m]
             else
                 sparseModel = Model(with_optimizer(GLPK.Optimizer))
                 @variable(sparseModel, y[j=1:m])
@@ -133,7 +133,7 @@ and irreversible reactions and also returns the DCE positive certificates.
             Y = Y*Matrix(S[:, .!blocked]) - sparse(I, temp, temp)
             blocked[.!blocked] = [norm(Y[:, j]) < norm(S[:, .!blocked], 2)*eps(Float64) for j in 1:temp]
         else
-            certificate = value(x[1:m])
+            certificate = [value(x[j]) for j in 1:m]
         end
         certificates[:, indices] .= S'*certificate
         coupled = findall(blocked)
