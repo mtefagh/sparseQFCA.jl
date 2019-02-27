@@ -125,7 +125,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 end
                 @objective(sparseModel, Max, sum(y[k]*S[k,j] for k in 1:m, j=findall(blocked)))
                 optimize!(sparseModel)
-                certificate = value(y)
+                certificate = [value(y[j]) for j in 1:m]
             end
             blocked = [in(j, indices) || result[j] ≈ -1 for j = 1:n]
             temp = sum(.!blocked)
