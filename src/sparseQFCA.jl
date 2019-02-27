@@ -43,7 +43,7 @@ and irreversible reactions and also returns the DCE positive certificates.
         set_lower_bound(z[m + j], rev[j] ? 0.0 : -1.0)
     end
     optimize!(model)
-    result = [value(z[j]) for j in m+1:end]
+    result = [value(z[j]) for j in m+1:m+n]
     blocked = result .≈ -1
     finalBlocked = copy(blocked)
     Z = nullspace(Matrix(S[:, .!blocked]))
@@ -94,7 +94,7 @@ and irreversible reactions and also returns the DCE positive certificates.
         end
         @objective(fullModel, Min, sum(x[j] for j in [m + j for j in 1:n if !(in(j, indices) || rev[j])]))
         optimize!(fullModel)
-        result = [value(x[j]) for j in m+1:end]
+        result = [value(x[j]) for j in m+1:m+n]
         blocked = [!in(j, indices) && result[j] ≈ -1 for j = 1:n]
         if any(blocked)
             index = indices[findmax(result[indices].^2)[2]]
