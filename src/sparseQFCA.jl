@@ -1,7 +1,7 @@
 ﻿module sparseQFCA
 export QFCA
 
-using LinearAlgebra, SparseArrays, JuMP, GLPKMathProgInterface       
+using LinearAlgebra, SparseArrays, JuMP, GLPK       
 
 function QFCA(S, rev)
 #=
@@ -24,7 +24,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 3 - reaction i is directionally coupled to reaction j
                 4 - reaction j is directionally coupled to reaction i
 =#
-    model = Model(solver = GLPKSolverLP())
+    model = Model(with_optimizer(GLPK.Optimizer))
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
@@ -71,7 +71,7 @@ and irreversible reactions and also returns the DCE positive certificates.
             end
         end
     end   
-    fullModel = Model(solver = GLPKSolverLP())
+    fullModel = Model(with_optimizer(GLPK.Optimizer))
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
@@ -112,7 +112,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 status = solve(fullModel)
                 certificate = getvalue(x)[1:m]
             else
-                sparseModel = Model(solver = GLPKSolverLP())
+                sparseModel = Model(with_optimizer(GLPK.Optimizer))
                 @variable(sparseModel, y[j=1:m])
                 for j in 1:n
                     if j == index
