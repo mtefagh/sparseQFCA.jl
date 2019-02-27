@@ -1,4 +1,4 @@
-module sparseQFCA
+﻿module sparseQFCA
 export QFCA
 
 using LinearAlgebra, SparseArrays, JuMP, GLPKMathProgInterface       
@@ -32,12 +32,12 @@ and irreversible reactions and also returns the DCE positive certificates.
     A = [S' -sparse(I, n, n)]
     for j in 1:n
         if rev[j]
-            @constraint(model, sum{A[j,k]*z[k], k=1:m+n} == 0.0)
+            @constraint(model, sum(A[j,k]*z[k] for k in 1:m+n) == 0.0)
         else
-            @constraint(model, sum{A[j,k]*z[k], k=1:m+n} <= 0.0)
+            @constraint(model, sum(A[j,k]*z[k] for k in 1:m+n) <= 0.0)
         end
     end
-    @objective(model, Min, sum{z[j], j = [m + j for j in 1:n if !rev[j]]})
+    @objective(model, Min, sum(z[j] for j in [m + j for j in 1:n if !rev[j]]))
     for j in 1:n
         setupperbound(z[m + j], 0.0)
         setlowerbound(z[m + j], rev[j] ? 0.0 : -1.0)
@@ -79,9 +79,9 @@ and irreversible reactions and also returns the DCE positive certificates.
     A = [S' -sparse(I, n, n)]
     for j in 1:n
         if rev[j]
-            @constraint(fullModel, sum{A[j,k]*x[k], k=1:m+n} == 0.0)
+            @constraint(fullModel, sum(A[j,k]*x[k] for k in 1:m+n) == 0.0)
         else
-            @constraint(fullModel, sum{A[j,k]*x[k], k=1:m+n} <= 0.0)
+            @constraint(fullModel, sum(A[j,k]*x[k] for k in 1:m+n) <= 0.0)
         end
     end
     fctable = zeros(n, n)
@@ -92,7 +92,7 @@ and irreversible reactions and also returns the DCE positive certificates.
             setupperbound(x[m + j], in(j, indices) ? Inf : 0.0)
             setlowerbound(x[m + j], in(j, indices) ? -Inf : (rev[j] ? 0.0 : -1.0))
         end
-        @objective(fullModel, Min, sum{x[j], j = [m + j for j in 1:n if !(in(j, indices) || rev[j])]})
+        @objective(fullModel, Min, sum(x[j] for j in [m + j for j in 1:n if !(in(j, indices) || rev[j])]))
         status = solve(fullModel)
         result = getvalue(x)[m+1:end]
         blocked = [!in(j, indices) && result[j] ≈ -1 for j = 1:n]
@@ -108,7 +108,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                         setlowerbound(x[m + j], 0)
                     end
                 end
-                @objective(fullModel, Max, sum{x[k]*S[k,j], k=1:m, j=findall(blocked)})
+                @objective(fullModel, Max, sum(x[k]*S[k,j] for k in 1:m, j=findall(blocked)))
                 status = solve(fullModel)
                 certificate = getvalue(x)[1:m]
             else
@@ -116,14 +116,14 @@ and irreversible reactions and also returns the DCE positive certificates.
                 @variable(sparseModel, y[j=1:m])
                 for j in 1:n
                     if j == index
-                        @constraint(sparseModel, sum{y[k]*S[k,j], k=1:m} == sign(result[j]))
+                        @constraint(sparseModel, sum(y[k]*S[k,j] for k in 1:m) == sign(result[j]))
                     elseif blocked[j]
-                        @constraint(sparseModel, sum{y[k]*S[k,j], k=1:m} <= 0)
+                        @constraint(sparseModel, sum(y[k]*S[k,j] for k in 1:m) <= 0)
                     else
-                        @constraint(sparseModel, sum{y[k]*S[k,j], k=1:m} == 0)
+                        @constraint(sparseModel, sum(y[k]*S[k,j] for k in 1:m) == 0)
                     end
                 end
-                @objective(sparseModel, Max, sum{y[k]*S[k,j], k=1:m, j=findall(blocked)})
+                @objective(sparseModel, Max, sum(y[k]*S[k,j] for k in 1:m, j=findall(blocked)))
                 status = solve(sparseModel)
                 certificate = getvalue(y)
             end
