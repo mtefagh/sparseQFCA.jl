@@ -39,10 +39,10 @@ and irreversible reactions and also returns the DCE positive certificates.
     end
     @objective(model, Min, sum(z[j] for j in [m + j for j in 1:n if !rev[j]]))
     for j in 1:n
-        setupperbound(z[m + j], 0.0)
-        setlowerbound(z[m + j], rev[j] ? 0.0 : -1.0)
+        JuMP.set_upper_bound(z[m + j], 0.0)
+        JuMP.set_lower_bound(z[m + j], rev[j] ? 0.0 : -1.0)
     end
-    status = solve(model)
+    optimize!(model)
     result = getvalue(z)[m+1:end]
     blocked = result .≈ -1
     finalBlocked = copy(blocked)
@@ -89,11 +89,11 @@ and irreversible reactions and also returns the DCE positive certificates.
     for i in 1:size(fc, 1)
         indices = findall(fc[i,:])
         for j in 1:n
-            setupperbound(x[m + j], in(j, indices) ? Inf : 0.0)
-            setlowerbound(x[m + j], in(j, indices) ? -Inf : (rev[j] ? 0.0 : -1.0))
+            JuMP.set_upper_bound(x[m + j], in(j, indices) ? Inf : 0.0)
+            JuMP.set_lower_bound(x[m + j], in(j, indices) ? -Inf : (rev[j] ? 0.0 : -1.0))
         end
         @objective(fullModel, Min, sum(x[j] for j in [m + j for j in 1:n if !(in(j, indices) || rev[j])]))
-        status = solve(fullModel)
+        optimize!(fullModel)
         result = getvalue(x)[m+1:end]
         blocked = [!in(j, indices) && result[j] ≈ -1 for j = 1:n]
         if any(blocked)
@@ -101,15 +101,15 @@ and irreversible reactions and also returns the DCE positive certificates.
             if rev[index]
                 for j in indices
                     if j == index
-                        setupperbound(x[m + j], sign(result[j]))
-                        setlowerbound(x[m + j], sign(result[j]))
+                        JuMP.set_upper_bound(x[m + j], sign(result[j]))
+                        JuMP.set_lower_bound(x[m + j], sign(result[j]))
                     else
-                        setupperbound(x[m + j], 0)
-                        setlowerbound(x[m + j], 0)
+                        JuMP.set_upper_bound(x[m + j], 0)
+                        JuMP.set_lower_bound(x[m + j], 0)
                     end
                 end
                 @objective(fullModel, Max, sum(x[k]*S[k,j] for k in 1:m, j=findall(blocked)))
-                status = solve(fullModel)
+                optimize!(fullModel)
                 certificate = getvalue(x)[1:m]
             else
                 sparseModel = Model(with_optimizer(GLPK.Optimizer))
@@ -124,7 +124,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                     end
                 end
                 @objective(sparseModel, Max, sum(y[k]*S[k,j] for k in 1:m, j=findall(blocked)))
-                status = solve(sparseModel)
+                optimize!(sparseModel)
                 certificate = getvalue(y)
             end
             blocked = [in(j, indices) || result[j] ≈ -1 for j = 1:n]
