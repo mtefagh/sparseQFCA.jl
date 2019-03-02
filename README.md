@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA?branch=master)
 [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA)
 
-*sparseQFCA* is a <img src="https://julialang.org/v2/img/logo.svg" height="20" /> package for the sparse [Quantitative Flux Coupling Analysis](https://mtefagh.github.io/qfca/).
+*sparseQFCA* is a [<img src="https://julialang.org/v2/img/logo.svg" height="20" />](https://julialang.org/) package for the sparse [Quantitative Flux Coupling Analysis](https://mtefagh.github.io/qfca/).
 
 ## Usage
 ### `certificates, blocked, fctable = QFCA(S, rev)`
