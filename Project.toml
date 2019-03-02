@@ -1,7 +1,7 @@
 authors = ["Mojtaba Tefagh <mtefagh@stanford.edu>"]
 name = "sparseQFCA"
-uuid = "47e41d82-2d4b-11e9-01da-5b8950e38350"
-version = "0.3.0"
+uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
+version = "0.4.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
