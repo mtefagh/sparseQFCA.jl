@@ -1,5 +1,5 @@
 # sparseQFCA
-[![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.svg?branch=master)](https://travis-ci.com/mtefagh/sparseQFCA)
+[![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://travis-ci.com/mtefagh/sparseQFCA.jl)
 [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA?branch=master)
 [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl)
 
