@@ -29,7 +29,7 @@ and irreversible reactions and also returns the DCE positive certificates.
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
     @variable(model, lb[j] <= z[j=1:m+n] <= ub[j])
-    A = [S' -sparse(I, n, n)]
+    A = [S' -sparse(1:n, 1:n, 1)]
     for j in 1:n
         if rev[j]
             @constraint(model, sum(A[j,k]*z[k] for k in 1:m+n) == 0.0)
@@ -76,7 +76,7 @@ and irreversible reactions and also returns the DCE positive certificates.
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
     @variable(fullModel, lb[j] <= x[j=1:m+n] <= ub[j])
-    A = [S' -sparse(I, n, n)]
+    A = [S' -sparse(1:n, 1:n, 1)]
     for j in 1:n
         if rev[j]
             @constraint(fullModel, sum(A[j,k]*x[k] for k in 1:m+n) == 0.0)
@@ -129,8 +129,8 @@ and irreversible reactions and also returns the DCE positive certificates.
             end
             blocked = [in(j, indices) || result[j] ≈ -1 for j = 1:n]
             temp = sum(.!blocked)
-            Y = sparse(I, temp, temp)/Matrix(S[:, .!blocked])
-            Y = Y*Matrix(S[:, .!blocked]) - sparse(I, temp, temp)
+            Y = sparse(1:temp, 1:temp, 1)/Matrix(S[:, .!blocked])
+            Y = Y*Matrix(S[:, .!blocked]) - sparse(1:temp, 1:temp, 1)
             blocked[.!blocked] = [norm(Y[:, j]) < norm(S[:, .!blocked], 2)*eps(Float64) for j in 1:temp]
         else
             certificate = [value(x[j]) for j in 1:m]
