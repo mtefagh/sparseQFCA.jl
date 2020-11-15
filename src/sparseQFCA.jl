@@ -24,7 +24,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 3 - reaction i is directionally coupled to reaction j
                 4 - reaction j is directionally coupled to reaction i
 =#
-    model = Model(with_optimizer(GLPK.Optimizer))
+    model = Model(GLPK.Optimizer)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
