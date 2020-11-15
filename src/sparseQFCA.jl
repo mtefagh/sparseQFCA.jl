@@ -71,7 +71,7 @@ and irreversible reactions and also returns the DCE positive certificates.
             end
         end
     end   
-    fullModel = Model(with_optimizer(GLPK.Optimizer))
+    fullModel = Model(GLPK.Optimizer)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
@@ -112,7 +112,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 optimize!(fullModel)
                 certificate = [value(x[j]) for j in 1:m]
             else
-                sparseModel = Model(with_optimizer(GLPK.Optimizer))
+                sparseModel = Model(GLPK.Optimizer)
                 @variable(sparseModel, y[j=1:m])
                 for j in 1:n
                     if j == index
