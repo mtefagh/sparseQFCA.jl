@@ -82,15 +82,15 @@ version = "0.3.4+0"
 
 [[Coverage]]
 deps = ["CoverageTools", "HTTP", "JSON", "LibGit2", "MbedTLS"]
-git-tree-sha1 = "aad69c0c2d8080427f507c36b289c77fe465c9fe"
+git-tree-sha1 = "a485b62b1ce53368e3a1a3a8dc0c39a61b9d3d9c"
 uuid = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
-version = "1.1.1"
+version = "1.2.0"
 
 [[CoverageTools]]
 deps = ["LibGit2"]
-git-tree-sha1 = "328154f6062b0053588295df6bffe22e1436597a"
+git-tree-sha1 = "9c2daef24f3e148c7411bf80b0a2e77913c89679"
 uuid = "c36e975a-824b-4404-a568-ef97ca766997"
-version = "1.1.0"
+version = "1.2.0"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
