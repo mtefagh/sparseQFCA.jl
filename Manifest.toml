@@ -192,10 +192,10 @@ uuid = "7d188eb4-7ad8-530c-ae41-71a32a6d4692"
 version = "0.3.3"
 
 [[JuMP]]
-deps = ["Calculus", "DataStructures", "ForwardDiff", "JSON", "LinearAlgebra", "MathOptInterface", "MutableArithmetics", "NaNMath", "Random", "SparseArrays", "Statistics"]
-git-tree-sha1 = "57c17a221a55f81890aabf00f478886859e25eaf"
+deps = ["Calculus", "DataStructures", "ForwardDiff", "JSON", "LinearAlgebra", "MathOptInterface", "MutableArithmetics", "NaNMath", "Random", "SparseArrays", "SpecialFunctions", "Statistics"]
+git-tree-sha1 = "e952f49e2242fa21edcf27bbd6c67041685bee5d"
 uuid = "4076af6c-e467-56ae-b986-b466b2749572"
-version = "0.21.5"
+version = "0.21.6"
 
 [[LibGit2]]
 deps = ["Printf"]
