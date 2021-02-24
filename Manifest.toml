@@ -159,10 +159,10 @@ uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
 version = "6.1.2+6"
 
 [[HTTP]]
-deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets", "URIs"]
-git-tree-sha1 = "942c1a9c750bbe79912b7bd060a420932afd35b8"
+deps = ["Base64", "Dates", "IniFile", "MbedTLS", "NetworkOptions", "Sockets", "URIs"]
+git-tree-sha1 = "c9f380c76d8aaa1fa7ea9cf97bddbc0d5b15adc2"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "0.9.3"
+version = "0.9.5"
 
 [[IniFile]]
 deps = ["Test"]
@@ -252,6 +252,11 @@ version = "0.2.14"
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "0.3.5"
+
+[[NetworkOptions]]
+git-tree-sha1 = "ed3157f48a05543cce9b241e1f2815f7e843d96e"
+uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
