@@ -58,9 +58,9 @@ version = "0.7.0"
 
 [[ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
-git-tree-sha1 = "4bffea7ed1a9f0f3d1a131bbcd4b925548d75288"
+git-tree-sha1 = "5e9769a17f17b587c951d57ba4319782b40c3513"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-version = "0.10.9"
+version = "0.10.10"
 
 [[Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "InteractiveUtils", "Reexport"]
@@ -271,9 +271,9 @@ version = "1.4.0"
 
 [[Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "50c9a9ed8c714945e01cd53a21007ed3865ed714"
+git-tree-sha1 = "223a825cccef2228f3fdbf2ecc7ca93363059073"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.0.15"
+version = "1.0.16"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
