@@ -40,9 +40,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "1132f4e0893f286b1b88eb64ec5ddc8a5ae4b04e"
+git-tree-sha1 = "0893f8d90331a0f5223c7ef2a8868464394a886c"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.9.32"
+version = "0.9.33"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
