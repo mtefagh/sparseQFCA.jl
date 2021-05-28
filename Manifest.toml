@@ -40,9 +40,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "b391f22252b8754f4440de1f37ece49d8a7314bb"
+git-tree-sha1 = "4b28f88cecf5d9a07c85b9ce5209a361ecaff34a"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.9.44"
+version = "0.9.45"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
@@ -148,9 +148,9 @@ version = "0.10.18"
 
 [[GLPK]]
 deps = ["BinaryProvider", "CEnum", "GLPK_jll", "Libdl", "MathOptInterface"]
-git-tree-sha1 = "d2539170674009054d96af7758c486a2e0e4f501"
+git-tree-sha1 = "d281bbf2c18152a25715a0959869d0ea1ec5d339"
 uuid = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
-version = "0.14.8"
+version = "0.14.9"
 
 [[GLPK_jll]]
 deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl", "Pkg"]
