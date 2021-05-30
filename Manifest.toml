@@ -148,9 +148,9 @@ version = "0.10.18"
 
 [[GLPK]]
 deps = ["BinaryProvider", "CEnum", "GLPK_jll", "Libdl", "MathOptInterface"]
-git-tree-sha1 = "d281bbf2c18152a25715a0959869d0ea1ec5d339"
+git-tree-sha1 = "5a15350de71516ac58588bbfa8f3fe1bde007d98"
 uuid = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
-version = "0.14.9"
+version = "0.14.10"
 
 [[GLPK_jll]]
 deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl", "Pkg"]
