@@ -40,9 +40,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "04dd5ce9f9d7b9b14559b00a7eb5be7528f56b82"
+git-tree-sha1 = "8b31cc69cbc38c5c826aaa1c890c694be3622d99"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.2"
+version = "0.10.3"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
@@ -88,15 +88,14 @@ version = "0.3.4+0"
 
 [[Coverage]]
 deps = ["CoverageTools", "HTTP", "JSON", "LibGit2", "MbedTLS"]
-git-tree-sha1 = "a485b62b1ce53368e3a1a3a8dc0c39a61b9d3d9c"
+git-tree-sha1 = "e5bf38ffbde0625c1757fc7cdd8e5704c30b7902"
 uuid = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
-version = "1.2.0"
+version = "1.2.1"
 
 [[CoverageTools]]
-deps = ["LibGit2"]
-git-tree-sha1 = "08b72d2f2154e33dc2aeb1bfcd4a83cb283abd4f"
+git-tree-sha1 = "b929b5d9dce2b188646843d465f8af8a7c9f6fb8"
 uuid = "c36e975a-824b-4404-a568-ef97ca766997"
-version = "1.2.2"
+version = "1.2.7"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -129,10 +128,10 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[DocStringExtensions]]
-deps = ["LibGit2", "Markdown", "Pkg", "Test"]
-git-tree-sha1 = "9d4f64f79012636741cf01133158a54b24924c32"
+deps = ["LibGit2"]
+git-tree-sha1 = "a32185f5428d3986f47c2ab78b1f216d5e6cc96f"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-version = "0.8.4"
+version = "0.8.5"
 
 [[FixedPointNumbers]]
 deps = ["Statistics"]
