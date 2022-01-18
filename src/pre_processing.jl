@@ -1,7 +1,7 @@
 module pre_processing
 
 export dataOfModel,setM,reversibility,check_duplicate_reaction,
-                homogenization,reversibility_correctionremove_wrong_reversible
+                homogenization,reversibility_correction,remove_wrong_reversible
 
 using COBREXA, JuMP, GLPK
 
@@ -10,7 +10,7 @@ using COBREXA, JuMP, GLPK
         input : model
         output : S, Metabolites, Reactions, Genes,
                 #Row of S (m) = #Metabolites,
-                #Culomn of S(n) = #Reactions,
+                #Column of S (n) = #Reactions,
                 LowerBound Of Reactions(lb),
                 UpperBounds of Reactions(ub)
 =#
@@ -40,11 +40,12 @@ end
 
 #=
     Reversibility
-        input : Reactions,n,lb
+        input : lb
         output : irreversible_reactions_id, reversible_reactions_id
 =#
 
-function reversibility(Reactions,n,lb)
+function reversibility(lb)
+    n = length(lb)
     irreversible_reactions_id = []
     reversible_reactions_id = []
     for i in 1:n
@@ -62,7 +63,7 @@ end
         input : Reactions
         output :
         True : There are a number of repetitive reactions
-        Flase : There is no repetitive Reaction
+        Flase : There is no repetitive reaction
 =#
 
 function check_duplicate_reaction(Reactions)
@@ -83,23 +84,19 @@ end
 =#
 
 function homogenization(lb,ub)
-    irreversible_reactions_id = []
-    reversible_reactions_id = []
-    irreversible_reactions_id,reversible_reactions_id = reversibility(myModel)
-    for i in irreversible_reactions_id
+    n = length(lb)
+    for i in 1:n
         if lb[i] > 0
             lb[i] = 0
         end
         if ub[i] > 0
             ub[i] = M
         end
-    end
-    for i in reversible_reactions_id
         if lb[i] < 0
             lb[i] = -M
         end
-        if ub[i] > 0
-            ub[i] = M
+        if ub[i] < 0
+            ub[i] = 0
         end
     end
     return lb,ub
@@ -109,13 +106,14 @@ end
     reversibility_correction
         input : S, irreversible_reactions_id, reversible_reactions_id, lb, ub
         output : Modified S, lb, ub
-                 reversible_reactions_id : Unchanged
-        irreversible_reactions_id : add Reversible reactions that are blocked in Forward or Backward Direction
+                 reversible_reactions_id : remove Reversible reactions that are blocked in either Forward or Backward Direction
+                 irreversible_reactions_id : add Reversible reactions that are blocked in either Forward or Backward Direction
                  rev_blocked_fwd : Reversible reactions that are blocked in Forward Direction
                  rev_blocked_back : Reversible reactions that are blocked in Backward Direction
 =#
 
 function reversibility_correction(S, irreversible_reactions_id, reversible_reactions_id, lb, ub)
+    n = length(lb)
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
@@ -130,20 +128,20 @@ function reversibility_correction(S, irreversible_reactions_id, reversible_react
 
         @objective(model, Max, V[j])
         @constraint(model, V[j] <= 1)
-    #   @constraint(model, V[j] >= 0)
         optimize!(model)
         opt_fwd = objective_value(model)
+    
+        if opt_fwd ≈ 0
+             append!(rev_blocked_fwd, j)
+        end
 
     # The Backward Direction :
 
         @objective(model, Min, V[j])
         @constraint(model, V[j] >= -1)
-    #   @constraint(model, V[j] >= 0)
         optimize!(model)
         opt_back = objective_value(model)
-        if opt_fwd ≈ 0
-             append!(rev_blocked_fwd, j)
-        end
+    
         if opt_back ≈ 0
              append!(rev_blocked_back, j)
         end
@@ -151,7 +149,7 @@ function reversibility_correction(S, irreversible_reactions_id, reversible_react
 
 ## Coorection Loop ...
 
-    # Fowrard
+    # Forward
 
      for i in rev_blocked_fwd
     # Update lb,ub :
@@ -162,8 +160,8 @@ function reversibility_correction(S, irreversible_reactions_id, reversible_react
     # Modify S :
         S[:, i] .= S[:, i] * -1
     # Remove From Reversible List :
-        # index = splice!(reversible_reactions_id, i)
-        # deleteat!(reversible_reactions_id,index)
+        index = splice!(reversible_reactions_id, i)
+        deleteat!(reversible_reactions_id, index)
       end
 
     # Backward
@@ -174,10 +172,10 @@ function reversibility_correction(S, irreversible_reactions_id, reversible_react
     # Add to Irreversible Reactions :
         append!(irreversible_reactions_id, i)
     # Remove From Reversible List :
-         #  index = splice!(reversible_reactions_id, i)
-         #  deleteat!(reversible_reactions_id,index)
+         index = splice!(reversible_reactions_id, i)
+         deleteat!(reversible_reactions_id, index)
       end
-return S, irreversible_reactions_id, reversible_reactions_id, lb, ub, rev_blocked_fwd,rev_blocked_back
+return S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back
 end
 
 #=
