@@ -1,3 +1,4 @@
 julia 1.6
 JuMP
 GLPK
+COBREXA
