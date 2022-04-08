@@ -1,6 +1,6 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
-authors = ["Mojtaba Tefagh <mtefagh@stanford.edu>"]
+authors = ["Mojtaba Tefagh <mtefagh@stanford.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
 version = "1.0.0"
 
 [deps]
