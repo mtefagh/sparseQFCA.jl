@@ -9,145 +9,6 @@
 #-------------------------------------------------------------------------------------------
 
 """
-    dataOfModel(myModel)
-
-Function that exports essential data from StandardModel that has been built using COBREXA's `load_model` function.
-
-# INPUTS
-
-- `myModel`:        A model that has been built using COBREXA's `load_model` function.
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
-- `S`:              Stoichiometric matrix.
-- `Metabolites`:    List of metabolic network metabolites.
-- `Reactions`:      List of metabolic network reactions.
-- `Genes`:          List of metabolic network reactions.
-- `m`:              Number of rows of stoichiometric matrix.
-- `n`:              Number of columns of stoichiometric matrix.
-- `lb`:             LowerBound Of Reactions.
-- `ub`:             UpperBound of Reactions.
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-```
-
-"""
-
-function dataOfModel(myModel)
-    S = stoichiometry(myModel)
-    Metabolites = metabolites(myModel)
-    Reactions = reactions(myModel)
-    Genes = genes(myModel)
-    m = length(metabolites(myModel))
-    n = length(reactions(myModel))
-    lb = lower_bounds(myModel)
-    ub = upper_bounds(myModel)
-    return S, Metabolites, Reactions, Genes, m, n, lb, ub
-end
-
-#-------------------------------------------------------------------------------------------
-
-"""
-    reversibility(lb)
-
-Function that determines the reversibility of a reaction from the lower_bound of a reaction.
-
-# INPUTS
-
-- `lb`:             LowerBound Of Reactions.
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
-- `irreversible_reactions_id`:            Irreversible reaction IDs.
-- `reversible_reactions_id`:              Reversible reaction IDs.
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
-```
-
-"""
-
-function reversibility(lb)
-    n = length(lb)
-    irreversible_reactions_id = []
-    reversible_reactions_id = []
-    for i in 1:n
-        if lb[i] >= 0
-            append!(irreversible_reactions_id, i)
-        else
-            append!(reversible_reactions_id, i)
-        end
-    end
-    return irreversible_reactions_id, reversible_reactions_id
-end
-
-#-------------------------------------------------------------------------------------------
-
-"""
-    homogenization(lb,ub)
-
-Function that homogenizes the upper_bound and lower_bound of reactions.
-
-# INPUTS
-
-- `lb`:             LowerBound Of Reactions.
-- `ub`:             UpperBound of Reactions.
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
-- `lb`:             LowerBound Of Reactions has become homogenous.
-- `ub`:             UpperBound of Reactions has become homogenous.
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> lb,ub = homogenization(lb,ub)
-```
-
-"""
-
-function homogenization(lb,ub)
-    n = length(lb)
-    for i in 1:n
-        if lb[i] > 0
-            lb[i] = 0
-        end
-        if ub[i] > 0
-            ub[i] = M
-        end
-        if lb[i] < 0
-            lb[i] = -M
-        end
-        if ub[i] < 0
-            ub[i] = 0
-        end
-    end
-    return lb,ub
-end
-
-#-------------------------------------------------------------------------------------------
-
-"""
     find_blocked_reactions(myModel)
 
 Function that finds blocked reactions in metabolic network.
@@ -171,9 +32,25 @@ Function that finds blocked reactions in metabolic network.
 julia> blocked_reactions = find_blocked_reactions(myModel)
 ```
 
+See also: `dataOfModel()`, `homogenization()`, `reversibility()`
+
 """
 
 function find_blocked_reactions(myModel)
+    
+    # Exporting data from model
+    
+    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
+    
+    # Determining the reversibility of a reaction 
+    
+    irreversible_reactions_id = []
+    reversible_reactions_id = []
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
+    
+    # Homogenizing the upper_bound and lower_bound of reactions
+    
+    lb,ub = homogenization(lb,ub)
 
     # Irreversible blocked
 
