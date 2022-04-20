@@ -113,6 +113,8 @@ Function that determines the reversibility of a reaction from the lower_bound of
 julia> irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
 ```
 
+See also: `dataOfModel()`
+
 """
 
 function reversibility(lb)
@@ -156,6 +158,8 @@ Function that examines metabolic networks to see if there is a repetitive reacti
 julia> check_duplicate = check_duplicate_reaction(Reactions)
 ```
 
+See also: `dataOfModel()`
+
 """
 
 function check_duplicate_reaction(Reactions)
@@ -196,6 +200,8 @@ Function that homogenizes the upper_bound and lower_bound of reactions.
 ```julia
 julia> lb,ub = homogenization(lb,ub)
 ```
+
+See also: `dataOfModel()`
 
 """
 
@@ -245,6 +251,8 @@ Function that detects reversible reactions that are blocked in only one directio
 ```julia
 julia> rev_blocked_fwd, rev_blocked_back = reversibility_checking(lb, reversible_reactions_id)
 ```
+
+See also: `dataOfModel()`, `reversibility()`
 
 """
 
@@ -324,6 +332,8 @@ Function that modifies 3 sets:
 julia> S, lb, ub, irreversible_reactions_id, corrected_reversible_reactions_id = reversibility_correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back)
 ```
 
+See also: `dataOfModel()`, `homogenization()`, `reversibility()`, reversibility_checking()
+
 """
 
 function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back)
@@ -366,3 +376,5 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
 end
 
 export dataOfModel, setM, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+
+
