@@ -18,10 +18,10 @@ blocked_iAF692 = readdlm("../example/PythonResults/iAF692.csv", header = false)
 blocked_iCN900 = readdlm("../example/PythonResults/iCN900.csv", header = false)
 blocked_Recon3D = readdlm("../example/PythonResults/Recon3D.csv", header = false)
 
-blockedTest(list) = all(list .== blocked_e_coli_core)
-blockedTest(list) = all(list .== blocked_iAB_RBC_283)
-blockedTest(list) = all(list .== blocked_iAF692)
-blockedTest(list) = all(list .== blocked_iCN900)
-blockedTest(list) = all(list .== blocked_Recon3D)
+blockedTest_e_coli_core(list) = all(list .== blocked_e_coli_core)
+blockedTest_iAB_RBC_283(list) = all(list .== blocked_iAB_RBC_283)
+blockedTest_iAF692(list) = all(list .== blocked_iAF692)
+blockedTest_iCN900(list) = all(list .== blocked_iCN900)
+blockedTest_Recon3D(list) = all(list .== blocked_Recon3D)
 
 end
