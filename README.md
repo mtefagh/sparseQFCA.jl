@@ -1,5 +1,5 @@
 # Sparse Quantitative Flux Coupling Analysis
-[![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://travis-ci.com/mtefagh/sparseQFCA.jl)
+[![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl)
 [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master)
 [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl)
 
