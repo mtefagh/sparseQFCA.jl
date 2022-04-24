@@ -126,4 +126,4 @@ function find_blocked_reactions(myModel)
 
 end
 
-export dataOfModel, reversibility, homogenization, find_blocked_reactions
+export find_blocked_reactions
