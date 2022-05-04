@@ -16,7 +16,11 @@ blocked_e_coli_core = readdlm("../example/PythonResults/e_coli_core.csv", header
 blocked_iAB_RBC_283 = readdlm("../example/PythonResults/iAB_RBC_283.csv", header = false)
 blocked_iAF692 = readdlm("../example/PythonResults/iAF692.csv", header = false)
 blocked_iCN900 = readdlm("../example/PythonResults/iCN900.csv", header = false)
-blocked_Recon3D = readdlm("../example/PythonResults/Recon3D.csv", header = false)
+try
+       blocked_Recon3D = readdlm("../example/PythonResults/Recon3D.csv", header = false)
+catch e
+       blocked_Recon3D = Array{Any}(undef, 0, 2)
+end
 
 blockedTest_e_coli_core(list) = all(list .== blocked_e_coli_core)
 blockedTest_iAB_RBC_283(list) = all(list .== blocked_iAB_RBC_283)
