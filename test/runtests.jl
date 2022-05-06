@@ -8,7 +8,7 @@ fctable = @time QFCA(S, rev)[end]
 # importing the example model and the TheNaiveApproach library
 
 include("../example/find_blocked_data.jl")
-include("../example/TheNaiveApproach.jl")
+include("../src/TheNaiveApproach.jl")
 using .find_blocked_data, Test
 
 # finding all blocked reactions among the reactions
