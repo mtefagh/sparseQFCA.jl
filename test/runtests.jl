@@ -1,4 +1,5 @@
 # importing the example model and the sparseQFCA module
+include("ecoli.jl")
 using .ecoli, JuMP, sparseQFCA, Test
 # finding all the flux coupling relations among the reactions
 fctable = @time QFCA(S, rev)[end]
