@@ -1,6 +1,5 @@
 # importing the example model and the sparseQFCA module
-include("ecoli.jl")
-using .ecoli, sparseQFCA, Test
+using .ecoli, JuMP, sparseQFCA, Test
 # finding all the flux coupling relations among the reactions
 fctable = @time QFCA(S, rev)[end]
 @test fctest(fctable)
@@ -9,7 +8,6 @@ fctable = @time QFCA(S, rev)[end]
 
 include("../example/find_blocked_data.jl")
 include("../src/TheNaiveApproach.jl")
-using .find_blocked_data, Test
 
 # finding all blocked reactions among the reactions
 
