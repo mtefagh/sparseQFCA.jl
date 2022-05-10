@@ -207,6 +207,8 @@ See also: `dataOfModel()`
 
 function homogenization(lb,ub)
     n = length(lb)
+    # Set a large number for M
+    setM(+1000.0)
     for i in 1:n
         if lb[i] > 0
             lb[i] = 0
