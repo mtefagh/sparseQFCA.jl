@@ -8,6 +8,11 @@
 
 #-------------------------------------------------------------------------------------------
 
+module TheNaiveApproach
+export find_blocked_reactions
+
+using GLPK, JuMP, COBREXA
+
 """
     find_blocked_reactions(myModel)
 
@@ -126,4 +131,4 @@ function find_blocked_reactions(myModel)
 
 end
 
-export find_blocked_reactions
+end
