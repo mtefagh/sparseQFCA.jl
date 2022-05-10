@@ -8,6 +8,11 @@
 
 #-------------------------------------------------------------------------------------------
 
+module pre_processing
+export dataOfModel, setM, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+
+using GLPK, JuMP, COBREXA
+
 """
     dataOfModel(myModel)
 
@@ -377,6 +382,5 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
     return S, lb, ub, irreversible_reactions_id, corrected_reversible_reactions_id
 end
 
-export dataOfModel, setM, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
-
+end
 
