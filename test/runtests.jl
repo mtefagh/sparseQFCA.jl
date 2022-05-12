@@ -16,7 +16,7 @@ using .find_blocked_data, .pre_processing, .TheNaiveApproach
 
 # finding all blocked reactions among the reactions
 
-blockedList_ecoli_core = @time find_blocked_reactions(myModel_ecoli_core)[end]
+blockedList_ecoli_core = @time find_blocked_reactions(myModel_ecoli_core)
 @test blockedTest_ecoli_core(blockedList_ecoli_core)
 
 blockedList_iAB_RBC_283 = @time find_blocked_reactions(myModel_iAB_RBC_283)[end]
