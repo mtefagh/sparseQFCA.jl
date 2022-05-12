@@ -13,7 +13,7 @@ myModel_iAF692 = load_model(StandardModel,"../example/Models/iAF692.xml")
 myModel_iCN900 = load_model(StandardModel,"../example/Models/iCN900.xml")
 myModel_Recon3D = load_model(StandardModel,"../example/Models/Recon3D.xml")
 
-blocked_ecoli_core = readdlm("../example/PythonResults/ecoli_core.csv", header = false)
+blocked_ecoli_core = readdlm("../example/PythonResults/e_coli_core.csv", header = false)
 blocked_iAB_RBC_283 = readdlm("../example/PythonResults/iAB_RBC_283.csv", header = false)
 blocked_iAF692 = readdlm("../example/PythonResults/iAF692.csv", header = false)
 blocked_iCN900 = readdlm("../example/PythonResults/iCN900.csv", header = false)
