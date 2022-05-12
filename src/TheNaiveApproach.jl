@@ -13,6 +13,10 @@ export find_blocked_reactions
 
 using GLPK, JuMP, COBREXA
 
+include("pre_processing.jl")
+
+using .pre_processing
+
 """
     find_blocked_reactions(myModel)
 
