@@ -7,7 +7,7 @@ export myModel_ecoli_core, myModel_iAB_RBC_283, myModel_iAF692, myModel_iCN900, 
 
 using COBREXA, DelimitedFiles
 
-myModel_ecoli_core = load_model(StandardModel,"../example/Models/ecoli_core.xml")
+myModel_ecoli_core = load_model(StandardModel,"../example/Models/e_coli_core.xml")
 myModel_iAB_RBC_283 = load_model(StandardModel,"../example/Models/iAB_RBC_283.xml")
 myModel_iAF692 = load_model(StandardModel,"../example/Models/iAF692.xml")
 myModel_iCN900 = load_model(StandardModel,"../example/Models/iCN900.xml")
