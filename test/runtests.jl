@@ -29,5 +29,4 @@ blockedList_iCN900 = @time find_blocked_reactions(myModel_iCN900)
 #@test blockedTest_iCN900(blockedList_iCN900)
 
 blockedList_Recon3D = @time find_blocked_reactions(myModel_Recon3D)
-@test blockedTest_Recon3D(blockedList_Recon3D)
-
+#@test blockedTest_Recon3D(blockedList_Recon3D)
