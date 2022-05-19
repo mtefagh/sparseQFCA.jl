@@ -89,8 +89,13 @@ and irreversible reactions and also returns the DCE positive certificates.
     for i in 1:size(fc, 1)
         indices = findall(fc[i,:])
         for j in 1:n
-            set_upper_bound(x[m + j], in(j, indices) ? Inf : 0.0)
-            set_lower_bound(x[m + j], in(j, indices) ? -Inf : (rev[j] ? 0.0 : -1.0))
+            if in(j, indices)
+                delete_upper_bound(x[m + j])
+                delete_lower_bound(x[m + j])
+            else
+                set_upper_bound(x[m + j], 0.0)
+                set_lower_bound(x[m + j], rev[j] ? 0.0 : -1.0)
+            end
         end
         @objective(fullModel, Min, sum(x[j] for j in [m + j for j in 1:n if !(in(j, indices) || rev[j])]))
         optimize!(fullModel)
