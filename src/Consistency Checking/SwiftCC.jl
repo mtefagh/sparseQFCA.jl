@@ -143,7 +143,7 @@ println("Q : $row_q * $col_q")
 println("R : $row_r * $col_r")
 
 St_endCol = m
-epsilon_row = 10 ^ -1
+epsilon_row = 10 ^ -15
 St = R[:,range(1,St_endCol)]
 row_St, col_St = size(St)
 println("St : $row_St * $col_St")
@@ -162,7 +162,7 @@ println("R_down : $row_Rdown * $col_Rdown")
 
 global c = 0
 global d = 0
-epsilon_col = 10 ^ -50
+epsilon_col = 10 ^ -15
 rev_blocked_col = []
 for col in eachcol(R_down)
     c = c + 1
