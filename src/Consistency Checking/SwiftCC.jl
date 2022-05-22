@@ -93,7 +93,7 @@ blocked_reactions_index = []
 for i in range(1,n_irr)
     if isapprox(value(u[i]), 0.0, atol=1e-6)
         append!(blocked_reactions, value(u[i]))
-        append!(blocked_reactions_index, i)
+        append!(blocked_reactions_index, irreversible_reactions_id[i])
     end
 end
 
@@ -161,7 +161,6 @@ row_Rdown, col_Rdown = size(R_down)
 println("R_down : $row_Rdown * $col_Rdown")
 
 global c = 0
-global d = 0
 epsilon_col = 10 ^ -15
 rev_blocked_col = []
 for col in eachcol(R_down)
