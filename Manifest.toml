@@ -419,15 +419,15 @@ version = "0.21.3"
 
 [[JuMP]]
 deps = ["Calculus", "DataStructures", "ForwardDiff", "LinearAlgebra", "MathOptInterface", "MutableArithmetics", "NaNMath", "OrderedCollections", "Printf", "SparseArrays", "SpecialFunctions"]
-git-tree-sha1 = "936e7ebf6c84f0c0202b83bb22461f4ebc5c9969"
+git-tree-sha1 = "67740bc79baa2104aa839f24181ea8110bb4f0f8"
 uuid = "4076af6c-e467-56ae-b986-b466b2749572"
-version = "1.0.0"
+version = "1.1.0"
 
 [[LLVM]]
 deps = ["CEnum", "LLVMExtra_jll", "Libdl", "Printf", "Unicode"]
-git-tree-sha1 = "c8d47589611803a0f3b4813d9e267cd4e3dbcefb"
+git-tree-sha1 = "10a20c556107dc5833d3bb7c5e45c4a6e191bd28"
 uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
-version = "4.11.1"
+version = "4.13.0"
 
 [[LLVMExtra_jll]]
 deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg", "TOML"]
@@ -704,9 +704,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[SciMLBase]]
 deps = ["ArrayInterfaceCore", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "83fbb7ed368d4a76e15f752c6a51db851782f0d5"
+git-tree-sha1 = "8071d925ea97b2fadd8008582a22db3cf96971d5"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.34.0"
+version = "1.35.0"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
