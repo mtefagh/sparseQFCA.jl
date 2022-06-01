@@ -71,7 +71,7 @@ function find_blocked_reactions(myModel)
     @constraint(model_irr, S * V .== 0)
     for j in irreversible_reactions_id
         @objective(model_irr, Max, V[j])
-        @constraint(model_irr,  V[j] <= 1)
+        @constraint(model_irr, c,  V[j] <= 1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_irr)
         if isapprox(objective_value(model_irr), 0, atol=1e-8)
@@ -79,8 +79,8 @@ function find_blocked_reactions(myModel)
         else
             append!(irreversible_unblocked_reactions_id, j)
         end
-        # delete(model, c)
-        # unregister(model, :c)
+        delete(model_irr, c)
+        unregister(model_irr, :c)
     end
 
     # Reversible blocked
@@ -96,24 +96,24 @@ function find_blocked_reactions(myModel)
         #Forward
 
         @objective(model_rev, Max, V[j])
-        @constraint(model_rev, V[j] <= 1)
+        @constraint(model_rev, c1, V[j] <= 1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_rev)
         opt_fwd = objective_value(model_rev)
         t_fwd = termination_status(model_rev)
-        # delete(model, c1)
-        # unregister(model, :c1)
+        delete(model_rev, c1)
+        unregister(model_rev, :c1)
 
         #Backward
 
         @objective(model_rev, Min, V[j])
-        @constraint(model_rev, V[j] >= -1)
+        @constraint(model_rev, c2, V[j] >= -1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_rev)
         opt_back = objective_value(model_rev)
         t_back = termination_status(model_rev)
-        # delete(model, c2)
-        # unregister(model, :c2)
+        delete(model_rev, c2)
+        unregister(model_rev, :c2)
         if isapprox(opt_fwd, 0, atol=1e-8) && isapprox(opt_back, 0, atol=1e-8)
             append!(reversible_blocked_reactions_id, j)
         else
