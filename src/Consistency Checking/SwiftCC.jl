@@ -5,7 +5,7 @@ using JuMP
 using GLPK
 using LinearAlgebra
 
-myModel = load_model(StandardModel,"/Users/iman/Desktop/M.S.Thesis/SourceCode/Data/e_coli_core.xml")
+myModel = load_model(StandardModel,"/Users/iman/Desktop/M.S.Thesis/SourceCode/Data/MetabolicNetworks/e_coli_core.xml")
 
 function dataOfModel(myModel)
    S = stoichiometry(myModel)
@@ -18,8 +18,6 @@ function dataOfModel(myModel)
    ub = upper_bounds(myModel)
    return S, Metabolites, Reactions, Genes, m, n, lb, ub
 end
-
-S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
 function reversibility(myModel)
    n = length(reactions(myModel))
@@ -34,10 +32,6 @@ function reversibility(myModel)
    end
    return irreversible_reactions_id, reversible_reactions_id
 end
-
-irreversible_reactions_id, reversible_reactions_id = reversibility(myModel)
-n_irr = length(irreversible_reactions_id)
-n_rev = length(reversible_reactions_id)
 
 function setM(x)
     global M = x
@@ -65,115 +59,136 @@ function homogenization(lb,ub)
     return lb,ub
 end
 
-lb, ub = homogenization(lb, ub)
+function swiftCC(myModel)
+    
+    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
+    
+    irreversible_reactions_id, reversible_reactions_id = reversibility(myModel)
+    n_irr = length(irreversible_reactions_id)
+    n_rev = length(reversible_reactions_id)
+    
+    lb, ub = homogenization(lb, ub) 
+    
+    # The Stoichiometric Matrix : 
 
-# The Stoichiometric Matrix :
+    S = Matrix(S)
+    row_num, col_num = size(S)
+    
+    # Irreversible Blocked : 
 
-S = Matrix(S)
-row_num, col_num = size(S)
-println("The Stoichiometric Matrix : $row_num * $col_num")
-println("Number of Irreversible Reactions: $n_irr")
-println("Number of Reversible Reactions: $n_rev")
-
-# Irreversible Blocked :
-
-lb_u = zeros(n_irr)
-ub_u = ones(n_irr)
-model = Model(GLPK.Optimizer)
-@variable(model, lb[i] <= V[i = 1:n] <= ub[i])
-@variable(model, lb_u[i] <= u[i = 1:n_irr] <= ub_u[i])
-@constraint(model, S * V .== 0)
-objective_function = ones(n_irr)'*u
-@objective(model, Max, objective_function)
-@constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
-optimize!(model)
-
-blocked_reactions = []
-blocked_reactions_index = []
-for i in range(1,n_irr)
-    if isapprox(value(u[i]), 0.0, atol=1e-6)
-        append!(blocked_reactions, value(u[i]))
-        append!(blocked_reactions_index, irreversible_reactions_id[i])
+    lb_u = zeros(n_irr)
+    ub_u = ones(n_irr)
+    model = Model(GLPK.Optimizer)
+    @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
+    @variable(model, lb_u[i] <= u[i = 1:n_irr] <= ub_u[i])
+    @constraint(model, S * V .== 0)
+    objective_function = ones(n_irr)'*u
+    @objective(model, Max, objective_function)
+    @constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
+    optimize!(model)
+    
+    irr_blocked_reactions = []
+    for i in range(1,n_irr)
+        if isapprox(value(u[i]), 0.0, atol=1e-6)
+            append!(irr_blocked_reactions, irreversible_reactions_id[i])
+        end
     end
-end
+    
+    irr_blocked_num = length(irr_blocked_reactions)
+    
+    # Reversible Blocked
+    
+    # S_Transpose :
 
-irr_blocked_num = length(blocked_reactions)
+    S_transpose = S'
+    S_transpose = Matrix(S_transpose)
+    row_num_trans, col_num_trans = size(S_transpose)
+    
+    # Add unit_vectors for reversible reactions : 
 
-println("Number of Irreversible Blocked reactions: $irr_blocked_num")
-println("Irreversible Blocked Index: $blocked_reactions_index")
+    unit_vector(i,n) = [zeros(i-1); 1 ; zeros(n-i)]
 
-# S_Transpose :
-
-S_transpose = S'
-S_transpose = Matrix(S_transpose)
-row_num_trans, col_num_trans = size(S_transpose)
-println("transpose : $row_num_trans * $col_num_trans")
-
-# add unit_vectors for reversible reactions :
-
-unit_vector(i,n) = [zeros(i-1); 1 ; zeros(n-i)]
-
-for i in reversible_reactions_id
+    for i in reversible_reactions_id
         a = unit_vector(i, row_num_trans)
         S_transpose = hcat(S_transpose, a)
-end
+    end
+    S_transpose_unitVectors = copy(S_transpose)
+    row_num_trans_unitVectors, col_num_trans_unitVectors = size(S_transpose_unitVectors)
+    
+    # Remove Irrevesible blocked from Stoichiometric Matrix : 
 
-S_transpose_unitVectors = copy(S_transpose)
-row_num_trans_unitVectors, col_num_trans_unitVectors = size(S_transpose_unitVectors)
-println("The Stoichiometric Matrix + unitVectors : $row_num_trans_unitVectors * $col_num_trans_unitVectors")
+    S_transpose_unitVectors_noIrrBlocked = []
 
-# Remove Irrevesible blocked from Stoichiometric Matrix :
+    S_transpose_unitVectors_noIrrBlocked = S_transpose_unitVectors[setdiff(1:end, irr_blocked_reactions), :]
 
-S_transpose_unitVectors_noIrrBlocked = []
-
-S_transpose_unitVectors_noIrrBlocked = S_transpose_unitVectors[setdiff(1:end, blocked_reactions_index), :]
-
-S_transpose_unitVectors_noIrrBlocked = Matrix(S_transpose_unitVectors_noIrrBlocked)
-row_num_trans_unitVectors_noIrrBlocked, col_num_trans_unitVectors_noIrrBlocked =
+    S_transpose_unitVectors_noIrrBlocked = Matrix(S_transpose_unitVectors_noIrrBlocked)
+    row_num_trans_unitVectors_noIrrBlocked, col_num_trans_unitVectors_noIrrBlocked = 
                                             size(S_transpose_unitVectors_noIrrBlocked)
-
-println("The Stoichiometric Matrix + unitVectors - Irrevesible blocked  : $row_num_trans_unitVectors_noIrrBlocked * $col_num_trans_unitVectors_noIrrBlocked")
-
-Q, R = qr(S_transpose_unitVectors_noIrrBlocked)
-Q = Matrix(Q)
-row_r, col_r = size(R)
-row_q, col_q = size(Q)
-println("S : $row_num_trans_unitVectors_noIrrBlocked * $col_num_trans_unitVectors_noIrrBlocked")
-println("Q : $row_q * $col_q")
-println("R : $row_r * $col_r")
-
-St_endCol = m
-epsilon_row = 10 ^ -15
-St = R[:,range(1,St_endCol)]
-row_St, col_St = size(St)
-println("St : $row_St * $col_St")
-global r = 0
-for row in eachrow(St)
-    r = r + 1
-    if norm(row) <= epsilon_row
-        break
+    
+    # Find Reversible blocked
+    
+    Q, R = qr(S_transpose_unitVectors_noIrrBlocked)
+    Q = Matrix(Q)
+    row_r, col_r = size(R)
+    row_q, col_q = size(Q)
+    
+    St_endCol = m
+    epsilon_row = 10 ^ -6
+    St = R[:,range(1,St_endCol)]
+    row_St, col_St = size(St)
+    
+    # Find special row of the S_T 
+    
+    r = 0
+    for row in eachrow(St)
+        r = r + 1
+        if norm(row)/sqrt(length(row)) <= epsilon_row
+            break
+        end
     end
-end
-println(r)
+    
+    R_down = R[range(r,end),range(St_endCol+1,end)]
+    row_Rdown, col_Rdown = size(R_down)
+    
+    # Find specific columns
+    
+    c = 0
 
-R_down = R[range(r,end),range(St_endCol+1,end)]
-row_Rdown, col_Rdown = size(R_down)
-println("R_down : $row_Rdown * $col_Rdown")
-
-global c = 0
-epsilon_col = 10 ^ -15
-rev_blocked_col = []
-for col in eachcol(R_down)
-    c = c + 1
-    if norm(col) <= epsilon_col
-        append!(rev_blocked_col, c)
+    epsilon_col = 10 ^ -6
+    rev_blocked_reactions_col = []
+    for col in eachcol(R_down)
+        c = c + 1
+        if norm(col)/sqrt(length(col)) <= epsilon_col
+            append!(rev_blocked_reactions_col, c)
+        end
     end
+
+    # Find reversible blocked 
+    
+    rev_blocked_reactions = []
+    for i in rev_blocked_reactions_col
+        append!(rev_blocked_reactions, reversible_reactions_id[i])
+    end
+    
+    # Merge reversbile and irreversible reactions
+    
+    blocked_index = []
+    blocked_index = union(rev_blocked_reactions, irr_blocked_reactions)
+    
+    blocked_names = []
+    for i in blocked_index
+        r_name = reactions(myModel)[i]
+        push!(blocked_names, r_name)
+    end
+    
+    blocked_names = sort(blocked_names)
+    return length(irr_blocked_reactions), length(rev_blocked_reactions)
+    
 end
 
-rev_blocked = []
-for i in rev_blocked_col
-    append!(rev_blocked, reversible_reactions_id[i])
-end
+x, y = swiftCC(myModel)
 
-length(rev_blocked) + irr_blocked_num
-
+println("Irreversible Blocked : ")
+println(x)
+println("Reversible Blocked : ")
+println(y)
