@@ -263,39 +263,43 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function reversibility_checking(lb, reversible_reactions_id)
-
-    n = length(lb)
+function reversibility_checking(S, lb, ub, reversible_reactions_id)
+    
+    Reactions = reactions(myModel)
+    n = length(Reactions)
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
     rev_blocked_fwd = []
     rev_blocked_back = []
 
+## Detection Loop ...
+
     for j in reversible_reactions_id
 
-    # The forward direction:
+    # The Forward Direction :
 
         @objective(model, Max, V[j])
         @constraint(model, V[j] <= 1)
         optimize!(model)
         opt_fwd = objective_value(model)
-
+    
         if opt_fwd ≈ 0
              append!(rev_blocked_fwd, j)
         end
 
-    # The backward direction:
+    # The Backward Direction :
 
         @objective(model, Min, V[j])
         @constraint(model, V[j] >= -1)
         optimize!(model)
         opt_back = objective_value(model)
-
+    
         if opt_back ≈ 0
              append!(rev_blocked_back, j)
         end
      end
+
     return rev_blocked_fwd, rev_blocked_back
 end
 

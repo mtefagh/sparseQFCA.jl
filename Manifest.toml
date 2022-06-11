@@ -405,9 +405,9 @@ version = "0.10.2"
 
 [[SBML_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "XML2_jll", "Zlib_jll"]
-git-tree-sha1 = "6878a9dee232041852ae36fcec0bbba724cf0d0b"
+git-tree-sha1 = "f4cbb8c56595bb6eaafc5efe72887335b368b799"
 uuid = "bb12108a-f4ef-5f88-8ef3-0b33ff7017f1"
-version = "5.19.5+0"
+version = "5.19.5+1"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -440,9 +440,9 @@ version = "1.0.0"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "383a578bdf6e6721f480e749d503ebc8405a0b22"
+git-tree-sha1 = "2bbd9f2e40afd197a1379aef05e0d85dba649951"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.4.6"
+version = "1.4.7"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
