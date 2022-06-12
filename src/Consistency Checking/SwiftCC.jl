@@ -59,6 +59,7 @@ function homogenization(lb,ub)
     return lb,ub
 end
 
+
 function swiftCC(myModel)
     
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
@@ -68,6 +69,10 @@ function swiftCC(myModel)
     n_rev = length(reversible_reactions_id)
     
     lb, ub = homogenization(lb, ub) 
+    
+    rev_blocked_fwd, rev_blocked_back = reversibility_checking(S, lb, ub, reversible_reactions_id)
+    
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = reversibility_correction(S,lb,ub,irreversible_reactions_id,reversible_reactions_id,rev_blocked_fwd,rev_blocked_back)
     
     # The Stoichiometric Matrix : 
 
@@ -154,7 +159,7 @@ function swiftCC(myModel)
     
     c = 0
 
-    epsilon_col = 10 ^ -6
+    epsilon_col = 10 ^ -2
     rev_blocked_reactions_col = []
     for col in eachcol(R_down)
         c = c + 1
