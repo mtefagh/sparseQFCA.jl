@@ -234,13 +234,15 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    reversibility_checking(lb, reversible_reactions_id)
+    reversibility_checking(S, lb, ub, reversible_reactions_id)
 
 Function that detects reversible reactions that are blocked in only one direction.
 
 # INPUTS
 
-- `lb`:                                   LowerBound Of Reactions.
+- `S`:              Stoichiometric matrix.
+- `lb`:             LowerBound Of Reactions.
+- `ub`:             UpperBound of Reactions.
 - `reversible_reactions_id`:              Reversible reaction IDs.
 
 # OPTIONAL INPUTS
