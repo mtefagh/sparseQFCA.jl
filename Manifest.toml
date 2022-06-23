@@ -404,9 +404,9 @@ version = "0.10.2"
 
 [[SBML_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "XML2_jll", "Zlib_jll"]
-git-tree-sha1 = "f4cbb8c56595bb6eaafc5efe72887335b368b799"
+git-tree-sha1 = "c0153704c9b0527f3d562d588ec6197ae636ef3c"
 uuid = "bb12108a-f4ef-5f88-8ef3-0b33ff7017f1"
-version = "5.19.5+1"
+version = "5.19.5+2"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
