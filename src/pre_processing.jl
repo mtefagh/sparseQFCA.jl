@@ -282,24 +282,28 @@ function reversibility_checking(S, lb, ub, reversible_reactions_id)
     # The Forward Direction :
 
         @objective(model, Max, V[j])
-        @constraint(model, V[j] <= 1)
+        @constraint(model, c1, V[j] <= 1)
         optimize!(model)
         opt_fwd = objective_value(model)
     
-        if opt_fwd ≈ 0
+        if isapprox(opt_fwd, 0, atol=1e-8)
              append!(rev_blocked_fwd, j)
         end
+        delete(model, c1)
+        unregister(model, :c1)
 
     # The Backward Direction :
 
         @objective(model, Min, V[j])
-        @constraint(model, V[j] >= -1)
+        @constraint(model, c2, V[j] >= -1)
         optimize!(model)
         opt_back = objective_value(model)
     
-        if opt_back ≈ 0
+        if isapprox(opt_back, 0, atol=1e-8)
              append!(rev_blocked_back, j)
         end
+        delete(model, c2)
+        unregister(model, :c2)
      end
 
     return rev_blocked_fwd, rev_blocked_back
