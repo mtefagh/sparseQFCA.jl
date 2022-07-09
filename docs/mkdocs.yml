@@ -4,20 +4,7 @@ site_description:    Julia package for sparseQFCA
 site_author:         Dr. Tefagh
 theme:               readthedocs
 
-markdown_extensions:
-  - codehilite
-  - extra
-  - tables
-  - fenced_code
-
-extra_css:
-  - assets/Documenter.css
-
-extra_javascript:
-  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
-  - assets/mathjaxhelper.js
-
-docs_dir: 'build'
+docs_dir: 'src'
 
 pages:
-- Introduction: index.md
+- Home: index.md
