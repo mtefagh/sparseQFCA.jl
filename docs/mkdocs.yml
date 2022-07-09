@@ -4,7 +4,5 @@ site_description:    Julia package for sparseQFCA
 site_author:         Dr. Tefagh
 theme:               readthedocs
 
-docs_dir: 'src'
-
 pages:
 - Home: index.md
