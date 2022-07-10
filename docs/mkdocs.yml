@@ -1,0 +1,8 @@
+site_name:           sparseQFCA.jl
+repo_url:            https://mtefagh.github.io/sparseQFCA.jl/
+site_description:    Julia package for sparseQFCA
+site_author:         Dr. Tefagh
+theme:               readthedocs
+
+pages:
+- Home: index.md
