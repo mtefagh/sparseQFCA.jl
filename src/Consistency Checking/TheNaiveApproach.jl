@@ -41,27 +41,31 @@ Function that finds blocked reactions in metabolic network.
 julia> blocked_reactions = find_blocked_reactions(myModel)
 ```
 
-See also: `dataOfModel()`, `homogenization()`, `reversibility()`
+See also: `dataOfModel()`, `homogenization()`, `reversibility()`, 'setTelorance()'
 
 """
 
 function find_blocked_reactions(myModel)
-    
-    # Exporting data from model
-    
+
+    # Exporting data from model:
+
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-    
-    # Determining the reversibility of a reaction 
-    
+
+    # assigning a small value to atol representing the concept of telorance:
+
+    setTelorance(1e-8)
+
+    # Determining the reversibility of a reaction:
+
     irreversible_reactions_id = []
     reversible_reactions_id = []
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
-    
-    # Homogenizing the upper_bound and lower_bound of reactions
-    
+
+    # Homogenizing the upper_bound and lower_bound of reactions:
+
     lb,ub = homogenization(lb,ub)
 
-    # Irreversible blocked
+    # Irreversible blocked:
 
     irreversible_blocked_reactions_id = []
     irreversible_unblocked_reactions_id = []
@@ -74,7 +78,7 @@ function find_blocked_reactions(myModel)
         @constraint(model_irr, c,  V[j] <= 1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_irr)
-        if isapprox(objective_value(model_irr), 0, atol=1e-8)
+        if isapprox(objective_value(model_irr), 0, atol = Telorance)
             append!(irreversible_blocked_reactions_id, j)
         else
             append!(irreversible_unblocked_reactions_id, j)
@@ -83,7 +87,7 @@ function find_blocked_reactions(myModel)
         unregister(model_irr, :c)
     end
 
-    # Reversible blocked
+    # Reversible blocked:
 
     reversible_unblocked_reactions_id = []
     reversible_blocked_reactions_id = []
@@ -114,7 +118,7 @@ function find_blocked_reactions(myModel)
         t_back = termination_status(model_rev)
         delete(model_rev, c2)
         unregister(model_rev, :c2)
-        if isapprox(opt_fwd, 0, atol=1e-8) && isapprox(opt_back, 0, atol=1e-8)
+        if isapprox(opt_fwd, 0, atol = Telorance) && isapprox(opt_back, 0, atol = Telorance)
             append!(reversible_blocked_reactions_id, j)
         else
             append!(reversible_unblocked_reactions_id, j)

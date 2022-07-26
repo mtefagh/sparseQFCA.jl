@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------------------
 
 module pre_processing
-export dataOfModel, setM, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+export dataOfModel, setM, setTelorance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
 using GLPK, JuMP, COBREXA
 
@@ -88,6 +88,39 @@ julia> setM(+1000.0)
 
 function setM(x)
     global M = x
+    return
+end
+
+#-------------------------------------------------------------------------------------------
+
+"""
+    setTelorance(x)
+
+Function that assigns a small value to Telorance representing the concept of telorance.
+
+# INPUTS
+
+- `x`:              a small number.
+
+# OPTIONAL INPUTS
+
+-
+
+# OUTPUTS
+
+-
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> setTelorance(1e-8)
+```
+
+"""
+
+function setTelorance(x)
+    global Telorance = x
     return
 end
 
@@ -206,13 +239,13 @@ Function that homogenizes the upper_bound and lower_bound of reactions.
 julia> lb,ub = homogenization(lb,ub)
 ```
 
-See also: `dataOfModel()`
+See also: `dataOfModel()`, 'setM()'
 
 """
 
 function homogenization(lb,ub)
     n = length(lb)
-    # Set a large number for M
+    # Set a large number for M:
     setM(+1000.0)
     for i in 1:n
         if lb[i] > 0
@@ -266,7 +299,7 @@ See also: `dataOfModel()`, `reversibility()`
 """
 
 function reversibility_checking(S, lb, ub, reversible_reactions_id)
-    
+
     Reactions = reactions(myModel)
     n = length(Reactions)
     model = Model(GLPK.Optimizer)
@@ -279,26 +312,26 @@ function reversibility_checking(S, lb, ub, reversible_reactions_id)
 
     for j in reversible_reactions_id
 
-    # The Forward Direction :
+    # The Forward Direction:
 
         @objective(model, Max, V[j])
         @constraint(model, c1, V[j] <= 1)
         optimize!(model)
         opt_fwd = objective_value(model)
-    
+
         if isapprox(opt_fwd, 0, atol=1e-8)
              append!(rev_blocked_fwd, j)
         end
         delete(model, c1)
         unregister(model, :c1)
 
-    # The Backward Direction :
+    # The Backward Direction:
 
         @objective(model, Min, V[j])
         @constraint(model, c2, V[j] >= -1)
         optimize!(model)
         opt_back = objective_value(model)
-    
+
         if isapprox(opt_back, 0, atol=1e-8)
              append!(rev_blocked_back, j)
         end
@@ -378,7 +411,7 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
         append!(irreversible_reactions_id, i)
     end
 
-    # Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list
+    # Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list:
 
     set_reversible_reactions_id = Set(reversible_reactions_id)
     set_rev_blocked_fwd = Set(rev_blocked_fwd)
@@ -393,4 +426,3 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
 end
 
 end
-

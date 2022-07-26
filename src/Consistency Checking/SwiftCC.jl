@@ -1,85 +1,79 @@
-# SwiftCC
+#-------------------------------------------------------------------------------------------
 
-using COBREXA
-using JuMP
-using GLPK
-using LinearAlgebra
+#=
+    Purpose:    Finding blocked reactions in metabolic network
+    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
+    Date:       July 2022
+=#
 
-myModel = load_model(StandardModel,"/Users/iman/Desktop/M.S.Thesis/SourceCode/Data/MetabolicNetworks/e_coli_core.xml")
+#-------------------------------------------------------------------------------------------
 
-function dataOfModel(myModel)
-   S = stoichiometry(myModel)
-   Metabolites = metabolites(myModel)
-   Reactions = reactions(myModel)
-   Genes = genes(myModel)
-   m = length(metabolites(myModel))
-   n = length(reactions(myModel))
-   lb = lower_bounds(myModel)
-   ub = upper_bounds(myModel)
-   return S, Metabolites, Reactions, Genes, m, n, lb, ub
-end
+module SwiftConsistencyChecking
+export swiftCC
 
-function reversibility(myModel)
-   n = length(reactions(myModel))
-   irreversible_reactions_id = []
-   reversible_reactions_id = []
-   for i in 1:n
-       if lower_bounds(myModel)[i] >= 0
-           append!(irreversible_reactions_id, i)
-       else
-           append!(reversible_reactions_id, i)
-       end
-   end
-   return irreversible_reactions_id, reversible_reactions_id
-end
+using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
 
-function setM(x)
-    global M = x
-    return
-end
+include("../pre_processing.jl")
 
-function homogenization(lb,ub)
-    n = length(lb)
-    # Set a large number for M
-    setM(+1000.0)
-    for i in 1:n
-        if lb[i] > 0
-            lb[i] = 0
-        end
-        if ub[i] > 0
-            ub[i] = M
-        end
-        if lb[i] < 0
-            lb[i] = -M
-        end
-        if ub[i] < 0
-            ub[i] = 0
-        end
-    end
-    return lb,ub
-end
+using .pre_processing
+
+"""
+    swiftCC(myModel)
+
+Function that finds blocked reactions in metabolic network.
+
+# INPUTS
+
+- `myModel`:        A model that has been built using COBREXA's `load_model` function.
+
+# OPTIONAL INPUTS
+
+-
+
+# OUTPUTS
+
+- `blocked_names`:  Blocked reaction Names.
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> blocked_reactions = swiftCC(myModel)
+```
+
+See also: `dataOfModel()`, `reversibility()`, `homogenization()`
+
+"""
 
 
 function swiftCC(myModel)
-    
+
+    # Exporting data from model:
+
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-    
-    irreversible_reactions_id, reversible_reactions_id = reversibility(myModel)
+
+    # assigning a small value to atol representing the concept of telorance:
+
+    setTelorance(1e-8)
+
+    # Determining the reversibility of a reaction:
+
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
+
+    # Determining the number of irreversible and reversible reactions:
+
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
-    
-    lb, ub = homogenization(lb, ub) 
-    
-    rev_blocked_fwd, rev_blocked_back = reversibility_checking(S, lb, ub, reversible_reactions_id)
-    
-    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = reversibility_correction(S,lb,ub,irreversible_reactions_id,reversible_reactions_id,rev_blocked_fwd,rev_blocked_back)
-    
-    # The Stoichiometric Matrix : 
 
-    S = Matrix(S)
+    # Homogenizing the upper_bound and lower_bound of reactions:
+
+    lb, ub = homogenization(lb, ub)
+
+    # Calculating the dimensions of the S matrix:
+
     row_num, col_num = size(S)
-    
-    # Irreversible Blocked : 
+
+    # Finding irreversible blocked reactions in 1 LP problem:
 
     lb_u = zeros(n_irr)
     ub_u = ones(n_irr)
@@ -91,109 +85,93 @@ function swiftCC(myModel)
     @objective(model, Max, objective_function)
     @constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
     optimize!(model)
-    
+
     irr_blocked_reactions = []
     for i in range(1,n_irr)
-        if isapprox(value(u[i]), 0.0, atol=1e-6)
+        if isapprox(value(u[i]), 0.0, atol = Telorance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
         end
     end
-    
+
+    # Determining the number of irreversible blocked reactions:
+
     irr_blocked_num = length(irr_blocked_reactions)
-    
-    # Reversible Blocked
-    
-    # S_Transpose :
+
+    # Finding reversible blocked reactions:
+
+    # S_Transpose:
 
     S_transpose = S'
-    S_transpose = Matrix(S_transpose)
+
+    # Calculating the dimensions of the S_transpose matrix:
+
     row_num_trans, col_num_trans = size(S_transpose)
-    
-    # Add unit_vectors for reversible reactions : 
+
+    # Removing irrevesible blocked from Stoichiometric Matrix:
+
+    S_transpose_noIrrBlocked = S_transpose[setdiff(1:end, irr_blocked_reactions), :]
+
+    # Constructing the I_reversible Matrix:
 
     unit_vector(i,n) = [zeros(i-1); 1 ; zeros(n-i)]
-
-    for i in reversible_reactions_id
-        a = unit_vector(i, row_num_trans)
-        S_transpose = hcat(S_transpose, a)
+    reversible_reactions_id = sort(reversible_reactions_id)
+    I_reversible = unit_vector(reversible_reactions_id[1], n)
+    for i in range(2, n_rev)
+        a = unit_vector(reversible_reactions_id[i], n)
+        I_reversible = hcat(I_reversible, a)
     end
-    S_transpose_unitVectors = copy(S_transpose)
-    row_num_trans_unitVectors, col_num_trans_unitVectors = size(S_transpose_unitVectors)
-    
-    # Remove Irrevesible blocked from Stoichiometric Matrix : 
 
-    S_transpose_unitVectors_noIrrBlocked = []
+    # Removing irrevesible blocked from I_reversible Matrix:
 
-    S_transpose_unitVectors_noIrrBlocked = S_transpose_unitVectors[setdiff(1:end, irr_blocked_reactions), :]
+    I_reversible = I_reversible[setdiff(1:end, irr_blocked_reactions), :]
 
-    S_transpose_unitVectors_noIrrBlocked = Matrix(S_transpose_unitVectors_noIrrBlocked)
-    row_num_trans_unitVectors_noIrrBlocked, col_num_trans_unitVectors_noIrrBlocked = 
-                                            size(S_transpose_unitVectors_noIrrBlocked)
-    
-    # Find Reversible blocked
-    
-    Q, R = qr(S_transpose_unitVectors_noIrrBlocked)
-    Q = Matrix(Q)
-    row_r, col_r = size(R)
-    row_q, col_q = size(Q)
-    
-    St_endCol = m
-    epsilon_row = 10 ^ -6
-    St = R[:,range(1,St_endCol)]
-    row_St, col_St = size(St)
-    
-    # Find special row of the S_T 
-    
-    r = 0
-    for row in eachrow(St)
-        r = r + 1
-        if norm(row)/sqrt(length(row)) <= epsilon_row
-            break
-        end
-    end
-    
-    R_down = R[range(r,end),range(St_endCol+1,end)]
-    row_Rdown, col_Rdown = size(R_down)
-    
-    # Find specific columns
-    
+    # Calculating the dimensions of the S_transpose_noIrrBlocked and I_reversible matrix :
+
+    S_trans_row, S_trans_col = size(S_transpose_noIrrBlocked)
+    I_row, I_col = size(I_reversible)
+
+    # using Gaussian elimination to find reversible blocked reactions:
+
+    X = S_transpose_noIrrBlocked \ I_reversible
+
+    Sol = (S_transpose_noIrrBlocked*X) - I_reversible
+
+    # Calculating the dimensions of the S_transpose_noIrrBlocked matrix:
+
+    row_sol, col_sol = size(Sol)
+
+    # Finding specific columns in Sol:
+
     c = 0
 
-    epsilon_col = 10 ^ -2
     rev_blocked_reactions_col = []
-    for col in eachcol(R_down)
+    for col in eachcol(Sol)
         c = c + 1
-        if norm(col)/sqrt(length(col)) <= epsilon_col
+        if isapprox(norm(col), 0, atol = Telorance)
             append!(rev_blocked_reactions_col, c)
         end
     end
 
-    # Find reversible blocked 
-    
     rev_blocked_reactions = []
     for i in rev_blocked_reactions_col
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end
-    
-    # Merge reversbile and irreversible reactions
-    
+
+    # Merging reversbile blocked reactions and irreversible blocked reactions:
+
     blocked_index = []
     blocked_index = union(rev_blocked_reactions, irr_blocked_reactions)
-    
+
     blocked_names = []
     for i in blocked_index
         r_name = reactions(myModel)[i]
         push!(blocked_names, r_name)
     end
-    
+
+    # Returning a list consist of the names of the blocked reactions:
+
     blocked_names = sort(blocked_names)
-    return length(irr_blocked_reactions), length(rev_blocked_reactions)
-    
+    return blocked_names
 end
 
-x, y = swiftCC(myModel)
-
-println("Irreversible Blocked : ")
-println(x)
-println("Reversible Blocked : ")
-println(y)
+end
