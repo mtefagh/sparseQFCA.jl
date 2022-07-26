@@ -41,7 +41,7 @@ Function that finds blocked reactions in metabolic network.
 julia> blocked_reactions = find_blocked_reactions(myModel)
 ```
 
-See also: `dataOfModel()`, `homogenization()`, `reversibility()`, 'setTelorance()'
+See also: `dataOfModel()`, `homogenization()`, `reversibility()`, 'setTolerance()'
 
 """
 
@@ -51,9 +51,9 @@ function find_blocked_reactions(myModel)
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
-    # assigning a small value to atol representing the concept of telorance:
+    # assigning a small value to atol representing the level of error tolerance:
 
-    setTelorance(1e-8)
+    setTolerance(1e-8)
 
     # Determining the reversibility of a reaction:
 
@@ -78,7 +78,7 @@ function find_blocked_reactions(myModel)
         @constraint(model_irr, c,  V[j] <= 1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_irr)
-        if isapprox(objective_value(model_irr), 0, atol = Telorance)
+        if isapprox(objective_value(model_irr), 0, atol = Tolerance)
             append!(irreversible_blocked_reactions_id, j)
         else
             append!(irreversible_unblocked_reactions_id, j)
