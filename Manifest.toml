@@ -145,9 +145,9 @@ version = "0.2.0"
 
 [[DocStringExtensions]]
 deps = ["LibGit2"]
-git-tree-sha1 = "c5544d8abb854e306b7b2f799ab31cdba527ccae"
+git-tree-sha1 = "5158c2b41018c5f7eb1470d558127ac274eca0c9"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-version = "0.9.0"
+version = "0.9.1"
 
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
@@ -411,9 +411,9 @@ version = "0.10.2"
 
 [[SBML_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "XML2_jll", "Zlib_jll"]
-git-tree-sha1 = "9c4683739e12becb2ceef10c9e9aa9c801b19645"
+git-tree-sha1 = "c8bc0b20ed7df3479e630d50ed3f3b0e93c7b7c8"
 uuid = "bb12108a-f4ef-5f88-8ef3-0b33ff7017f1"
-version = "5.19.6+0"
+version = "5.19.6+1"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
