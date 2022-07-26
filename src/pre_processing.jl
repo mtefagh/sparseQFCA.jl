@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------------------
 
 module pre_processing
-export dataOfModel, setM, setTelorance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+export dataOfModel, setM, setTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
 using GLPK, JuMP, COBREXA
 
