@@ -94,9 +94,9 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    setTelorance(x)
+    setTolerance(x)
 
-Function that assigns a small value to Telorance representing the concept of telorance.
+Function that assigns a small value to Tolerance representing the level of error tolerance.
 
 # INPUTS
 
@@ -114,13 +114,13 @@ Function that assigns a small value to Telorance representing the concept of tel
 
 - Full input/output example
 ```julia
-julia> setTelorance(1e-8)
+julia> setTolerance(1e-8)
 ```
 
 """
 
-function setTelorance(x)
-    global Telorance = x
+function setTolerance(x)
+    global Tolerance = x
     return
 end
 
