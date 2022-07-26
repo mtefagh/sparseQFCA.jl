@@ -14,7 +14,7 @@ fctable = @time QFCA(S, rev)[end]
 include("../example/find_blocked_data.jl")
 include("../src/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
-include("../src/Consistency Checking/SwiftConsistencyChecking.jl")
+include("../src/Consistency Checking/SwiftCC.jl")
 using .find_blocked_data, .pre_processing, .TheNaiveApproach, .SwiftConsistencyChecking
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
