@@ -52,9 +52,9 @@ function swiftCC(myModel)
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
-    # assigning a small value to atol representing the concept of telorance:
+    # assigning a small value to atol representing the level of error tolerance:
 
-    setTelorance(1e-8)
+    setTolerance(1e-8)
 
     # Determining the reversibility of a reaction:
 
@@ -88,7 +88,7 @@ function swiftCC(myModel)
 
     irr_blocked_reactions = []
     for i in range(1,n_irr)
-        if isapprox(value(u[i]), 0.0, atol = Telorance)
+        if isapprox(value(u[i]), 0.0, atol = Tolerance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
         end
     end
