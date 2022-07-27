@@ -8,7 +8,7 @@
 
 #-------------------------------------------------------------------------------------------
 
-module SwiftConsistencyChecking
+module SwiftCC
 export swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
