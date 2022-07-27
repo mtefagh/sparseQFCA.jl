@@ -41,7 +41,7 @@ Function that finds blocked reactions in metabolic network.
 julia> blocked_reactions = swiftCC(myModel)
 ```
 
-See also: `dataOfModel()`, `reversibility()`, `homogenization()`
+See also: `dataOfModel()`, 'getTolerance()', `reversibility()`, `homogenization()`
 
 """
 
@@ -52,9 +52,9 @@ function swiftCC(myModel)
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
-    # assigning a small value to atol representing the level of error tolerance:
+    # assigning a small value to Tolerance representing the level of error tolerance:
 
-    setTolerance(1e-8)
+    Tolerance = getTolerance()
 
     # Determining the reversibility of a reaction:
 
@@ -147,7 +147,7 @@ function swiftCC(myModel)
     rev_blocked_reactions_col = []
     for col in eachcol(Sol)
         c = c + 1
-        if isapprox(norm(col), 0, atol = Telorance)
+        if isapprox(norm(col), 0, atol = Tolerance)
             append!(rev_blocked_reactions_col, c)
         end
     end
