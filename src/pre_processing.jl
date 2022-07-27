@@ -93,6 +93,7 @@ function getM()
         c = c + 1
         if c == 1
             M = lines
+            M = parse(Float64, M)
             return M
         else
             return
@@ -137,6 +138,7 @@ function getTolerance()
             continue
         else
             Tolerance = lines
+            Tolerance = parse(Float64, Tolerance)
             return Tolerance
         end
     end
