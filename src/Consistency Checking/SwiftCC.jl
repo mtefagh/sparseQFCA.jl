@@ -87,7 +87,7 @@ function swiftCC(myModel)
     optimize!(model)
 
     irr_blocked_reactions = []
-    for i in range(1,n_irr)
+    for i in range(1,n_irr; step=1)
         if isapprox(value(u[i]), 0.0, atol = Tolerance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
         end
@@ -116,7 +116,7 @@ function swiftCC(myModel)
     unit_vector(i,n) = [zeros(i-1); 1 ; zeros(n-i)]
     reversible_reactions_id = sort(reversible_reactions_id)
     I_reversible = unit_vector(reversible_reactions_id[1], n)
-    for i in range(2, n_rev)
+    for i in range(2, n_rev; step=1)
         a = unit_vector(reversible_reactions_id[i], n)
         I_reversible = hcat(I_reversible, a)
     end
