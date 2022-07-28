@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------------------
 
 module pre_processing
-export dataOfModel, setM, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
 using GLPK, JuMP, COBREXA
 
@@ -61,17 +61,60 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    setM(x)
+    getM()
 
-Function that assigns a large value to M representing the concept of infinite boundary.
+Function that returns a large value to set M representing the concept of infinite boundary.
 
 # INPUTS
 
-- `x`:              a large number.
+-
 
 # OPTIONAL INPUTS
 
 -
+
+# OUTPUTS
+
+- `M`:             A large number.
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> M = getM()
+```
+
+"""
+
+function getM()
+    f = open("../config/ConfigFile.txt", "r")
+    c = 0
+    for lines in readlines(f)
+        c = c + 1
+        if c == 1
+            M = lines
+            M = parse(Float64, M)
+            return M
+        else
+            return
+        end
+    end
+end
+
+#-------------------------------------------------------------------------------------------
+
+"""
+    getTolerance(x)
+
+Function that returns a small value to set Tolerance representing the level of error tolerance.
+
+# INPUTS
+
+-
+
+# OPTIONAL INPUTS
+
+- `Tolerance`:              a small number.
 
 # OUTPUTS
 
@@ -81,14 +124,24 @@ Function that assigns a large value to M representing the concept of infinite bo
 
 - Full input/output example
 ```julia
-julia> setM(+1000.0)
+julia> Tolerance = getTolerance()
 ```
 
 """
 
-function setM(x)
-    global M = x
-    return
+function getTolerance()
+    f = open("../config/ConfigFile.txt", "r")
+    c = 0
+    for lines in readlines(f)
+        c = c + 1
+        if c == 1
+            continue
+        else
+            Tolerance = lines
+            Tolerance = parse(Float64, Tolerance)
+            return Tolerance
+        end
+    end
 end
 
 #-------------------------------------------------------------------------------------------
@@ -206,14 +259,14 @@ Function that homogenizes the upper_bound and lower_bound of reactions.
 julia> lb,ub = homogenization(lb,ub)
 ```
 
-See also: `dataOfModel()`
+See also: `dataOfModel()`, 'getM()'
 
 """
 
 function homogenization(lb,ub)
     n = length(lb)
-    # Set a large number for M
-    setM(+1000.0)
+    # Set a large number for M:
+    M = getM()
     for i in 1:n
         if lb[i] > 0
             lb[i] = 0
@@ -261,14 +314,15 @@ Function that detects reversible reactions that are blocked in only one directio
 julia> rev_blocked_fwd, rev_blocked_back = reversibility_checking(lb, reversible_reactions_id)
 ```
 
-See also: `dataOfModel()`, `reversibility()`
+See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
 function reversibility_checking(S, lb, ub, reversible_reactions_id)
-    
+
     Reactions = reactions(myModel)
     n = length(Reactions)
+    Tolerance = getTolerance()
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
@@ -279,27 +333,27 @@ function reversibility_checking(S, lb, ub, reversible_reactions_id)
 
     for j in reversible_reactions_id
 
-    # The Forward Direction :
+    # The Forward Direction:
 
         @objective(model, Max, V[j])
         @constraint(model, c1, V[j] <= 1)
         optimize!(model)
         opt_fwd = objective_value(model)
-    
-        if isapprox(opt_fwd, 0, atol=1e-8)
+
+        if isapprox(opt_fwd, 0, atol=Tolerance)
              append!(rev_blocked_fwd, j)
         end
         delete(model, c1)
         unregister(model, :c1)
 
-    # The Backward Direction :
+    # The Backward Direction:
 
         @objective(model, Min, V[j])
         @constraint(model, c2, V[j] >= -1)
         optimize!(model)
         opt_back = objective_value(model)
-    
-        if isapprox(opt_back, 0, atol=1e-8)
+
+        if isapprox(opt_back, 0, atol=Tolerance)
              append!(rev_blocked_back, j)
         end
         delete(model, c2)
@@ -378,7 +432,7 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
         append!(irreversible_reactions_id, i)
     end
 
-    # Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list
+    # Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list:
 
     set_reversible_reactions_id = Set(reversible_reactions_id)
     set_rev_blocked_fwd = Set(rev_blocked_fwd)
@@ -393,4 +447,3 @@ function reversibility_correction(S, lb, ub, irreversible_reactions_id, reversib
 end
 
 end
-

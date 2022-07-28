@@ -18,6 +18,76 @@ include("../pre_processing.jl")
 using .pre_processing
 
 """
+    setM(x)
+Function that assigns a large value to M representing the concept of infinite boundary.
+# INPUTS
+- `x`:              a large number.
+# OPTIONAL INPUTS
+-
+# OUTPUTS
+-
+# EXAMPLES
+- Full input/output example
+```julia
+julia> setM(+1000.0)
+```
+"""
+
+function setM(x)
+    global M = x
+    return
+end
+
+
+"""
+    Homogenization(lb,ub)
+
+Function that homogenizes the upper_bound and lower_bound of reactions.
+
+# INPUTS
+- `lb`:             LowerBound Of Reactions.
+- `ub`:             UpperBound of Reactions.
+
+# OPTIONAL INPUTS
+-
+
+# OUTPUTS
+- `lb`:             LowerBound Of Reactions has become homogenous.
+- `ub`:             UpperBound of Reactions has become homogenous.
+
+# EXAMPLES
+- Full input/output example
+```julia
+julia> lb,ub = homogenization(lb,ub)
+```
+
+See also: `dataOfModel()`
+"""
+
+function Homogenization(lb,ub)
+    n = length(lb)
+    # Set a large number for M
+    setM(+1000.0)
+    for i in 1:n
+        if lb[i] > 0
+            lb[i] = 0
+        end
+        if ub[i] > 0
+            ub[i] = M
+        end
+        if lb[i] < 0
+            lb[i] = -M
+        end
+        if ub[i] < 0
+            ub[i] = 0
+        end
+    end
+    return lb,ub
+end
+
+
+
+"""
     find_blocked_reactions(myModel)
 
 Function that finds blocked reactions in metabolic network.
@@ -41,27 +111,31 @@ Function that finds blocked reactions in metabolic network.
 julia> blocked_reactions = find_blocked_reactions(myModel)
 ```
 
-See also: `dataOfModel()`, `homogenization()`, `reversibility()`
+See also: `dataOfModel()`, `homogenization()`, `reversibility()`, 'getTolerance()'
 
 """
 
 function find_blocked_reactions(myModel)
-    
-    # Exporting data from model
-    
+
+    # Exporting data from model:
+
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-    
-    # Determining the reversibility of a reaction 
-    
+
+    # assigning a small value to Tolerance representing the level of error tolerance:
+
+    Tolerance = getTolerance()
+
+    # Determining the reversibility of a reaction:
+
     irreversible_reactions_id = []
     reversible_reactions_id = []
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
-    
-    # Homogenizing the upper_bound and lower_bound of reactions
-    
-    lb,ub = homogenization(lb,ub)
 
-    # Irreversible blocked
+    # Homogenizing the upper_bound and lower_bound of reactions:
+
+    lb,ub = Homogenization(lb,ub)
+
+    # Irreversible blocked:
 
     irreversible_blocked_reactions_id = []
     irreversible_unblocked_reactions_id = []
@@ -74,7 +148,7 @@ function find_blocked_reactions(myModel)
         @constraint(model_irr, c,  V[j] <= 1)
         # @constraint(model, V[j] >= 0)
         optimize!(model_irr)
-        if isapprox(objective_value(model_irr), 0, atol=1e-8)
+        if isapprox(objective_value(model_irr), 0, atol = Tolerance)
             append!(irreversible_blocked_reactions_id, j)
         else
             append!(irreversible_unblocked_reactions_id, j)
@@ -83,7 +157,7 @@ function find_blocked_reactions(myModel)
         unregister(model_irr, :c)
     end
 
-    # Reversible blocked
+    # Reversible blocked:
 
     reversible_unblocked_reactions_id = []
     reversible_blocked_reactions_id = []
@@ -114,7 +188,7 @@ function find_blocked_reactions(myModel)
         t_back = termination_status(model_rev)
         delete(model_rev, c2)
         unregister(model_rev, :c2)
-        if isapprox(opt_fwd, 0, atol=1e-8) && isapprox(opt_back, 0, atol=1e-8)
+        if isapprox(opt_fwd, 0, atol = Tolerance) && isapprox(opt_back, 0, atol = Tolerance)
             append!(reversible_blocked_reactions_id, j)
         else
             append!(reversible_unblocked_reactions_id, j)
