@@ -18,6 +18,76 @@ include("../pre_processing.jl")
 using .pre_processing
 
 """
+    setM(x)
+Function that assigns a large value to M representing the concept of infinite boundary.
+# INPUTS
+- `x`:              a large number.
+# OPTIONAL INPUTS
+-
+# OUTPUTS
+-
+# EXAMPLES
+- Full input/output example
+```julia
+julia> setM(+1000.0)
+```
+"""
+
+function setM(x)
+    global M = x
+    return
+end
+
+
+"""
+    Homogenization(lb,ub)
+
+Function that homogenizes the upper_bound and lower_bound of reactions.
+
+# INPUTS
+- `lb`:             LowerBound Of Reactions.
+- `ub`:             UpperBound of Reactions.
+
+# OPTIONAL INPUTS
+-
+
+# OUTPUTS
+- `lb`:             LowerBound Of Reactions has become homogenous.
+- `ub`:             UpperBound of Reactions has become homogenous.
+
+# EXAMPLES
+- Full input/output example
+```julia
+julia> lb,ub = homogenization(lb,ub)
+```
+
+See also: `dataOfModel()`
+"""
+
+function Homogenization(lb,ub)
+    n = length(lb)
+    # Set a large number for M
+    setM(+1000.0)
+    for i in 1:n
+        if lb[i] > 0
+            lb[i] = 0
+        end
+        if ub[i] > 0
+            ub[i] = M
+        end
+        if lb[i] < 0
+            lb[i] = -M
+        end
+        if ub[i] < 0
+            ub[i] = 0
+        end
+    end
+    return lb,ub
+end
+
+
+
+"""
     find_blocked_reactions(myModel)
 
 Function that finds blocked reactions in metabolic network.
@@ -63,7 +133,7 @@ function find_blocked_reactions(myModel)
 
     # Homogenizing the upper_bound and lower_bound of reactions:
 
-    lb,ub = homogenization(lb,ub)
+    lb,ub = Homogenization(lb,ub)
 
     # Irreversible blocked:
 
