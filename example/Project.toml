@@ -1,5 +1,5 @@
 [compat]
-julia = "1.5"
+julia = "1.6, 1.7"
 
 [deps]
 sparseQFCA = "077cf62c-ad2d-5edd-99ec-638372f8b004"

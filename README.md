@@ -18,7 +18,7 @@
 * `fctable`: the resulting **flux coupling** matrix
 
 ## Quick Start
-To get started, first run `import Pkg; Pkg.add("sparseQFCA")` to install the *sparseQFCA* package, and then see [this Jupyter notebook](https://nbviewer.jupyter.org/github/mtefagh/demos/blob/master/sparseQFCA.ipynb) for a demonstration on how to use it.
+To get started, first run `import Pkg; Pkg.add("sparseQFCA")` to install the *sparseQFCA* package, and then see [this Jupyter notebook](https://nbviewer.org/github/mtefagh/sparseQFCA/blob/master/example/sparseQFCA.ipynb) for a demonstration on how to use it.
 
 ## License
 *sparseQFCA* is distributed under the [GNU General Public License v3.0](http://www.gnu.org/copyleft/gpl.html).
