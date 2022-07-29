@@ -11,7 +11,7 @@ fctable = @time QFCA(S, rev)[end]
 
 # importing the example model and the TheNaiveApproach library:
 
-include("../example/find_blocked_data.jl")
+include("find_blocked_data.jl")
 include("../src/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")

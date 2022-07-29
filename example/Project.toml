@@ -1,0 +1,6 @@
+[compat]
+julia = "1.5"
+
+[deps]
+sparseQFCA = "077cf62c-ad2d-5edd-99ec-638372f8b004"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
