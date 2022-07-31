@@ -31,18 +31,6 @@ blockedList_TheNaive_iAT_PLT_636 = @time find_blocked_reactions(myModel_iAT_PLT_
 blockedList_swiftCC_iAT_PLT_636 = @time swiftCC(myModel_iAT_PLT_636)
 @test blockedTest_iAT_PLT_636(blockedList_TheNaive_iAT_PLT_636, blockedList_swiftCC_iAT_PLT_636)
 
-# iCN900
-
-blockedList_TheNaive_iCN900 = @time find_blocked_reactions(myModel_iCN900)
-blockedList_swiftCC_iCN900 = @time swiftCC(myModel_iCN900)
-#@test blockedTest_iCN900(blockedList_TheNaive_iCN900, blockedList_swiftCC_iCN900)
-
-# iNF517
-
-blockedList_TheNaive_iNF517 = @time find_blocked_reactions(myModel_iNF517)
-blockedList_swiftCC_iNF517 = @time swiftCC(myModel_iNF517)
-#@test blockedTest_iNF517(blockedList_TheNaive_iNF517, blockedList_swiftCC_iNF517)
-
 # iNJ661
 
 blockedList_TheNaive_iNJ661 = @time find_blocked_reactions(myModel_iNJ661)
