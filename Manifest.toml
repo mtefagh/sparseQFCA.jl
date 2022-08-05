@@ -27,10 +27,10 @@ uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.8+0"
 
 [[COBREXA]]
-deps = ["Distributed", "DistributedData", "JSON", "JuMP", "LinearAlgebra", "MAT", "MacroTools", "OrderedCollections", "Pkg", "Random", "SBML", "Serialization", "SparseArrays", "StableRNGs", "Statistics"]
-git-tree-sha1 = "9f480ac6164cddfc8d6cac3d80b2556b278011ab"
+deps = ["Distributed", "DistributedData", "HDF5", "JSON", "JuMP", "LinearAlgebra", "MAT", "MacroTools", "OrderedCollections", "Pkg", "Random", "SBML", "Serialization", "SparseArrays", "StableRNGs", "Statistics"]
+git-tree-sha1 = "de2e954639c66b6b86cd14db9734688ac176bc77"
 uuid = "babc4406-5200-4a30-9033-bf5ae714c842"
-version = "1.3.1"
+version = "1.4.0"
 
 [[Calculus]]
 deps = ["LinearAlgebra"]
@@ -405,9 +405,9 @@ version = "1.3.0"
 
 [[SBML]]
 deps = ["DocStringExtensions", "IfElse", "Libdl", "SBML_jll", "SparseArrays", "Unitful"]
-git-tree-sha1 = "329944f80f405051c1656658cfe64550182725f6"
+git-tree-sha1 = "a5527ded533e58038073ad82dd107956d451509d"
 uuid = "e5567a89-2604-4b09-9718-f5f78e97c3bb"
-version = "0.10.2"
+version = "1.1.0"
 
 [[SBML_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "XML2_jll", "Zlib_jll"]
