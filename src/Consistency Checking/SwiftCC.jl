@@ -11,21 +11,22 @@
 module SwiftCC
 export swiftCC
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
+using Distributed
 
-include("../pre_processing.jl")
+@everywhere using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
+
+include("../Data Processing/pre_processing.jl")
 
 using .pre_processing
 
-
 """
-    swiftCC(myModel)
+    swiftCC(ModelObject)
 
-Function that finds blocked reactions in metabolic network.
+Function that finds blocked reactions for a metabolic network.
 
 # INPUTS
 
-- `myModel`:        A model that has been built using COBREXA's `load_model` function.
+- `ModelObject`:        a newly object of MyModel.
 
 # OPTIONAL INPUTS
 
@@ -39,19 +40,24 @@ Function that finds blocked reactions in metabolic network.
 
 - Full input/output example
 ```julia
-julia> blocked_reactions = swiftCC(myModel)
+julia> blocked_reactions = swiftCC(ModelObject)
 ```
 
-See also: `dataOfModel()`, 'getTolerance()', `reversibility()`, `homogenization()`
+See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`, `homogenization()`
 
 """
 
+@everywhere function swiftCC(ModelObject::MyModel)
 
-function swiftCC(myModel)
+    # Exporting data from ModelObject:
 
-    # Exporting data from model:
-
-    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
+    S = ModelObject.S
+    Metabolites = ModelObject.Metabolites
+    Reactions = ModelObject.Reactions
+    m = ModelObject.m
+    n = ModelObject.n
+    lb = ModelObject.lb
+    ub = ModelObject.ub
 
     # assigning a small value to Tolerance representing the level of error tolerance:
 
