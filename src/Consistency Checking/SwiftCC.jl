@@ -15,14 +15,14 @@ using Distributed
 
 @everywhere using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
 
-include("../pre_processing.jl")
+include("../Data Processing/pre_processing.jl")
 
 using .pre_processing
 
 """
     swiftCC(ModelObject)
 
-Function that finds blocked reactions in metabolic network.
+Function that finds blocked reactions for a metabolic network.
 
 # INPUTS
 
