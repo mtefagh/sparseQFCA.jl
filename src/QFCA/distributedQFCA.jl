@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------------------
 
 module DistributedQFCA
-export distributedQFCA
+export addQFCAProcs, removeQFCAProcs, distributedQFCA
 
 using Distributed
 
@@ -24,9 +24,78 @@ include("../Consistency Checking/SwiftCC.jl")
 using .SwiftCC
 
 """
+    addQFCAProcs(n)
+
+Function that adds n-1 processes to System.
+
+# INPUTS
+
+- `n`:        Number of processes to add.
+
+# OPTIONAL INPUTS
+
+-
+
+# OUTPUTS
+
+-
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> addQFCAProcs(n)
+```
+
+See also: ``
+
+"""
+
+function addQFCAProcs(n::Int)
+   addprocs(n-1)
+   return
+end
+
+"""
+    removeQFCAProcs()
+
+Function that removes n-1 processes from Systems.
+
+# INPUTS
+
+-
+
+# OPTIONAL INPUTS
+
+-
+
+# OUTPUTS
+
+-
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> removeQFCAProcs()
+```
+
+See also: ``
+
+"""
+
+function removeQFCAProcs()
+    procs_vector = procs()
+    for i in procs_vector[2:end]
+       rmprocs(i)
+    end
+    return
+end
+
+"""
     distributedQFCA(myModel)
 
-Function computes the table of flux coupling relations for a metabolic network.
+Function that computes the table of flux coupling relations for a metabolic network.
 
 # INPUTS
 
@@ -57,8 +126,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
 """
 
-
-function QFCA(myModel)
+function distributedQFCA(myModel)
 
     # Exporting data from StandardModel:
 
