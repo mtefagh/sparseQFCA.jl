@@ -11,11 +11,11 @@ fctable = @time QFCA(S, rev)[end]
 
 # importing the example model and the TheNaiveApproach library:
 
-include("find_blocked_data.jl")
-include("../src/pre_processing.jl")
+include("TestData.jl")
+include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
-using .find_blocked_data, .pre_processing, .TheNaiveApproach, .SwiftCC
+using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
 
@@ -36,3 +36,46 @@ blockedList_swiftCC_iAT_PLT_636 = @time swiftCC(myModel_iAT_PLT_636)
 blockedList_TheNaive_iNJ661 = @time find_blocked_reactions(myModel_iNJ661)
 blockedList_swiftCC_iNJ661 = @time swiftCC(myModel_iNJ661)
 @test blockedTest_iNJ661(blockedList_TheNaive_iNJ661, blockedList_swiftCC_iNJ661)
+
+## Comparing fctable among 1P and 4P and 8P:
+
+# 1P
+
+include("TestData.jl")
+include("../src/Data Processing/pre_processing.jl")
+include("../src/Consistency Checking/SwiftCC.jl")
+using .TestData, .pre_processing, .SwiftCC
+
+fctable_seq_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+
+# 4P
+
+n = 4
+addQFCAProcs(n)
+
+include("TestData.jl")
+include("../src/Data Processing/pre_processing.jl")
+include("../src/Consistency Checking/SwiftCC.jl")
+using .TestData, .pre_processing, .SwiftCC
+
+fctable_4P_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+
+removeQFCAProcs()
+
+# 8P
+
+n = 8
+addQFCAProcs(n)
+
+include("TestData.jl")
+include("../src/Data Processing/pre_processing.jl")
+include("../src/Consistency Checking/SwiftCC.jl")
+using .TestData, .pre_processing, .SwiftCC
+
+fctable_8P_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+
+removeQFCAProcs()
+
+# Test
+
+@test distributedQFCATest_e_coli_core(fctable_seq_e_coli_core, fctable_4P_e_coli_core, fctable_8P_e_coli_core)
