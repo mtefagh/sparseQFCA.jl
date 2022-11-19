@@ -378,11 +378,10 @@ See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
-function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Int64})
+function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Any})
 
-    Reactions = reactions(myModel)
-    n = length(Reactions)
-    Tolerance = getTolerance()
+    n = length(lb)
+    Tolerance = 1e-8
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
@@ -467,8 +466,8 @@ See also: `dataOfModel()`, `homogenization()`, `reversibility()`, reversibility_
 
 """
 
-function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Int64},
-                                  reversible_reactions_id::Vector{Int64}, rev_blocked_fwd::Vector{Int64}, rev_blocked_back::Vector{Int64})
+function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Any},
+                                  reversible_reactions_id::Vector{Any}, rev_blocked_fwd::Vector{Any}, rev_blocked_back::Vector{Any})
 
     corrected_reversible_reactions_id = []
 
