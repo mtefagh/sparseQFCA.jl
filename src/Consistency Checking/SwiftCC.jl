@@ -22,7 +22,7 @@ using .pre_processing
 """
     swiftCC(ModelObject)
 
-Function that finds blocked reactions for a metabolic network.
+A function that finds blocked reactions for a metabolic network.
 
 # INPUTS
 
@@ -34,7 +34,7 @@ Function that finds blocked reactions for a metabolic network.
 
 # OUTPUTS
 
-- `blocked_names`:  Blocked reaction Names.
+- `blocked_names`:      Blocked reaction Names.
 
 # EXAMPLES
 
