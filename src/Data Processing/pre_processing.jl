@@ -18,7 +18,7 @@ using Distributed
 """
     MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-General type for storing a StandardModel which contains the following fields:
+A general type for storing a StandardModel which contains the following fields:
 
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.
@@ -45,7 +45,7 @@ end
 """
     myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-Function that initializes a newly created object of MyModel.
+A function that initializes a newly created object of MyModel.
 
 # INPUTS
 
@@ -76,11 +76,11 @@ end
 """
     dataOfModel(myModel)
 
-Function that exports essential data from StandardModel that has been built using COBREXA's `load_model` function.
+A function that extracts essential data from StandardModel that has been built using COBREXA's `load_model` function.
 
 # INPUTS
 
-- `myModel`:        A model that has been built using COBREXA's `load_model` function.
+- `myModel`:        A StandardModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -106,7 +106,7 @@ julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
 """
 
-function dataOfModel(myModel)
+function dataOfModel(myModel::StandardModel)
     S = stoichiometry(myModel)
     Metabolites = metabolites(myModel)
     Reactions = reactions(myModel)
@@ -123,7 +123,7 @@ end
 """
     getM()
 
-Function that returns a large value to set M representing the concept of infinite boundary.
+A function that returns a large value to set M representing the concept of infinite boundary.
 
 # INPUTS
 
@@ -166,7 +166,7 @@ end
 """
     getTolerance()
 
-Function that returns a small value to set Tolerance representing the level of error tolerance.
+A function that returns a small value to set Tolerance representing the level of error tolerance.
 
 # INPUTS
 
@@ -209,7 +209,7 @@ end
 """
     reversibility(lb)
 
-Function that determines the reversibility of a reaction from the lower_bound of a reaction.
+A function that determines the reversibility of a reaction from the lower_bound of a reaction.
 
 # INPUTS
 
@@ -254,7 +254,7 @@ end
 """
     check_duplicate_reaction(Reactions)
 
-Function that examines metabolic networks to see if there is a repetitive reaction.
+A function that examines metabolic networks to see if there is a repetitive reaction.
 
 # INPUTS
 
@@ -296,7 +296,7 @@ end
 """
     homogenization(lb,ub)
 
-Function that homogenizes the upper_bound and lower_bound of reactions.
+A function that homogenizes the upper_bound and lower_bound of reactions.
 
 # INPUTS
 
@@ -349,13 +349,13 @@ end
 """
     reversibility_checking(S, lb, ub, reversible_reactions_id)
 
-Function that detects reversible reactions that are blocked in only one direction.
+A function that detects reversible reactions that are blocked in only one direction.
 
 # INPUTS
 
-- `S`:              Stoichiometric matrix.
-- `lb`:             LowerBound Of Reactions.
-- `ub`:             UpperBound of Reactions.
+- `S`:                                    Stoichiometric matrix.
+- `lb`:                                   LowerBound Of Reactions.
+- `ub`:                                   UpperBound of Reactions.
 - `reversible_reactions_id`:              Reversible reaction IDs.
 
 # OPTIONAL INPUTS
@@ -381,7 +381,7 @@ See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Any})
 
     n = length(lb)
-    Tolerance = 1e-8
+    Tolerance = getTolerance()
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
@@ -427,7 +427,7 @@ end
 """
     reversibility_correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back)
 
-Function that modifies 3 sets:
+A function that modifies 3 sets:
 
     1) Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list.
     2) Add rev_blocked_fwd and rev_blocked_back from irreversible reactions list.
