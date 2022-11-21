@@ -20,11 +20,11 @@ using .pre_processing
 """
     find_blocked_reactions(myModel)
 
-Function that finds blocked reactions in metabolic network.
+A function that finds blocked reactions in metabolic network.
 
 # INPUTS
 
-- `myModel`:        A model that has been built using COBREXA's `load_model` function.
+- `myModel`:        A StandardModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -45,7 +45,7 @@ See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
-function find_blocked_reactions(myModel)
+function find_blocked_reactions(myModel::StandardModel)
 
     # Exporting data from model:
 

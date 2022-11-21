@@ -26,7 +26,7 @@ using .SwiftCC
 """
     addQFCAProcs(n)
 
-Function that adds n-1 processes to System.
+A function that adds n-1 processes to System.
 
 # INPUTS
 
@@ -59,7 +59,7 @@ end
 """
     removeQFCAProcs()
 
-Function that removes n-1 processes from Systems.
+A function that removes n-1 processes from Systems.
 
 # INPUTS
 
@@ -95,7 +95,7 @@ end
 """
     distributedQFCA(myModel)
 
-Function that computes the table of flux coupling relations for a metabolic network.
+A function that computes the table of flux coupling relations for a metabolic network.
 
 # INPUTS
 
@@ -126,7 +126,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
 """
 
-function distributedQFCA(myModel)
+function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
     # Exporting data from StandardModel:
 
@@ -172,17 +172,62 @@ function distributedQFCA(myModel)
     # Finding Coupling between reactions by using swiftCC functions in Parallel:
 
     @sync @distributed for i in range(1, col_noBlocked)
-        lb_temp = lb_noBlocked[i]
-        ub_temp = ub_noBlocked[i]
-        lb_noBlocked[i] = 0.0
-        ub_noBlocked[i] = 0.0
-        myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-        blocked = swiftCC(ModelObject)
-        D[i] = blocked
-        D_values = collect(values(D[i]))
-        DC_Matrix[i,D_values] .= 1.0
-        lb_noBlocked[i] = lb_temp
-        ub_noBlocked[i] = ub_temp
+
+        if(removing)
+
+            # Saving Values
+
+            lb_noBlocked_temp = copy(lb_noBlocked)
+            ub__noBlocked_temp = copy(ub_noBlocked)
+            S_noBlocked_temp = copy(S_noBlocked)
+
+            # Removing
+
+            list = []
+            append!(list, i)
+            lb_noBlocked = lb_noBlocked[setdiff(1:end, list)]
+            ub_noBlocked = ub_noBlocked[setdiff(1:end, list)]
+            S_noBlocked  = S_noBlocked[:, setdiff(1:end, list)]
+            row_noBlocked, col_noBlocked = size(S_noBlocked)
+
+            # Finding Couples
+
+            myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
+            blocked = swiftCC(ModelObject)
+            D[i] = blocked
+            D_values = collect(values(D[i]))
+            DC_Matrix[i,D_values] .= 1.0
+
+            # Retrieving Values
+
+            lb_noBlocked = copy(lb_noBlocked_temp)
+            ub_noBlocked = copy(ub__noBlocked_temp)
+            S_noBlocked = copy(S_noBlocked_temp)
+        else
+
+            # Saving Values
+
+            lb_temp = lb_noBlocked[i]
+            ub_temp = ub_noBlocked[i]
+
+            # Reset to zero
+
+            lb_noBlocked[i] = 0.0
+            ub_noBlocked[i] = 0.0
+
+            # Finding Couples
+
+            myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
+            blocked = swiftCC(ModelObject)
+            D[i] = blocked
+            D_values = collect(values(D[i]))
+            DC_Matrix[i,D_values] .= 1.0
+
+            # Retrieving Values
+
+            lb_noBlocked[i] = lb_temp
+            ub_noBlocked[i] = ub_temp
+        end
     end
 
     end
