@@ -178,16 +178,14 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
             # Saving Values
 
             lb_noBlocked_temp = copy(lb_noBlocked)
-            ub__noBlocked_temp = copy(ub_noBlocked)
+            ub_noBlocked_temp = copy(ub_noBlocked)
             S_noBlocked_temp = copy(S_noBlocked)
 
             # Removing
 
-            list = []
-            append!(list, i)
-            lb_noBlocked = lb_noBlocked[setdiff(1:end, list)]
-            ub_noBlocked = ub_noBlocked[setdiff(1:end, list)]
-            S_noBlocked  = S_noBlocked[:, setdiff(1:end, list)]
+            lb_noBlocked = lb_noBlocked[setdiff(1:end, i)]
+            ub_noBlocked = ub_noBlocked[setdiff(1:end, i)]
+            S_noBlocked  = S_noBlocked[:, setdiff(1:end, i)]
             row_noBlocked, col_noBlocked = size(S_noBlocked)
 
             # Finding Couples
@@ -201,7 +199,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
             # Retrieving Values
 
             lb_noBlocked = copy(lb_noBlocked_temp)
-            ub_noBlocked = copy(ub__noBlocked_temp)
+            ub_noBlocked = copy(ub_noBlocked_temp)
             S_noBlocked = copy(S_noBlocked_temp)
         else
 
