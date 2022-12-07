@@ -192,6 +192,11 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
             blocked = swiftCC(ModelObject)
+            for j = 1:length(blocked)
+                if blocked[j] >= i
+                   blocked[j] = blocked[j] + 1
+                end
+            end
             D[i] = blocked
             D_values = collect(values(D[i]))
             DC_Matrix[i,D_values] .= 1.0
