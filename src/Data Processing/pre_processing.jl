@@ -237,8 +237,8 @@ See also: `dataOfModel()`
 
 @everywhere function reversibility(lb::Array{Float64,1})
     n = length(lb)
-    irreversible_reactions_id = []
-    reversible_reactions_id = []
+    irreversible_reactions_id = Array{Int64}([])
+    reversible_reactions_id = Array{Int64}([])
     for i in 1:n
         if lb[i] >= 0
             append!(irreversible_reactions_id, i)
@@ -378,15 +378,15 @@ See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
-function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Any})
+function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Int64})
 
     n = length(lb)
     Tolerance = getTolerance()
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @constraint(model, S * V .== 0)
-    rev_blocked_fwd = []
-    rev_blocked_back = []
+    rev_blocked_fwd = Array{Int64}([])
+    rev_blocked_back = Array{Int64}([])
 
 ## Detection Loop ...
 
@@ -466,10 +466,10 @@ See also: `dataOfModel()`, `homogenization()`, `reversibility()`, reversibility_
 
 """
 
-function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Any},
-                                  reversible_reactions_id::Vector{Any}, rev_blocked_fwd::Vector{Any}, rev_blocked_back::Vector{Any})
+function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Int64},
+                                  reversible_reactions_id::Vector{Int64}, rev_blocked_fwd::Vector{Int64}, rev_blocked_back::Vector{Int64})
 
-    corrected_reversible_reactions_id = []
+    corrected_reversible_reactions_id = Array{Int64}([])
 
     # Forward
 
