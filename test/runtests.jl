@@ -19,48 +19,19 @@ using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
 
-# iAM_Pv461
+# e_coli_core
 
-blockedList_TheNaive_iAM_Pv461 = @time find_blocked_reactions(myModel_iAM_Pv461)
-blockedList_swiftCC_iAM_Pv461 = @time swiftCC(myModel_iAM_Pv461)
-@test blockedTest_iAM_Pv461(blockedList_TheNaive_iAM_Pv461, blockedList_swiftCC_iAM_Pv461)
+blockedList_TheNaive_e_coli_core = @time find_blocked_reactions(myModel_e_coli_core)
+blockedList_swiftCC_e_coli_core = @time swiftCC(myModel_e_coli_core)
+@test blockedTest_e_coli_core(blockedList_TheNaive_e_coli_core, blockedList_swiftCC_e_coli_core)
 
-# iAT_PLT_636
+# iIS312
 
-blockedList_TheNaive_iAT_PLT_636 = @time find_blocked_reactions(myModel_iAT_PLT_636)
-blockedList_swiftCC_iAT_PLT_636 = @time swiftCC(myModel_iAT_PLT_636)
-@test blockedTest_iAT_PLT_636(blockedList_TheNaive_iAT_PLT_636, blockedList_swiftCC_iAT_PLT_636)
+blockedList_TheNaive_iIS312 = @time find_blocked_reactions(myModel_iIS312)
+blockedList_swiftCC_iIS312 = @time swiftCC(myModel_iIS312)
+@test blockedTest_iIS312(blockedList_TheNaive_iIS312, blockedList_swiftCC_iIS312)
 
-# iNJ661
-
-blockedList_TheNaive_iNJ661 = @time find_blocked_reactions(myModel_iNJ661)
-blockedList_swiftCC_iNJ661 = @time swiftCC(myModel_iNJ661)
-@test blockedTest_iNJ661(blockedList_TheNaive_iNJ661, blockedList_swiftCC_iNJ661)
-
-## Comparing fctable among 1P and 4P and 8P:
-
-# 1P
-
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
-using .TestData, .pre_processing, .SwiftCC
-
-fctable_seq_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
-
-# 4P
-
-n = 4
-addQFCAProcs(n)
-
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
-using .TestData, .pre_processing, .SwiftCC
-
-fctable_4P_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
-
-removeQFCAProcs()
+## Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
 
 # 8P
 
@@ -72,10 +43,12 @@ include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
 using .TestData, .pre_processing, .SwiftCC
 
-fctable_8P_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+fctable_distributedQFCA_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+fctable_distributedQFCA_iIS312 = @time distributedQFCA(myModel_iIS312)
 
 removeQFCAProcs()
 
-# Test
+# Testing
 
-@test distributedQFCATest_e_coli_core(fctable_seq_e_coli_core, fctable_4P_e_coli_core, fctable_8P_e_coli_core)
+@test distributedQFCATest_e_coli_core(fctable_distributedQFCA_e_coli_core)
+@test distributedQFCATest__iIS312(fctable_distributedQFCA_iIS312)
