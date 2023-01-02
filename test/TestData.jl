@@ -1,23 +1,23 @@
 
 module TestData
 
-export myModel_e_coli_core, myModel_iAM_Pv461, myModel_iAT_PLT_636, myModel_iNJ661,
-       distributedQFCATest_e_coli_core, blockedTest_iAM_Pv461, blockedTest_iAT_PLT_636, blockedTest_iNJ661
+export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
+       blockedTest_e_coli_core, blockedTest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
 
 using COBREXA, DelimitedFiles
 
 # Loading Metabolic Networks:
 
 myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
-myModel_iAM_Pv461 = load_model(StandardModel,"Models/iAM_Pv461.xml")
-myModel_iAT_PLT_636 = load_model(StandardModel,"Models/iAT_PLT_636.xml")
-myModel_iNJ661 = load_model(StandardModel,"Models/iNJ661.xml")
+myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
+fctable_FFCA_e_coli_core = readdlm("FCTables/MatlabFFCA_Fctable_Ecolicore.csv", header = false)
+fctable_FFCA_iIS312 = readdlm("FCTables/MatlabFFCA_Fctable_iIS312.csv", header = false)
 
-# Defining functions to Compare Results:
+# Defining functions to Comparing Results:
 
-blockedTest_iAM_Pv461(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_SwiftCC)
-blockedTest_iAT_PLT_636(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_SwiftCC)
-blockedTest_iNJ661(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_SwiftCC)
-distributedQFCATest_e_coli_core(fctable_seq, fctable_4P, fctable_8P) = all(fctable_seq .== fctable_4P .== fctable_8P)
+blockedTest_e_coli_core(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_SwiftCC)
+blockedTest_iIS312(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_SwiftCC)
+distributedQFCATest_e_coli_core(fctable_distributedQFCA_e_coli_core) = all(fctable_distributedQFCA_e_coli_core .== fctable_FFCA_e_coli_core)
+distributedQFCATest_iIS312(fctable_distributedQFCA_iIS312) = all(fctable_distributedQFCA_iIS312 .== fctable_FFCA_iIS312)
 
 end
