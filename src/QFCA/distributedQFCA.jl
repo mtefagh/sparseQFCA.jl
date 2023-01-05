@@ -145,6 +145,10 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
     lb, ub = homogenization(lb, ub)
 
+    # assigning a small value to Tolerance representing the level of error tolerance:
+
+    Tolerance = getTolerance()
+
     # Creating a newly object of MyModel:
 
     ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
@@ -164,8 +168,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
     @everywhere D = Dict()
 
     # Defining a SharedMatrix:
-
-    @time begin
 
     DC_Matrix = SharedArray{Int,2}((col_noBlocked, col_noBlocked), init = false)
 
@@ -233,11 +235,9 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
         end
     end
 
-    end
+    # Defining a matrix to show coupling relations
 
-    # Defining a matrix to save coupling relations:
-
-    fctable = zeros(col_noBlocked, col_noBlocked)
+    fctable = SharedArray{Int,2}((col_noBlocked, col_noBlocked), init = false)
 
     # Directional Coupling:
 
@@ -282,7 +282,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
     # Determining Partial Couples:
 
-    PC = Dict()
+    @everywhere PC = Dict()
 
     s = 1
     Partially_Couples = []
@@ -299,7 +299,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
     # Solving a LU for each pair to determine Fully Coupling:
 
-    for key in sort(collect(keys(PC)))
+    @sync @distributed for key in sort(collect(keys(PC)))
 
         # Transposing S:
 
@@ -327,7 +327,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
 
         # Determining Fully Coupling:
 
-        if isapprox(norm(Sol), 0.0, atol = 1e-8)
+        if isapprox(norm(Sol), 0.0, atol = Tolerance)
             fctable[PC[key][1],PC[key][2]] = 1.0
         end
     end

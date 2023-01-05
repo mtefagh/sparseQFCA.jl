@@ -57,8 +57,6 @@ function find_blocked_reactions(myModel::StandardModel)
 
     # Determining the reversibility of a reaction:
 
-    irreversible_reactions_id = []
-    reversible_reactions_id = []
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
 
     # Homogenizing the upper_bound and lower_bound of reactions:
@@ -140,17 +138,10 @@ function find_blocked_reactions(myModel::StandardModel)
         end
     end
 
-    blocked_reactions = union(reversible_blocked_reactions_id, irreversible_blocked_reactions_id)
-    blocked_names = []
+    blocked_index = union(reversible_blocked_reactions_id, irreversible_blocked_reactions_id)
+    blocked_index = sort(blocked_index)
 
-    for i in blocked_reactions
-        r_name = reactions(myModel)[i]
-        push!(blocked_names, r_name)
-    end
-
-    blocked_names = sort(blocked_names)
-
-    return blocked_names
+    return blocked_index
 
 end
 

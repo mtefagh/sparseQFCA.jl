@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------------------
 
 #=
-    Purpose:    Preprocessing functions of metabolic networks
+    Purpose:    Preprocessing functions of metabolic networks analysis
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
     Date:       April 2022
 =#
@@ -107,6 +107,8 @@ julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 """
 
 function dataOfModel(myModel::StandardModel)
+
+    # Extracting Data:
     S = stoichiometry(myModel)
     Metabolites = metabolites(myModel)
     Reactions = reactions(myModel)
@@ -115,6 +117,13 @@ function dataOfModel(myModel::StandardModel)
     n = length(reactions(myModel))
     lb = lower_bounds(myModel)
     ub = upper_bounds(myModel)
+
+    # Sorting Reactions:
+    p = sortperm(Reactions)
+    Reactions = Reactions[p]
+    lb = lb[p]
+    ub = ub[p]
+    S = S[:,p]
     return S, Metabolites, Reactions, Genes, m, n, lb, ub
 end
 

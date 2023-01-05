@@ -72,10 +72,6 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
 
-    # Homogenizing the upper_bound and lower_bound of reactions:
-
-    lb, ub = homogenization(lb, ub)
-
     # Calculating the dimensions of the S matrix:
 
     row_num, col_num = size(S)
@@ -120,12 +116,12 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
 
     # Constructing the I_reversible Matrix:
 
-    unit_vector(i,n) = [zeros(i-1); 1 ; zeros(n-i)]
-    reversible_reactions_id = sort(reversible_reactions_id)
-    I_reversible = unit_vector(reversible_reactions_id[1], n)
-    for i in range(2, n_rev; step=1)
-        a = unit_vector(reversible_reactions_id[i], n)
-        I_reversible = hcat(I_reversible, a)
+    I_reversible = zeros(n, n_rev)
+
+    rev_id = 1
+    for col in eachcol(I_reversible)
+        col[reversible_reactions_id[rev_id]] = 1.0
+        rev_id = rev_id + 1
     end
 
     # Removing irrevesible blocked from I_reversible Matrix:
@@ -169,16 +165,10 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
     blocked_index = []
     blocked_index = union(rev_blocked_reactions, irr_blocked_reactions)
 
-    blocked_names = []
-    for i in blocked_index
-        r_name = reactions(myModel)[i]
-        push!(blocked_names, r_name)
-    end
+    # Returning a list consist of the Ids of the blocked reactions:
 
-    # Returning a list consist of the names of the blocked reactions:
-
-    blocked_names = sort(blocked_names)
-    return blocked_names
+    blocked_index = sort(blocked_index)
+    return blocked_index
 end
 
 end
