@@ -11,7 +11,7 @@
 module pre_processing
 export MyModel, myModel_Constructor, dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
-using Distributed
+using Distributed, SparseArrays
 
 @everywhere using GLPK, JuMP, COBREXA
 
