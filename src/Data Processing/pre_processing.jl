@@ -11,9 +11,9 @@
 module pre_processing
 export MyModel, myModel_Constructor, dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
-using Distributed, SparseArrays
+using Distributed
 
-@everywhere using GLPK, JuMP, COBREXA
+@everywhere using GLPK, JuMP, COBREXA, SparseArrays
 
 """
     MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
