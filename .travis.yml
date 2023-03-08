@@ -20,9 +20,9 @@ jobs:
       os:
         - linux
       julia:
-        - 1.8.4
+        - 1.8.5
       notifications:
-        email: false
+        email: true
       sudo: false
       deploy:
         provider: pages
