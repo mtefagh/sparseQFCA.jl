@@ -2,7 +2,9 @@
 # importing the example model and the sparseQFCA module:
 
 include("ecoli.jl")
-using .ecoli, COBREXA, JuMP, sparseQFCA, Test
+
+using Distributed
+using .ecoli, COBREXA, JuMP, sparseQFCA, Test,
 
 # finding all the flux coupling relations among the reactions:
 
