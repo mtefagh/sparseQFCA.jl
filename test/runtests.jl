@@ -19,17 +19,31 @@ using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
 
+# 8P
+
+n = 8
+addQFCAProcs(n)
+
 # e_coli_core
 
 blockedList_TheNaive_e_coli_core = @time find_blocked_reactions(myModel_e_coli_core)
 blockedList_swiftCC_e_coli_core = @time swiftCC(myModel_e_coli_core)
 @test blockedTest_e_coli_core(blockedList_TheNaive_e_coli_core, blockedList_swiftCC_e_coli_core)
 
+removeQFCAProcs()
+
+# 8P
+
+n = 8
+addQFCAProcs(n)
+
 # iIS312
 
 blockedList_TheNaive_iIS312 = @time find_blocked_reactions(myModel_iIS312)
 blockedList_swiftCC_iIS312 = @time swiftCC(myModel_iIS312)
 @test blockedTest_iIS312(blockedList_TheNaive_iIS312, blockedList_swiftCC_iIS312)
+
+removeQFCAProcs()
 
 ## Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
 
