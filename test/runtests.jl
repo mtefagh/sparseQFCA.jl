@@ -4,7 +4,7 @@
 include("ecoli.jl")
 
 using Distributed
-using .ecoli, COBREXA, JuMP, sparseQFCA, Test,
+using .ecoli, COBREXA, JuMP, sparseQFCA, Test
 
 # finding all the flux coupling relations among the reactions:
 
