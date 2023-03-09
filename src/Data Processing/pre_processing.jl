@@ -1,11 +1,9 @@
 #-------------------------------------------------------------------------------------------
-
 #=
     Purpose:    Preprocessing functions of metabolic networks analysis
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
     Date:       April 2022
 =#
-
 #-------------------------------------------------------------------------------------------
 
 module pre_processing
@@ -336,20 +334,16 @@ See also: `dataOfModel()`, 'getM()'
     n = length(lb)
     # Set a large number for M:
     M = getM()
-    for i in 1:n
-        if lb[i] > 0
-            lb[i] = 0
-        end
-        if ub[i] > 0
-            ub[i] = M
-        end
-        if lb[i] < 0
-            lb[i] = -M
-        end
-        if ub[i] < 0
-            ub[i] = 0
-        end
-    end
+
+    # If the lower bound is greater than zero, set it to zero
+    lb[lb .> 0] .= 0
+    # If the upper bound is greater than zero, set it to the constant M
+    ub[ub .> 0] .= M
+    # If the lower bound is less than zero, set it to the negative of the constant M
+    lb[lb .< 0] .= -M
+    # If the upper bound is less than zero, set it to zero
+    ub[ub .< 0] .= 0
+
     return lb,ub
 end
 
