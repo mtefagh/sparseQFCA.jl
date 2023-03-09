@@ -12,16 +12,16 @@ fctable = @time QFCA(S, rev)[end]
 
 ## Consistency_Checking:
 
-# 8P
-
-n = 8
-addQFCAProcs(n)
-
 include("TestData.jl")
 include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
 include("../src/QFCA/distributedQFCA.jl")
+
+# 8P
+
+n = 8
+addQFCAProcs(n)
 
 using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA
 
@@ -42,17 +42,19 @@ blockedList_swiftCC_iIS312 = @time swiftCC(myModel_iIS312)
 removeQFCAProcs()
 
 ## QFCA:
-## Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
+
+# Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
+
+include("TestData.jl")
+include("../src/Data Processing/pre_processing.jl")
+include("../src/Consistency Checking/SwiftCC.jl")
+include("../src/QFCA/distributedQFCA.jl")
 
 # 8P
 
 n = 8
 addQFCAProcs(n)
 
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
-include("../src/QFCA/distributedQFCA.jl")
 using .TestData, .pre_processing, .SwiftCC, .DistributedQFCA
 
 fctable_distributedQFCA_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
