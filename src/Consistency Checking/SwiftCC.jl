@@ -1,11 +1,9 @@
 #-------------------------------------------------------------------------------------------
-
 #=
     Purpose:    Finding blocked reactions in metabolic network
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
     Date:       July 2022
 =#
-
 #-------------------------------------------------------------------------------------------
 
 module SwiftCC
@@ -34,13 +32,14 @@ A function that finds blocked reactions for a metabolic network.
 
 # OUTPUTS
 
-- `blocked_names`:      Blocked reaction Names.
+- `blocked_index`:      Blocked reaction Ids.
+- `dualVar`:            Dual variables of a specific constraint.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> blocked_reactions = swiftCC(ModelObject)
+julia> blocked_index, dual_var = swiftCC(ModelObject)
 ```
 
 See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`, `homogenization()`
@@ -88,6 +87,10 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
     @objective(model, Max, objective_function)
     @constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
     optimize!(model)
+
+    # Calculating dual variables:
+
+    dualVar = dual.(c1)
 
     irr_blocked_reactions = []
     for i in range(1,n_irr; step=1)
@@ -168,7 +171,7 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
     # Returning a list consist of the Ids of the blocked reactions:
 
     blocked_index = sort(blocked_index)
-    return blocked_index
+    return blocked_index, dualVar
 end
 
 end

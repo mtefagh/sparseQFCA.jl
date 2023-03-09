@@ -1,11 +1,9 @@
 #-------------------------------------------------------------------------------------------
-
 #=
     Purpose:    Finding blocked reactions in metabolic network
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
     Date:       April 2022
 =#
-
 #-------------------------------------------------------------------------------------------
 
 module TheNaiveApproach
@@ -32,13 +30,13 @@ A function that finds blocked reactions in metabolic network.
 
 # OUTPUTS
 
-- `blocked_names`:  Blocked reaction Names.
+- `blocked_names`:  Blocked reaction Ids.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> blocked_reactions = find_blocked_reactions(myModel)
+julia> blocked_index = find_blocked_reactions(myModel)
 ```
 
 See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
