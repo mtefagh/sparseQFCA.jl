@@ -22,15 +22,15 @@ A function that finds blocked reactions in metabolic network.
 
 # INPUTS
 
-- `myModel`:        A StandardModel that has been built using COBREXA's `load_model` function.
+- `myModel`:            A StandardModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
--
+- `Tolerance`:          A small number that represents the level of error tolerance.
 
 # OUTPUTS
 
-- `blocked_names`:  Blocked reaction Ids.
+- `blocked_names`:      Blocked reaction Ids.
 
 # EXAMPLES
 
@@ -39,19 +39,15 @@ A function that finds blocked reactions in metabolic network.
 julia> blocked_index = find_blocked_reactions(myModel)
 ```
 
-See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
+See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(myModel::StandardModel)
+function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
 
     # Exporting data from model:
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-
-    # assigning a small value to Tolerance representing the level of error tolerance:
-
-    Tolerance = getTolerance()
 
     # Determining the reversibility of a reaction:
 

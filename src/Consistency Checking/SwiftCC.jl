@@ -24,11 +24,11 @@ A function that finds blocked reactions for a metabolic network.
 
 # INPUTS
 
-- `ModelObject`:        a newly object of MyModel.
+- `ModelObject`:        A newly object of MyModel.
 
 # OPTIONAL INPUTS
 
--
+- `Tolerance`:          A small number that represents the level of error tolerance.
 
 # OUTPUTS
 
@@ -42,11 +42,11 @@ A function that finds blocked reactions for a metabolic network.
 julia> blocked_index, dual_var = swiftCC(ModelObject)
 ```
 
-See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`, `homogenization()`
+See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()`
 
 """
 
-@everywhere function swiftCC(ModelObject::MyModel)
+@everywhere function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
 
     # Exporting data from ModelObject:
 
@@ -57,10 +57,6 @@ See also: `MyModel`, myModel_Constructor(), 'getTolerance()', `reversibility()`,
     n = ModelObject.n
     lb = ModelObject.lb
     ub = ModelObject.ub
-
-    # assigning a small value to Tolerance representing the level of error tolerance:
-
-    Tolerance = getTolerance()
 
     # Determining the reversibility of a reaction:
 

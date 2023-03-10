@@ -97,11 +97,12 @@ A function that computes the table of flux coupling relations for a metabolic ne
 
 # INPUTS
 
-- `myModel`:        A model that has been built using COBREXA's `load_model` function.
+- `myModel`:                   A model that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
--
+- `removing`:                  A boolean variable that indicates whether reactions should be removed from the network in the stages of determining coupling or not.
+- `Tolerance`:                 A small number that represents the level of error tolerance.
 
 # OUTPUTS
 
@@ -127,7 +128,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
 """
 
-function distributedQFCA(myModel::StandardModel, removing::Bool=false)
+function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
 
     # Exporting data from StandardModel:
 
@@ -145,10 +146,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
     # Homogenizing the upper_bound and lower_bound of reactions:
 
     lb, ub = homogenization(lb, ub)
-
-    # assigning a small value to Tolerance representing the level of error tolerance:
-
-    Tolerance = getTolerance()
 
     # Creating a newly object of MyModel:
 
@@ -198,7 +195,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
             # Finding Couples:
 
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, epsilon)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance)
             for j = 1:length(blocked)
                 if blocked[j] >= i
                    blocked[j] = blocked[j] + 1
@@ -232,7 +229,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
             # Finding Couples
 
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, epsilon)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance)
 
             D[i] = blocked
             D_values = collect(values(D[i]))
@@ -405,7 +402,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false)
             # Determining Fully Coupling:
 
             S_noBlocked_removedC = S_noBlocked_transpose_removedC'
-            if isapprox(norm(Sol), 0.0, atol = epsilon)
+            if isapprox(norm(Sol), 0.0, atol = Tolerance)
 
                 # Editing fctable and changing partially Coupling to Fully Coupling:
 
