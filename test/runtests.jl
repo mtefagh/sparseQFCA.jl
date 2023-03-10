@@ -12,18 +12,20 @@ fctable = @time QFCA(S, rev)[end]
 
 ## Consistency_Checking:
 
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/TheNaiveApproach.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
 include("../src/QFCA/distributedQFCA.jl")
-
-using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA
+using .DistributedQFCA
 
 # 8P
 
 n = 8
 addQFCAProcs(n)
+@everywhere begin
+    include("TestData.jl")
+    include("../src/Data Processing/pre_processing.jl")
+    include("../src/Consistency Checking/TheNaiveApproach.jl")
+    include("../src/Consistency Checking/SwiftCC.jl")
+    using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
+end
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
 
@@ -45,17 +47,20 @@ removeQFCAProcs()
 
 # Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
 
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
 include("../src/QFCA/distributedQFCA.jl")
-
-using .TestData, .pre_processing, .SwiftCC, .DistributedQFCA
+using .DistributedQFCA
 
 # 8P
 
 n = 8
 addQFCAProcs(n)
+@everywhere begin
+    include("TestData.jl")
+    include("../src/Data Processing/pre_processing.jl")
+    include("../src/Consistency Checking/TheNaiveApproach.jl")
+    include("../src/Consistency Checking/SwiftCC.jl")
+    using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
+end
 
 fctable_distributedQFCA_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
 fctable_distributedQFCA_iIS312 = @time distributedQFCA(myModel_iIS312)
