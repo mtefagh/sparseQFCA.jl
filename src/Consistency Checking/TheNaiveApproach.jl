@@ -51,7 +51,16 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
 
     # Determining the reversibility of a reaction:
 
-    irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
+    n = length(lb)
+    irreversible_reactions_id = Array{Int64}([])
+    reversible_reactions_id = Array{Int64}([])
+    for i in 1:n
+        if lb[i] >= 0
+            append!(irreversible_reactions_id, i)
+        else
+            append!(reversible_reactions_id, i)
+        end
+    end
 
     # Homogenizing the upper_bound and lower_bound of reactions:
 
