@@ -115,7 +115,6 @@ A function that computes the table of flux coupling relations for a metabolic ne
                                     * 4 - reaction j is directionally coupled to reaction i
 - `Fc_Coefficients`:           fully-coupling coefficients
 - `Dc_Coefficients`:           DCE coefficients.
-- `n_blocked`:                 Number of blocked reactions.
 
 # EXAMPLES
 
@@ -432,6 +431,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     removeQFCAProcs()
 
-    return fctable, Fc_Coefficients, Dc_Coefficients, n_blocked
+    return fctable, Fc_Coefficients, Dc_Coefficients
 end
 end

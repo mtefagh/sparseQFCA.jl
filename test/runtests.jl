@@ -12,36 +12,33 @@ fctable = @time QFCA(S, rev)[end]
 
 ## Consistency_Checking:
 
-include("../src/QFCA/distributedQFCA.jl")
-using .DistributedQFCA
-
-# 8P
-
-n = 8
-addQFCAProcs(n)
-
 include("TestData.jl")
 include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
-using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
-
+include("../src/QFCA/distributedQFCA.jl")
+using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
 
 # e_coli_core
 
 blockedList_TheNaive_e_coli_core = @time find_blocked_reactions(myModel_e_coli_core)
-blockedList_swiftCC_e_coli_core = @time swiftCC(myModel_e_coli_core)
+
+S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel_e_coli_core)
+lb, ub = homogenization(lb, ub)
+ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+blockedList_swiftCC_e_coli_core, dualVar_e_coli_core = @time swiftCC(myModel_e_coli_core)
 @test blockedTest_e_coli_core(blockedList_TheNaive_e_coli_core, blockedList_swiftCC_e_coli_core)
 
 # iIS312
 
 blockedList_TheNaive_iIS312 = @time find_blocked_reactions(myModel_iIS312)
-blockedList_swiftCC_iIS312 = @time swiftCC(myModel_iIS312)
+S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel_iIS312)
+lb, ub = homogenization(lb, ub)
+ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+blockedList_swiftCC_iIS312, dualVar_e_coli_core_iIS312  = @time swiftCC(myModel_iIS312)
 @test blockedTest_iIS312(blockedList_TheNaive_iIS312, blockedList_swiftCC_iIS312)
-
-removeQFCAProcs()
 
 ## QFCA:
 
@@ -61,8 +58,10 @@ include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
 using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
-fctable_distributedQFCA_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
-fctable_distributedQFCA_iIS312 = @time distributedQFCA(myModel_iIS312)
+fctable, Fc_Coefficients, Dc_Coefficients, n_blocked
+
+fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312)
 
 removeQFCAProcs()
 
