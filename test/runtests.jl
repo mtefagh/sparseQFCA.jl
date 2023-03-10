@@ -25,18 +25,18 @@ using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA
 
 blockedList_TheNaive_e_coli_core = @time find_blocked_reactions(myModel_e_coli_core)
 
-S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel_e_coli_core)
-lb, ub = homogenization(lb, ub)
-ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, lb_e_coli_core, ub_e_coli_core = dataOfModel(myModel_e_coli_core)
+lb_e_coli_core, ub_e_coli_core = homogenization(lb, ub)
+ModelObject = MyModel(S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, lb_e_coli_core, ub_e_coli_core)
 blockedList_swiftCC_e_coli_core, dualVar_e_coli_core = @time swiftCC(myModel_e_coli_core)
 @test blockedTest_e_coli_core(blockedList_TheNaive_e_coli_core, blockedList_swiftCC_e_coli_core)
 
 # iIS312
 
 blockedList_TheNaive_iIS312 = @time find_blocked_reactions(myModel_iIS312)
-S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel_iIS312)
-lb, ub = homogenization(lb, ub)
-ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312 = dataOfModel(myModel_iIS312)
+lb_iIS312, ub_iIS312 = homogenization(lb, ub)
+ModelObject = MyModel(S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312)
 blockedList_swiftCC_iIS312, dualVar_e_coli_core_iIS312  = @time swiftCC(myModel_iIS312)
 @test blockedTest_iIS312(blockedList_TheNaive_iIS312, blockedList_swiftCC_iIS312)
 
