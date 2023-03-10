@@ -44,21 +44,11 @@ blockedList_swiftCC_iIS312, dualVar_e_coli_core_iIS312  = @time swiftCC(ModelObj
 
 # Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
 
-include("../src/QFCA/distributedQFCA.jl")
-using .DistributedQFCA
-
 # 8P
 
 n = 8
 addQFCAProcs(n)
-
-include("TestData.jl")
-include("../src/Data Processing/pre_processing.jl")
-include("../src/Consistency Checking/TheNaiveApproach.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
-using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
-
-fctable, Fc_Coefficients, Dc_Coefficients, n_blocked
+println(nprocs())
 
 fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
 fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312)

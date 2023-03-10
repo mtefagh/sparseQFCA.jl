@@ -127,7 +127,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
 """
 
-function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
+@everywhere function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
 
     # Exporting data from StandardModel:
 
@@ -175,7 +175,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     # Finding Coupling between reactions by using swiftCC functions in Parallel:
 
     @sync @distributed for i in range(1, col_noBlocked)
-
         if(removing)
 
             # Saving Values:
