@@ -78,7 +78,7 @@ See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()
     model = Model(GLPK.Optimizer)
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @variable(model, lb_u[i] <= u[i = 1:n_irr] <= ub_u[i])
-    @constraint(model, S * V .== 0)
+    @constraint(model, c1, S * V .== 0)
     objective_function = ones(n_irr)'*u
     @objective(model, Max, objective_function)
     @constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
