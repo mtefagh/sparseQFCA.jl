@@ -24,7 +24,7 @@ include("TestData.jl")
 include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
-@everywhere using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
+using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
@@ -59,7 +59,7 @@ include("TestData.jl")
 include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 include("../src/Consistency Checking/SwiftCC.jl")
-@everywhere using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
+using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC
 
 fctable_distributedQFCA_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
 fctable_distributedQFCA_iIS312 = @time distributedQFCA(myModel_iIS312)
