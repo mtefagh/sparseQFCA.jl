@@ -7,69 +7,10 @@
 #-------------------------------------------------------------------------------------------
 
 module pre_processing
-export MyModel, myModel_Constructor, dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
-using Distributed
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
-@everywhere using GLPK, JuMP, COBREXA, SparseArrays
-
-"""
-    MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-
-A general type for storing a StandardModel which contains the following fields:
-
-- `S`:              LHS matrix (m x n)
-- `Metabolites`:    List of metabolic network metabolites.
-- `Reactions`:      List of metabolic network reactions.
-- `Genes`:          List of metabolic network reactions.
-- `m`:              Number of rows of stoichiometric matrix.
-- `n`:              Number of columns of stoichiometric matrix.
-- `lb`:             Lower bound vector (n x 1)
-- `ub`:             Upper bound vector (n x 1)
-
-"""
-
-@everywhere mutable struct MyModel
-    S              ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
-    Metabolites    ::Array{String,1}
-    Reactions      ::Array{String,1}
-    Genes          ::Array{String,1}
-    m              ::Int
-    n              ::Int
-    lb             ::Array{Float64,1}
-    ub             ::Array{Float64,1}
-end
-
-"""
-    myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
-
-A function that initializes a newly created object of MyModel.
-
-# INPUTS
-
--'ModelObject'      a newly object of MyModel.
-- `S`:              LHS matrix (m x n)
-- `Metabolites`:    List of metabolic network metabolites.
-- `Reactions`:      List of metabolic network reactions.
-- `Genes`:          List of metabolic network reactions.
-- `m`:              Number of rows of stoichiometric matrix.
-- `n`:              Number of columns of stoichiometric matrix.
-- `lb`:             Lower bound vector (n x 1)
-- `ub`:             Upper bound vector (n x 1)
-
-"""
-
-@everywhere function myModel_Constructor(ModelObject::MyModel, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
-                                         Genes::Array{String,1}, m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
-     ModelObject.S = S
-     ModelObject.Metabolites = Metabolites
-     ModelObject.Reactions = Reactions
-     ModelObject.Genes = Genes
-     ModelObject.m = m
-     ModelObject.n = n
-     ModelObject.lb = lb
-     ModelObject.ub = ub
-end
+using GLPK, JuMP, COBREXA, SparseArrays
 
 """
     dataOfModel(myModel)
@@ -153,7 +94,7 @@ julia> M = getM()
 
 """
 
-@everywhere function getM()
+function getM()
     f = open("../config/ConfigFile.txt", "r")
     c = 0
     for lines in readlines(f)
@@ -196,7 +137,7 @@ julia> Tolerance = getTolerance()
 
 """
 
-@everywhere function getTolerance()
+function getTolerance()
     f = open("../config/ConfigFile.txt", "r")
     c = 0
     for lines in readlines(f)
@@ -242,7 +183,7 @@ See also: `dataOfModel()`
 
 """
 
-@everywhere function reversibility(lb::Array{Float64,1})
+function reversibility(lb::Array{Float64,1})
     n = length(lb)
     irreversible_reactions_id = Array{Int64}([])
     reversible_reactions_id = Array{Int64}([])
@@ -330,7 +271,7 @@ See also: `dataOfModel()`, 'getM()'
 
 """
 
-@everywhere function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1})
+function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1})
     n = length(lb)
     # Set a large number for M:
     M = getM()

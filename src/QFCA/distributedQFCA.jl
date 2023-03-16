@@ -49,7 +49,7 @@ See also: ``
 
 """
 
-function addQFCAProcs(n::Int)
+function addQFCAProcs(n::Int=7)
    addprocs(n-1)
    return
 end
@@ -127,7 +127,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
 """
 
-@everywhere function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
+function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
 
     # Exporting data from StandardModel:
 
@@ -162,7 +162,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
     # Determining Coupling by using swiftCC function:
 
-    @everywhere D = Dict()
+    println(nprocs())
 
     # Defining a matrix to save DC-couplings:
 
@@ -170,7 +170,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
     # Defining a matrix to save DCE coefficients:
 
-    Dc_Coefficients = SharedArray{Int,2}((col_noBlocked, col_noBlocked), init = false)
+    Dc_Coefficients = SharedArray{Float64,2}((col_noBlocked, col_noBlocked), init = false)
 
     # Finding Coupling between reactions by using swiftCC functions in Parallel:
 
@@ -200,9 +200,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
                 end
             end
 
-            D[i] = blocked
-            D_values = collect(values(D[i]))
-            DC_Matrix[i,D_values] .= 1.0
+            DC_Matrix[i,blocked] .= 1.0
 
             lambda = S_noBlocked_temp' * dualVar
             Dc_Coefficients[i, :] = lambda
@@ -211,7 +209,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
             lb_noBlocked = copy(lb_noBlocked_temp)
             ub_noBlocked = copy(ub_noBlocked_temp)
-            S_noBlocked = copy(S_noBlocked_temp)
+            S_noBlocked  = copy(S_noBlocked_temp)
         else
 
             # Saving Values
@@ -229,9 +227,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
             blocked, dualVar = swiftCC(ModelObject, Tolerance)
 
-            D[i] = blocked
-            D_values = collect(values(D[i]))
-            DC_Matrix[i,D_values] .= 1.0
+            DC_Matrix[i,blocked] .= 1.0
 
             lambda = S_noBlocked' * dualVar
             Dc_Coefficients[i, :] = lambda
@@ -253,7 +249,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
     for i in range(1, col_noBlocked)
         for j in range(1, col_noBlocked)
-            if DC_Matrix[i, j] == 1
+            if DC_Matrix[i, j] == 1.0
                 fctable[j,i] = 3.0
             end
         end
@@ -290,7 +286,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
     # Determining Partial Couples:
 
-    @everywhere PC = Dict()
+    PC = Dict()
 
     s = 1
     Partially_Couples = []
@@ -314,122 +310,65 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 
     Fc_Coefficients[diagind(Fc_Coefficients)] .= 1.0
 
-    # Defining a dictionary to save metabolites with only two reactions that are fully-coupled:
-    @everywhere FC_OneMet = Dict()
-    met = 1
-    for row in eachrow(S)
-        non_zero_indices = []
-        row = sparsevec(row)
-        if nnz(row) == 2
-            for i = 1:length(row)
-                if row[i] != 0
-                append!(non_zero_indices, i)
-                end
-            end
-            FC_OneMet[met] = non_zero_indices
-        end
-        met += 1
-    end
-
-    # Converting FC_OneMet : Vector{any} ---> Tuple{Int64, Int64}
-
-    for key in sort(collect(keys(FC_OneMet)))
-        FC_OneMet[key] = (FC_OneMet[key][1], FC_OneMet[key][2])
-        FC_OneMet[key] = convert(Tuple{Int64, Int64}, FC_OneMet[key])
-    end
-
-    # Merging Keys of two Dictionary to use it as a Tuple:
-
-    Keys = Tuple(zip(sort(collect(keys(PC))), sort(collect(keys(FC_OneMet)))))
-
     # Solving a LU for each pair to determine Fully Coupling:
 
-    @sync @distributed for (key_PC, Key_FC_OneMet) in Keys
+    @sync @distributed for key in sort(collect(keys(PC)))
 
-        # Check if the nodes corresponding to the current key_PC in the Partially-Coupling Dictionary (PC) and
-        # the nodes corresponding to the current Key_FC_OneMet in the Fully Connected One-Metabolite Dictionary (FC_OneMet)
-        # are the same.
+        # Transpose S:
 
-        if (PC[key_PC][1] == FC_OneMet[Key_FC_OneMet][1]) && (PC[key_PC][2] == FC_OneMet[Key_FC_OneMet][2])
+        S_noBlocked_transpose = S_noBlocked'
 
-            # If the nodes are the same, update the FC table to indicate that the nodes are fully coupled.
+        # CO
 
-            fctable[PC[key_PC][1],PC[key_PC][2]] = 1.0
-            fctable[PC[key_PC][2],PC[key_PC][1]] = 1.0
+        CO = zeros(col_noBlocked)
 
-            # Calculate the fully coupling coefficients using the ratio of the absolute values of the
-            # corresponding elements in the No-Blocked Stoichiometric matrix (S_noBlocked).
+        # Set CO vector :
 
-            # V_i = |b/a| * V_j
+        CO[PC[key][1]] = -1
 
-            Fc_Coefficients[PC[key_PC][1],PC[key_PC][2]] = abs(S_noBlocked[Key_FC_OneMet ,FC_OneMet[Key_FC_OneMet][2]])/ abs(S_noBlocked[Key_FC_OneMet ,FC_OneMet[Key_FC_OneMet][1]])
+        # Removing C:
 
-            # V_j = |a/b| * V_i
+        S_noBlocked_transpose_removedC = S_noBlocked_transpose[1:end .!= PC[key][2], :]
 
-            Fc_Coefficients[PC[key_PC][2],PC[key_PC][1]] = abs(S_noBlocked[Key_FC_OneMet ,FC_OneMet[Key_FC_OneMet][1]])/ abs(S_noBlocked[Key_FC_OneMet ,FC_OneMet[Key_FC_OneMet][2]])
+        rowS, colS = size(S_noBlocked_transpose)
+        rowC, colC = size(S_noBlocked_transpose_removedC)
 
-        else
+        CO = CO[setdiff(1:end, PC[key][2])]
 
-            # Transpose S:
+        # Using Gaussian elimination
 
-            S_noBlocked_transpose = S_noBlocked'
+        X = S_noBlocked_transpose_removedC \ CO
 
-            # CO
+        Sol = (S_noBlocked_transpose_removedC*X) - (CO)
 
-            CO = zeros(col_noBlocked)
+        # Determining Fully Coupling
 
-            # Set CO vector:
+        S_noBlocked_removedC = S_noBlocked_transpose_removedC'
+        if isapprox(norm(Sol), 0.0, atol = Tolerance)
 
-            CO[PC[key_PC][1]] = -1
+            # Editing fctable and changing partially Coupling to Fully Coupling
 
-            # Removing C:
+            fctable[PC[key][1],PC[key][2]] = 1.0
+            fctable[PC[key][2],PC[key][1]] = 1.0
 
-            S_noBlocked_transpose_removedC = S_noBlocked_transpose[1:end .!= PC[key_PC][2], :]
+            # Casting SparseVector{Float64, Int64} to SparseMatrixCSC{Float64, Int64}
 
-            rowS, colS = size(S_noBlocked_transpose)
-            rowC, colC = size(S_noBlocked_transpose_removedC)
+            rowC_S_noBlocked_transpose = sparsevec(S_noBlocked_transpose[PC[key][2], :])
+            matrix_rowC_S_noBlocked_transpose = sparse(rowC_S_noBlocked_transpose)
+            sparseMatrix_rowC = SparseMatrixCSC(matrix_rowC_S_noBlocked_transpose)
 
-            CO = CO[setdiff(1:end, PC[key_PC][2])]
+            # Calculationg coefficient :
+            C = sparseMatrix_rowC' * X
 
-            # Using Gaussian elimination:
+            ## Setting coefficient for i,j
 
-            X = S_noBlocked_transpose_removedC \ CO
+            # V_i = C * V_j
+            Fc_Coefficients[PC[key][1],PC[key][2]] = C[1]
 
-            Sol = (S_noBlocked_transpose_removedC*X) - (CO)
-
-            # Determining Fully Coupling:
-
-            S_noBlocked_removedC = S_noBlocked_transpose_removedC'
-            if isapprox(norm(Sol), 0.0, atol = Tolerance)
-
-                # Editing fctable and changing partially Coupling to Fully Coupling:
-
-                fctable[PC[key_PC][1],PC[key_PC][2]] = 1.0
-                fctable[PC[key_PC][2],PC[key_PC][1]] = 1.0
-
-                # Casting SparseVector{Float64, Int64} to SparseMatrixCSC{Float64, Int64}:
-
-                rowC_S_noBlocked_transpose = sparsevec(S_noBlocked_transpose[PC[key_PC][2], :])
-                matrix_rowC_S_noBlocked_transpose = sparse(rowC_S_noBlocked_transpose)
-                sparseMatrix_rowC = SparseMatrixCSC(matrix_rowC_S_noBlocked_transpose)
-
-                # Calculationg coefficient:
-                C = sparseMatrix_rowC' * X
-
-                ## Setting coefficient for i,j:
-
-                # V_i = C * V_j
-                Fc_Coefficients[PC[key_PC][1],PC[key_PC][2]] = C[1]
-
-                # V_j = 1/C * V_i
-                Fc_Coefficients[PC[key_PC][2],PC[key_PC][1]] = 1 / C[1]
-
-            end
+            # V_j = 1/C * V_i
+            Fc_Coefficients[PC[key][2],PC[key][1]] = 1 / C[1]
         end
     end
-
-    removeQFCAProcs()
-
     return fctable, Fc_Coefficients, Dc_Coefficients
 end
 end

@@ -7,16 +7,72 @@
 #-------------------------------------------------------------------------------------------
 
 module SwiftCC
-export swiftCC
+export MyModel, myModel_Constructor, swiftCC
 
-using Distributed
-
-@everywhere using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
+using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 
 include("../Data Processing/pre_processing.jl")
 
 using .pre_processing
 
+
+"""
+    MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+
+A general type for storing a StandardModel which contains the following fields:
+
+- `S`:              LHS matrix (m x n)
+- `Metabolites`:    List of metabolic network metabolites.
+- `Reactions`:      List of metabolic network reactions.
+- `Genes`:          List of metabolic network reactions.
+- `m`:              Number of rows of stoichiometric matrix.
+- `n`:              Number of columns of stoichiometric matrix.
+- `lb`:             Lower bound vector (n x 1)
+- `ub`:             Upper bound vector (n x 1)
+
+"""
+
+mutable struct MyModel
+    S              ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
+    Metabolites    ::Array{String,1}
+    Reactions      ::Array{String,1}
+    Genes          ::Array{String,1}
+    m              ::Int
+    n              ::Int
+    lb             ::Array{Float64,1}
+    ub             ::Array{Float64,1}
+end
+
+"""
+    myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
+
+A function that initializes a newly created object of MyModel.
+
+# INPUTS
+
+-'ModelObject'      a newly object of MyModel.
+- `S`:              LHS matrix (m x n)
+- `Metabolites`:    List of metabolic network metabolites.
+- `Reactions`:      List of metabolic network reactions.
+- `Genes`:          List of metabolic network reactions.
+- `m`:              Number of rows of stoichiometric matrix.
+- `n`:              Number of columns of stoichiometric matrix.
+- `lb`:             Lower bound vector (n x 1)
+- `ub`:             Upper bound vector (n x 1)
+
+"""
+
+function myModel_Constructor(ModelObject::MyModel, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
+                                         Genes::Array{String,1}, m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
+     ModelObject.S = S
+     ModelObject.Metabolites = Metabolites
+     ModelObject.Reactions = Reactions
+     ModelObject.Genes = Genes
+     ModelObject.m = m
+     ModelObject.n = n
+     ModelObject.lb = lb
+     ModelObject.ub = ub
+end
 """
     swiftCC(ModelObject)
 
@@ -46,7 +102,7 @@ See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()
 
 """
 
-@everywhere function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
+function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
 
     # Exporting data from ModelObject:
 

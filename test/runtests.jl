@@ -3,7 +3,7 @@
 
 include("ecoli.jl")
 
-using .ecoli, COBREXA, JuMP, sparseQFCA, Test
+using .ecoli, COBREXA, JuMP, sparseQFCA, Test, Distributed
 
 # finding all the flux coupling relations among the reactions:
 
@@ -12,11 +12,13 @@ fctable = @time QFCA(S, rev)[end]
 
 ## Consistency_Checking:
 
+addprocs(7)
+
 include("TestData.jl")
 include("../src/Data Processing/pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
-include("../src/Consistency Checking/SwiftCC.jl")
-include("../src/QFCA/distributedQFCA.jl")
+@everywhere include("../src/Consistency Checking/SwiftCC.jl")
+@everywhere include("../src/QFCA/distributedQFCA.jl")
 using .TestData, .pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA
 
 # Comparing TheNaiveApproach and SwiftCC Outputs:
@@ -44,13 +46,59 @@ blockedList_swiftCC_iIS312, dualVar_e_coli_core_iIS312  = @time swiftCC(ModelObj
 
 # Comparing final flux coupling table between distributedQFCA and FFCA Algorithms:
 
-# 8P
-
-n = 8
-addQFCAProcs(n)
-println(nprocs())
 
 fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+
+d_0 = 0
+d_1 = 0
+d_2 = 0
+d_3 = 0
+d_4 = 0
+
+d_0 = sum(fctable_distributedQFCA_e_coli_core .== 0.0)
+d_1 = sum(fctable_distributedQFCA_e_coli_core .== 1.0)
+d_2 = sum(fctable_distributedQFCA_e_coli_core .== 2.0)
+d_3 = sum(fctable_distributedQFCA_e_coli_core .== 3.0)
+d_4 = sum(fctable_distributedQFCA_e_coli_core .== 4.0)
+
+println()
+
+println("Final fctable_distributedQFCA_e_coli_core : ")
+
+println()
+
+println("Number of 0's (unCoupled) : $d_0")
+println("Number of 1's (Fully)     : $d_1")
+println("Number of 2's (Partialy)  : $d_2")
+println("Number of 3's (DC i-->j)  : $d_3")
+println("Number of 4's (DC j-->i)  : $d_4")
+
+fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core, true)
+
+d_0 = 0
+d_1 = 0
+d_2 = 0
+d_3 = 0
+d_4 = 0
+
+d_0 = sum(fctable_distributedQFCA_e_coli_core .== 0.0)
+d_1 = sum(fctable_distributedQFCA_e_coli_core .== 1.0)
+d_2 = sum(fctable_distributedQFCA_e_coli_core .== 2.0)
+d_3 = sum(fctable_distributedQFCA_e_coli_core .== 3.0)
+d_4 = sum(fctable_distributedQFCA_e_coli_core .== 4.0)
+
+println()
+
+println("Final fctable_distributedQFCA_e_coli_core : ")
+
+println()
+
+println("Number of 0's (unCoupled) : $d_0")
+println("Number of 1's (Fully)     : $d_1")
+println("Number of 2's (Partialy)  : $d_2")
+println("Number of 3's (DC i-->j)  : $d_3")
+println("Number of 4's (DC j-->i)  : $d_4")
+
 fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312)
 
 removeQFCAProcs()
