@@ -1,4 +1,3 @@
-
 module TestData
 
 using Distributed
@@ -12,8 +11,11 @@ using COBREXA, DelimitedFiles
 
 myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
 myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
-fctable_FFCA_e_coli_core = readdlm("FCTables/MatlabFFCA_Fctable_Ecolicore.csv", header = false)
-fctable_FFCA_iIS312 = readdlm("FCTables/MatlabFFCA_Fctable_iIS312.csv", header = false)
+
+# read the CSV file into a matrix of type String:
+
+fctable_FFCA_e_coli_core = readdlm("FCTables/MatlabFFCA_Fctable_Ecolicore.csv", ',', Int, header=false)
+fctable_FFCA_iIS312 = readdlm("FCTables/MatlabFFCA_Fctable_iIS312.csv", ',', Int, header=false)
 
 # Defining functions to Comparing Results:
 

@@ -1,4 +1,5 @@
 module ecoli
+
 export S, rev, fctest, fcfig
 
 using SparseArrays, DelimitedFiles, Colors

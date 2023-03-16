@@ -49,7 +49,7 @@ See also: ``
 
 """
 
-function addQFCAProcs(n::Int=7)
+function addQFCAProcs(n::Int=8)
    addprocs(n-1)
    return
 end
@@ -161,8 +161,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     row_noBlocked, col_noBlocked = size(S_noBlocked)
 
     # Determining Coupling by using swiftCC function:
-
-    println(nprocs())
 
     # Defining a matrix to save DC-couplings:
 
