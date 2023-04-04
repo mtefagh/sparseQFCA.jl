@@ -248,9 +248,9 @@ version = "0.21.3"
 
 [[deps.JuMP]]
 deps = ["LinearAlgebra", "MathOptInterface", "MutableArithmetics", "OrderedCollections", "Printf", "SnoopPrecompile", "SparseArrays"]
-git-tree-sha1 = "611b9f12f02c587d860c813743e6cec6264e94d8"
+git-tree-sha1 = "4ec0e68fecbbe1b78db2ddf1ac573963ed5adebc"
 uuid = "4076af6c-e467-56ae-b986-b466b2749572"
-version = "1.9.0"
+version = "1.10.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
