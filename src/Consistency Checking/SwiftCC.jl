@@ -104,7 +104,7 @@ See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()
 
 function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
 
-    ## Export data from ModelObject:
+    ## Export data from ModelObject
 
     S = ModelObject.S
     Metabolites = ModelObject.Metabolites
@@ -114,54 +114,54 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
     lb = ModelObject.lb
     ub = ModelObject.ub
 
-    ## Determine the reversibility of a reaction:
+    ## Determine the reversibility of a reaction
 
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
 
-    ## Determine the number of irreversible and reversible reactions:
+    ## Determine the number of irreversible and reversible reactions
 
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
 
-    ## Calculate the dimensions of the S matrix:
+    ## Calculate the dimensions of the S matrix
 
     row_num, col_num = size(S)
 
-    ## Find irreversible blocked reactions in 1 LP problem:
+    ## Find irreversible blocked reactions in 1 LP problem
 
-    # Set the lower and upper bounds of the "u" variables to 0 and 1, respectively
+    # Set the lower and upper bounds of the "u" variables to 0 and 1, respectively:
     lb_u = zeros(n_irr)
     ub_u = ones(n_irr)
 
-    # Create a new optimization model using the GLPK optimizer
+    # Create a new optimization model using the GLPK optimizer:
     model = Model(GLPK.Optimizer)
 
-    # Define variables V and u with their lower and upper bounds
+    # Define variables V and u with their lower and upper bounds:
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
     @variable(model, lb_u[i] <= u[i = 1:n_irr] <= ub_u[i])
 
-    # Add a constraint that ensures the mass balance of the system
+    # Add a constraint that ensures the mass balance of the system:
     @constraint(model, c1, S * V .== 0)
 
-    # Define the objective function to be the sum of all "u" variables
+    # Define the objective function to be the sum of all "u" variables:
     objective_function = ones(n_irr)'*u
 
-    # Set the optimization objective to maximize the objective function
+    # Set the optimization objective to maximize the objective function:
     @objective(model, Max, objective_function)
 
-    # Add a constraint for each irreversible reaction that sets its "u" variable to be less than or equal to its corresponding V variable
+    # Add a constraint for each irreversible reaction that sets its "u" variable to be less than or equal to its corresponding V variable:
     @constraint(model, [i in 1:n_irr], u[i] <= V[irreversible_reactions_id[i]])
 
-    # Solve the optimization problem
+    # Solve the optimization problem:
     optimize!(model)
 
-    # Get the dual variables for the stoichiometric constraint
+    # Get the dual variables for the stoichiometric constraint:
     dualVar = dual.(c1)
 
-    # Initialize an empty list to store the IDs of blocked irreversible reactions
+    # Initialize an empty list to store the IDs of blocked irreversible reactions:
     irr_blocked_reactions = []
 
-    # Iterate over the irreversible reactions and check if the corresponding u variable is close to 0, If it is, the reaction is considered blocked and its ID is added to the list
+    # Iterate over the irreversible reactions and check if the corresponding u variable is close to 0, If it is, the reaction is considered blocked and its ID is added to the list:
     for i in range(1,n_irr; step=1)
         if isapprox(value(u[i]), 0.0, atol = Tolerance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
@@ -172,42 +172,42 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
 
     irr_blocked_num = length(irr_blocked_reactions)
 
-    ## Find reversible blocked reactions:
+    ## Find reversible blocked reactions
 
-    # Creating S_transpose
+    # Creating S_transpose:
     S_transpose = S'
 
-    # Determining the dimensions of the S_transpose matrix
+    # Determining the dimensions of the S_transpose matrix:
     row_num_trans, col_num_trans = size(S_transpose)
 
-    # Removing irreversibly blocked reactions from the Stoichiometric Matrix
+    # Removing irreversibly blocked reactions from the Stoichiometric Matrix:
     S_transpose_noIrrBlocked = S_transpose[setdiff(1:end, irr_blocked_reactions), :]
 
     # Creating the I_reversible Matrix:
     I_reversible = zeros(n, n_rev)
 
-    # Populating the I_reversible Matrix with 1 in the rows corresponding to reversible reactions
+    # Populating the I_reversible Matrix with 1 in the rows corresponding to reversible reactions:
     rev_id = 1
     for col in eachcol(I_reversible)
         col[reversible_reactions_id[rev_id]] = 1.0
         rev_id += 1
     end
 
-    # Removing irreversibly blocked reactions from the I_reversible Matrix
+    # Removing irreversibly blocked reactions from the I_reversible Matrix:
     I_reversible = I_reversible[setdiff(1:end, irr_blocked_reactions), :]
 
-    # Determining the dimensions of the S_transpose_noIrrBlocked and I_reversible matrices
+    # Determining the dimensions of the S_transpose_noIrrBlocked and I_reversible matrices:
     S_trans_row, S_trans_col = size(S_transpose_noIrrBlocked)
     I_row, I_col = size(I_reversible)
 
-    # Solving the system of equations using Gaussian elimination to identify blocked reversible reactions
+    # Solving the system of equations using Gaussian elimination to identify blocked reversible reactions:
     X = S_transpose_noIrrBlocked \ I_reversible
     Sol = (S_transpose_noIrrBlocked*X) - I_reversible
 
-    # Determining the dimensions of the Sol matrix
+    # Determining the dimensions of the Sol matrix:
     row_sol, col_sol = size(Sol)
 
-    # Finding columns in Sol that correspond to blocked reversible reactions
+    # Finding columns in Sol that correspond to blocked reversible reactions:
     c = 0
     rev_blocked_reactions_col = []
     for col in eachcol(Sol)
