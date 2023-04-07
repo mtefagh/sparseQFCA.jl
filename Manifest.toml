@@ -317,9 +317,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[deps.MathOptInterface]]
 deps = ["BenchmarkTools", "CodecBzip2", "CodecZlib", "DataStructures", "ForwardDiff", "JSON", "LinearAlgebra", "MutableArithmetics", "NaNMath", "OrderedCollections", "Printf", "SnoopPrecompile", "SparseArrays", "SpecialFunctions", "Test", "Unicode"]
-git-tree-sha1 = "88551cb56065a7bf9276af1d1970d2bd0d4b6ed4"
+git-tree-sha1 = "58a367388e1b068104fa421cb34f0e6ee6316a26"
 uuid = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
-version = "1.14.0"
+version = "1.14.1"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "Random", "Sockets"]
