@@ -97,7 +97,7 @@ If the file cannot be opened or the value on the first line is not a valid float
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:    Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -112,7 +112,7 @@ julia> M = getM()
 
 """
 
-function getM()
+function getM(printLevel::Int=1)
 
     ## Attempt to open the file "ConfigFile.txt" for reading
 
@@ -125,6 +125,12 @@ function getM()
         # Convert the line to a float and close the file:
         M = parse(Float64, line)
         close(f)
+
+        ## Print out results if requested
+
+        if printLevel > 0
+            printstyled("M = $M\n"; color=:magenta)
+        end
 
         # Return M:
         return M
@@ -150,7 +156,7 @@ the function prints an error message and returns nothing.
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:             Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -165,7 +171,7 @@ julia> Tolerance = getTolerance()
 
 """
 
-function getTolerance()
+function getTolerance(printLevel::Int=1)
 
     ## Attempt to open the file "ConfigFile.txt" for reading
 
@@ -179,6 +185,12 @@ function getTolerance()
         # Convert the line to a float and close the file:
         Tolerance = parse(Float64, line)
         close(f)
+
+        ## Print out results if requested
+
+        if printLevel > 0
+            printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        end
 
         # Return Tolerance:
         return Tolerance
@@ -410,7 +422,7 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     n = length(lb)
 
     # Set the tolerance value:
-    Tolerance = getTolerance()
+    Tolerance = getTolerance(0)
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])

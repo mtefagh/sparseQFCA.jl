@@ -65,7 +65,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
     ## Homogenize the upper_bound and lower_bound of reactions
 
     # Set the maximum value for M:
-    M = 1000.0
+    M = getM()
 
     ## Loop through each value in the array "lb" and "ub"
 
@@ -185,7 +185,8 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
     ## Print out results if requested
 
     if printLevel > 0
-        printstyled("Consistency_Checking(TheNaiveApproch) :\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
         println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
         println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")
         println("Number of blocked reactions              : $(length(blocked_index))")

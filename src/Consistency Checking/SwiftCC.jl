@@ -239,7 +239,8 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
     ## Print out results if requested
 
     if printLevel > 0
-        printstyled("Consistency_Checking(SwiftCC) :\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
         println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
         println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")
         println("Number of blocked reactions              : $(length(blocked_index))")
