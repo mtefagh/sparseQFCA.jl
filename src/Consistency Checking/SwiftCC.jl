@@ -1,12 +1,13 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Finding blocked reactions in metabolic network
-    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
+    Purpose:    Identifying blocked reactions in metabolic networks using linear programming(1LP) and Gaussian elimination
+    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       July 2022
 =#
 #-------------------------------------------------------------------------------------------
 
 module SwiftCC
+
 export MyModel, myModel_Constructor, swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
@@ -14,7 +15,6 @@ using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 include("../Data Processing/pre_processing.jl")
 
 using .pre_processing
-
 
 """
     MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
@@ -46,11 +46,12 @@ end
 """
     myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A function that initializes a newly created object of MyModel.
+The function takes in several arguments, including a ModelObject of type MyModel,
+and assigns values to its fields based on the other arguments passed in.
 
 # INPUTS
 
--'ModelObject'      a newly object of MyModel.
+-'ModelObject':     A newly object of MyModel.
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.
 - `Reactions`:      List of metabolic network reactions.
@@ -73,10 +74,13 @@ function myModel_Constructor(ModelObject::MyModel, S::Union{SparseMatrixCSC{Floa
      ModelObject.lb = lb
      ModelObject.ub = ub
 end
+
 """
     swiftCC(ModelObject)
 
-A function that finds blocked reactions for a metabolic network.
+The function first exports data from ModelObject and performs some calculations to determine the reversibility of reactions
+and the number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
+and uses Gaussian elimination to identify blocked reversible reactions.
 
 # INPUTS
 
@@ -88,7 +92,7 @@ A function that finds blocked reactions for a metabolic network.
 
 # OUTPUTS
 
-- `blocked_index`:      Index of blocked reactions.
+- `blocked_index`:      IDs of of blocked reactions.
 - `dualVar`:            Dual variables of a specific constraint.
 
 # EXAMPLES
@@ -168,8 +172,7 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
         end
     end
 
-    # Determine the number of irreversible blocked reactions
-
+    # Determine the number of irreversible blocked reactions:
     irr_blocked_num = length(irr_blocked_reactions)
 
     ## Find reversible blocked reactions
@@ -222,12 +225,12 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end
 
-    # Union reversbile blocked reactions and irreversible blocked reactions
+    ## Union reversbile blocked reactions and irreversible blocked reactions
 
     blocked_index = []
     blocked_index = union(rev_blocked_reactions, irr_blocked_reactions)
 
-    # Returning a list consist of the Ids of the blocked reactions
+    ## Returning a list consist of the Ids of the blocked reactions
 
     blocked_index = sort(blocked_index)
     return blocked_index, dualVar

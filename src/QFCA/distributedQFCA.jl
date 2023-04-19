@@ -429,6 +429,28 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             end
         end
     end
+
+    d_0 = 0
+    d_1 = 0
+    d_2 = 0
+    d_3 = 0
+    d_4 = 0
+
+    d_0 = sum(fctable .== 0.0)
+    d_1 = sum(fctable .== 1.0)
+    d_2 = sum(fctable .== 2.0)
+    d_3 = sum(fctable .== 3.0)
+    d_4 = sum(fctable .== 4.0)
+
+    println()
+    println("Final fctable : ")
+    println()
+    println("Number of 0's (unCoupled) : $d_0")
+    println("Number of 1's (Fully)     : $d_1")
+    println("Number of 2's (Partialy)  : $d_2")
+    println("Number of 3's (DC i-->j)  : $d_3")
+    println("Number of 4's (DC j-->i)  : $d_4")
+    
     return fctable, Fc_Coefficients, Dc_Coefficients
 end
 end
