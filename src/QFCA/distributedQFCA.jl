@@ -158,7 +158,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
     ub_noBlocked = ub[setdiff(1:end, blocked_index)]
     S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
-    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked)
+    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, 0)
     row_noBlocked, col_noBlocked = size(S_noBlocked)
 
     ## Correct Reversibility
@@ -191,7 +191,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
             # Calculate the set of blocked reactions and dual variables for the modified network:
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, Tolerance)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance, 0)
 
             # Update indices of blocked reactions after removing ith reaction:
             for j = 1:length(blocked)
@@ -222,7 +222,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
             # Find the set of blocked reactions and dual variables for the modified network:
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, Tolerance)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance, 0)
 
             # Update DC_Matrix based on the blocked reactions:
             DC_Matrix[i,blocked] .= 1.0

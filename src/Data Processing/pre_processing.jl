@@ -8,7 +8,7 @@
 
 module pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
@@ -24,7 +24,7 @@ represented by a StandardModel object, and returns it as a tuple.
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:     Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -46,7 +46,7 @@ julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
 """
 
-function dataOfModel(myModel::StandardModel)
+function dataOfModel(myModel::StandardModel, printLevel::Int=1)
 
     ## Extracting Data
 
@@ -56,6 +56,7 @@ function dataOfModel(myModel::StandardModel)
     Genes = genes(myModel) # Array of gene IDs
     m = length(metabolites(myModel)) # Number of metabolites
     n = length(reactions(myModel)) # Number of reactions
+    n_genes = length(genes(myModel)) # Number of genes
     lb = lower_bounds(myModel) # Array of lower bounds for each reaction
     ub = upper_bounds(myModel) # Array of upper bounds for each reaction
 
@@ -66,6 +67,15 @@ function dataOfModel(myModel::StandardModel)
     lb = lb[p] # Reorder the lower bounds according to the sorted indices
     ub = ub[p] # Reorder the upper bounds according to the sorted indices
     S = S[:,p] # Reorder the columns of the stoichiometric matrix according to the sorted indices
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        println("Number of Metabolites : $m")
+        println("Number of Reactions   : $n")
+        println("Number of Genes       : $n_genes")
+        println("Stoichiometric matrix : $m x $n")
+    end
 
     # Return the extracted data as a tuple:
     return S, Metabolites, Reactions, Genes, m, n, lb, ub
@@ -120,7 +130,7 @@ function getM()
         return M
     catch e
         # If an error occurs, print an error message and return nothing:
-        println("Error: Could not open file \"ConfigFile.txt\" for reading.")
+        printstyled("Error: Could not open file \"ConfigFile.txt\" for reading.\n"; color=:red)
         return nothing
     end
 end
@@ -174,7 +184,7 @@ function getTolerance()
         return Tolerance
     catch e
         # If an error occurs, print an error message and return nothing:
-        println("Error: Could not open file \"ConfigFile.txt\" for reading.")
+        printstyled("Error: Could not open file \"ConfigFile.txt\" for reading.\n"; color=:red)
         return nothing
     end
 end
@@ -194,7 +204,7 @@ one containing the IDs of irreversible reactions, and the other containing the I
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:                     Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -212,14 +222,12 @@ See also: `dataOfModel()`
 
 """
 
-function reversibility(lb::Array{Float64,1})
+function reversibility(lb::Array{Float64,1}, printLevel::Int=1)
 
-    ## Get the length of the "lb" array
-
+    # Get the length of the "lb" array:
     n = length(lb)
 
-    ## Create empty arrays to hold the IDs of irreversible and reversible reactions
-
+    # Create empty arrays to hold the IDs of irreversible and reversible reactions:
     irreversible_reactions_id = Array{Int64}([])
     reversible_reactions_id = Array{Int64}([])
 
@@ -234,6 +242,19 @@ function reversibility(lb::Array{Float64,1})
             append!(reversible_reactions_id, i)
         end
     end
+
+    # Get the number of irreversible and reversible reactions:
+    n_irr = length(irreversible_reactions_id)
+    n_rev = length(reversible_reactions_id)
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        println("Number of irreversible reactions : $n_irr ")
+        println("Number of reversibe    reactions : $n_rev ")
+    end
+
+    # Return the IDs of the irreversible and reversible reactions:
     return irreversible_reactions_id, reversible_reactions_id
 end
 
@@ -250,25 +271,25 @@ The function takes an array of strings, representing reaction IDs, and checks if
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:     Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
-- `true`:           There is a duplicate reactions.
-- `false`:          There are no duplicate reactions.
+- `true`:           There is a duplicate reaction.
+- `false`:          There is no duplicate reaction.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> check_duplicate = check_duplicate_reaction(Reactions)
+julia> check_duplicate = check_duplicate_reactions(Reactions)
 ```
 
 See also: `dataOfModel()`
 
 """
 
-function check_duplicate_reaction(Reactions::Array{String,1})
+function check_duplicate_reactions(Reactions::Array{String,1}, printLevel::Int=1)
 
     # Get the length of the Reactions array:
     n = length(Reactions)
@@ -279,11 +300,12 @@ function check_duplicate_reaction(Reactions::Array{String,1})
     # Check if the length of Reactions is equal to the length of unique_reactions
     # If they are equal, then there are no duplicate reactions, so return false:
     if n == n_unique
+        printstyled("There is no duplicate reaction.\n"; color=:green)
         return false
     else
+        printstyled("There is a duplicate reaction.\n"; color=:red)
         return true
     end
-
 end
 
 #-------------------------------------------------------------------------------------------
@@ -300,7 +322,7 @@ The function homogenizes the lower and upper bounds of a set of reactions in a m
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:     Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -318,10 +340,13 @@ See also: `dataOfModel()`, 'getM()'
 
 """
 
-function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1})
+function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::Int=1)
+
+    # Get the length of the lb array:
     n = length(lb)
+
     # Set a large number for M:
-    M = 1000000.0
+    M = getM()
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .> 0] .= 0
@@ -332,7 +357,8 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1})
     # If the upper bound is less than zero, set it to zero:
     ub[ub .< 0] .= 0
 
-    return lb,ub
+    # Return the homogenized lower and upper bounds as a tuple:
+     return lb, ub
 end
 
 #-------------------------------------------------------------------------------------------
@@ -340,9 +366,8 @@ end
 """
     distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
-The function first distributes the list of reversible reactions among worker processes,
-and for each reversible reaction, solves two linear programming problems to maximize
-the flux through the reaction in the forward direction and minimize the flux
+The function first distributes the list of reversible reactions among worker processes, and for each reversible reaction,
+solves two linear programming problems to maximize the flux through the reaction in the forward direction and minimize the flux
 through the reaction in the backward direction. The function then identifies which reactions are blocked in each direction,
 modifies the lower and upper bounds accordingly, and appends the blocked reactions to the list of irreversible reactions.
 Finally, the function removes the blocked reactions from the list of reversible reactions.
@@ -357,7 +382,7 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # OPTIONAL INPUTS
 
--
+- `printLevel`:                         Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -378,7 +403,8 @@ See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
-function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Int64}, reversible_reactions_id::Vector{Int64})
+function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1},
+                                             irreversible_reactions_id::Vector{Int64}, reversible_reactions_id::Vector{Int64}, printLevel::Int=1)
 
     # Define the number of variables in the model:
     n = length(lb)
@@ -386,9 +412,12 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     # Set the tolerance value:
     Tolerance = getTolerance()
 
-    # Initialize empty arrays to store blocked reactions:
+    # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
     rev_blocked_back = Array{Int64}([])
+
+    # Initialize a shared array to represent whether each reversible reaction is blocked in the forward or backward direction
+    # The initial value of false indicates that no reactions are blocked at the beginning:
     Correction = SharedArray{Int,2}((n, n), init = false)
 
     # Iterate over all reversible reactions in the model
@@ -449,17 +478,14 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
 
     for i = 1 : n
         for j = 1 : n
-
             # If the (i,j)-th element of Correction is +1.0 and i == j,
             # then the i-th reversible reaction is blocked in the forward direction:
             if Correction[i,j] == +1.0 && i == j
                 append!(rev_blocked_fwd, i)
-
             # If the (i,j)-th element of Correction is -1.0 and i == j,
             # then the i-th reversible reaction is blocked in the backward direction:
             elseif Correction[i,j] == -1.0 && i == j
                 append!(rev_blocked_back, i)
-
             # If neither of the above conditions are met, continue to the next iteration of the inner loop:
             else
                 continue
@@ -467,6 +493,7 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
         end
     end
 
+    # Initialize an empty array to store the IDs of corrected reversible reactions:
     corrected_reversible_reactions_id = Array{Int64}([])
 
     ## Forward
@@ -490,22 +517,35 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
         append!(irreversible_reactions_id, i)
     end
 
-    # Remove blocked reversible reactions from the reversible reactions list
+    ## Remove blocked reversible reactions from the reversible reactions list
 
+    # Convert the lists to sets to perform set operations:
     set_reversible_reactions_id = Set(reversible_reactions_id)
     set_rev_blocked_fwd = Set(rev_blocked_fwd)
     set_rev_blocked_back = Set(rev_blocked_back)
+    # Find the union of the sets for the reactions blocked in either direction:
     set_rev_blocked_onedirection = union(set_rev_blocked_fwd, set_rev_blocked_back)
+    # Remove the blocked reactions from the set of reversible reactions:
     set_reversible_reactions_id = setdiff(set_reversible_reactions_id, set_rev_blocked_onedirection)
 
-    # Add remaining reversible reactions to the corrected reversible reactions list
+    ## Add remaining reversible reactions to the corrected reversible reactions list
 
+    # Convert the remaining reversible reactions set back to a list:
     for i in set_reversible_reactions_id
         append!(corrected_reversible_reactions_id, i)
     end
 
-    return S, lb, ub, irreversible_reactions_id, corrected_reversible_reactions_id
+    ## Print out results if requested
 
+    if printLevel > 0
+        println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
+        println("Number of reversibe blocked in backward direction : $(length(rev_blocked_back))")
+        println("Number of irreversible reactions after Correction : $(length(irreversible_reactions_id))")
+        println("Number of reversible   reactions after Correction : $(length(corrected_reversible_reactions_id))")
+    end
+
+    # Return the modified model and reaction information as a tuple:
+    return S, lb, ub, irreversible_reactions_id, corrected_reversible_reactions_id
 end
 
 end

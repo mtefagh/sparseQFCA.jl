@@ -35,6 +35,7 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 # OPTIONAL INPUTS
 
 - `Tolerance`:          A small number that represents the level of error tolerance.
+- `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -51,7 +52,7 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
+function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Export data from model
 
@@ -180,6 +181,15 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
 
     blocked_index = union(reversible_blocked_reactions_id, irreversible_blocked_reactions_id)
     blocked_index = sort(blocked_index)
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        printstyled("Consistency_Checking(TheNaiveApproch) :\n"; color=:cyan)
+        println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
+        println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")
+        println("Number of blocked reactions              : $(length(blocked_index))")
+    end
 
     return blocked_index
 
