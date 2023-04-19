@@ -8,7 +8,7 @@
 
 module pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 

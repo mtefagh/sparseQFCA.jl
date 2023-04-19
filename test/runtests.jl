@@ -4,6 +4,7 @@
 
 using Distributed
 addprocs(7)
+println("Number of Workers : $(nprocs())")
 
 ## Importing Libraries:
 
@@ -53,6 +54,8 @@ fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficient
 fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312)
 
 removeQFCAProcs()
+
+println("Number of Workers : $(nprocs())")
 
 # Testing
 
