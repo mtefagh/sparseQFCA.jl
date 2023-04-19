@@ -8,7 +8,7 @@
 
 module pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, reversibility_checking, reversibility_correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reaction, homogenization, distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
@@ -338,16 +338,22 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    reversibility_checking(S, lb, ub, reversible_reactions_id)
+    distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
-A function that detects reversible reactions that are blocked in only one direction.
+The function first distributes the list of reversible reactions among worker processes,
+and for each reversible reaction, solves two linear programming problems to maximize
+the flux through the reaction in the forward direction and minimize the flux
+through the reaction in the backward direction. The function then identifies which reactions are blocked in each direction,
+modifies the lower and upper bounds accordingly, and appends the blocked reactions to the list of irreversible reactions.
+Finally, the function removes the blocked reactions from the list of reversible reactions.
 
 # INPUTS
 
-- `S`:                           Stoichiometric matrix.
-- `lb`:                          LowerBound Of Reactions.
-- `ub`:                          UpperBound of Reactions.
-- `reversible_reactions_id`:     Reversible reaction IDs.
+- `S`:                                  A `m` x `n` matrix representing the stoichiometric coefficients of each metabolite in each reaction.
+- `lb`:                                 A `n` x `1` vector representing the lower bounds of each reaction.
+- `ub`:                                 A `n` x `1` vector representing the upper bounds of each reaction.
+- `irreversible_reactions_id`:          IDs of irreversible reactions.
+- `reversible_reactions_id`:            IDs of reversible reactions.
 
 # OPTIONAL INPUTS
 
@@ -355,21 +361,24 @@ A function that detects reversible reactions that are blocked in only one direct
 
 # OUTPUTS
 
-- `rev_blocked_fwd`:             Reversible reactions that are blocked in forward direction.
-- `rev_blocked_back`:            Reversible reactions that are blocked in backward direction.
+- `S`:                                  Stoichiometric matrix with reversible reactions corrected.
+- `lb`:                                 A corrected `n` x `1` vector representing the lower bounds of each reaction.
+- `ub`:                                 A corrected `n` x `1` vector representing the upper bounds of each reaction.
+- `irreversible_reactions_id`:          IDs of corrected irreversible reactions.
+- `corrected_reversible_reactions_id`:  IDs of corrected reversible reactions.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> rev_blocked_fwd, rev_blocked_back = reversibility_checking(S, lb, ub, reversible_reactions_id)
+julia> S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 ```
 
 See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
 
 """
 
-function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, reversible_reactions_id::Vector{Int64})
+function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Int64}, reversible_reactions_id::Vector{Int64})
 
     # Define the number of variables in the model:
     n = length(lb)
@@ -377,110 +386,86 @@ function reversibility_checking(S::Union{SparseMatrixCSC{Float64,Int64}, Abstrac
     # Set the tolerance value:
     Tolerance = getTolerance()
 
-    # Create a GLPK model object:
-    model = Model(GLPK.Optimizer)
-
-    # Define variables V:
-    @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
-
-    # Add the stoichiometric constraints to the model:
-    @constraint(model, S * V .== 0)
-
     # Initialize empty arrays to store blocked reactions:
     rev_blocked_fwd = Array{Int64}([])
     rev_blocked_back = Array{Int64}([])
+    Correction = SharedArray{Int,2}((n, n), init = false)
 
     # Iterate over all reversible reactions in the model
 
-    for j in reversible_reactions_id
+    @sync @distributed for i in reversible_reactions_id
 
-        # Set the objective function to maximize the flux through reaction j in the forward direction:
-        @objective(model, Max, V[j])
+        # Create a local model object for each worker process:
+        local_model = Model(GLPK.Optimizer)
 
-        # Add a constraint that limits the flux through reaction j in the forward direction to be less than or equal to 1:
-        @constraint(model, c1, V[j] <= 1)
+        # Define variables V:
+        @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+
+        # Add the stoichiometric constraints to the model:
+        @constraint(local_model, S * V .== 0)
+
+        # Set the objective function to maximize the flux through reaction i in the forward direction:
+        @objective(local_model, Max, V[i])
+
+        # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
+        @constraint(local_model, c1, V[i] <= 1)
 
         # Optimize the model and retrieve the objective value:
-        optimize!(model)
-        opt_fwd = objective_value(model)
+        optimize!(local_model)
+        opt_fwd = objective_value(local_model)
 
+        # Delete the constraint and unregister it from the model:
+        delete(local_model, c1)
+        unregister(local_model, :c1)
+
+        # Set the objective function to minimize the flux through reaction i in the backward direction:
+        @objective(local_model, Min, V[i])
+
+        # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
+        @constraint(local_model, c2, V[i] >= -1)
+
+        # Optimize the model and retrieve the objective value:
+        optimize!(local_model)
+        opt_back = objective_value(local_model)
+
+        # Delete the constraint and unregister it from the model:
+        delete(local_model, c2)
+        unregister(local_model, :c2)
+
+        # The reaction is considered to be blocked:
+        if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
+            Correction[i,i] = +2.0
+            continue
         # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
-        if isapprox(opt_fwd, 0, atol=Tolerance)
-            append!(rev_blocked_fwd, j)
-        end
-
-        # Delete the constraint and unregister it from the model:
-        delete(model, c1)
-        unregister(model, :c1)
-
-        # Set the objective function to minimize the flux through reaction j in the backward direction:
-        @objective(model, Min, V[j])
-
-        # Add a constraint that limits the flux through reaction j in the backward direction to be greater than or equal to -1:
-        @constraint(model, c2, V[j] >= -1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(model)
-        opt_back = objective_value(model)
-
+        elseif isapprox(opt_fwd, 0, atol=Tolerance)
+            Correction[i,i] = +1.0
         # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
-        if isapprox(opt_back, 0, atol=Tolerance)
-            append!(rev_blocked_back, j)
+        elseif isapprox(opt_back, 0, atol=Tolerance)
+            Correction[i,i] = -1.0
+        else
+            continue
         end
-
-        # Delete the constraint and unregister it from the model:
-        delete(model, c2)
-        unregister(model, :c2)
     end
 
-    return rev_blocked_fwd, rev_blocked_back
-end
+    for i = 1 : n
+        for j = 1 : n
 
-#-------------------------------------------------------------------------------------------
+            # If the (i,j)-th element of Correction is +1.0 and i == j,
+            # then the i-th reversible reaction is blocked in the forward direction:
+            if Correction[i,j] == +1.0 && i == j
+                append!(rev_blocked_fwd, i)
 
-"""
-    reversibility_correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back)
+            # If the (i,j)-th element of Correction is -1.0 and i == j,
+            # then the i-th reversible reaction is blocked in the backward direction:
+            elseif Correction[i,j] == -1.0 && i == j
+                append!(rev_blocked_back, i)
 
-A function that modifies 3 sets:
-
-    1) Remove rev_blocked_fwd and rev_blocked_back from reversible reactions list.
-    2) Add rev_blocked_fwd and rev_blocked_back to irreversible reactions list.
-    3) modify S, lb and ub.
-
-# INPUTS
-
-- `S`:                                    Stoichiometric matrix.
-- `lb`:                                   LowerBound Of Reactions.
-- `ub`:                                   UpperBound of Reactions.
-- `irreversible_reactions_id`:            Irreversible reaction IDs.
-- `reversible_reactions_id`:              Reversible reaction IDs.
-- `rev_blocked_fwd`:                      Reversible reactions that are blocked in forward direction.
-- `rev_blocked_back`:                     Reversible reactions that are blocked in backward direction.
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
-- `S`:                                    Stoichiometric matrix.
-- `lb`:                                   LowerBound Of Reactions.
-- `ub`:                                   UpperBound of Reactions.
-- `irreversible_reactions_id`:            Irreversible reaction IDs.
-- `reversible_reactions_id`:              Corrected reversible reaction IDs.
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> S, lb, ub, irreversible_reactions_id, reversible_reactions_id = reversibility_correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, rev_blocked_fwd, rev_blocked_back)
-```
-
-See also: `dataOfModel()`, `homogenization()`, `reversibility()`, reversibility_checking()
-
-"""
-
-function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Vector{Int64}, reversible_reactions_id::Vector{Int64}, rev_blocked_fwd::Vector{Int64}, rev_blocked_back::Vector{Int64})
+            # If neither of the above conditions are met, continue to the next iteration of the inner loop:
+            else
+                continue
+            end
+        end
+    end
 
     corrected_reversible_reactions_id = Array{Int64}([])
 
@@ -520,6 +505,7 @@ function reversibility_correction(S::Union{SparseMatrixCSC{Float64,Int64}, Abstr
     end
 
     return S, lb, ub, irreversible_reactions_id, corrected_reversible_reactions_id
+
 end
 
 end
