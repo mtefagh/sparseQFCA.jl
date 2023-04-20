@@ -1,12 +1,13 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Finding blocked reactions in metabolic network
-    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
+    Purpose:    Identifying blocked reactions in metabolic networks using linear programming(1LP) and Gaussian elimination
+    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       July 2022
 =#
 #-------------------------------------------------------------------------------------------
 
 module SwiftCC
+
 export MyModel, myModel_Constructor, swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
@@ -14,7 +15,6 @@ using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 include("../Data Processing/pre_processing.jl")
 
 using .pre_processing
-
 
 """
     MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
@@ -43,14 +43,17 @@ mutable struct MyModel
     ub             ::Array{Float64,1}
 end
 
+#-------------------------------------------------------------------------------------------
+
 """
     myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A function that initializes a newly created object of MyModel.
+The function takes in several arguments, including a ModelObject of type MyModel,
+and assigns values to its fields based on the other arguments passed in.
 
 # INPUTS
 
--'ModelObject'      a newly object of MyModel.
+-'ModelObject':     A newly object of MyModel.
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.
 - `Reactions`:      List of metabolic network reactions.
@@ -73,10 +76,15 @@ function myModel_Constructor(ModelObject::MyModel, S::Union{SparseMatrixCSC{Floa
      ModelObject.lb = lb
      ModelObject.ub = ub
 end
+
+#-------------------------------------------------------------------------------------------
+
 """
     swiftCC(ModelObject)
 
-A function that finds blocked reactions for a metabolic network.
+The function first exports data from ModelObject and performs some calculations to determine the reversibility of reactions
+and the number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
+and uses Gaussian elimination to identify blocked reversible reactions.
 
 # INPUTS
 
@@ -85,10 +93,11 @@ A function that finds blocked reactions for a metabolic network.
 # OPTIONAL INPUTS
 
 - `Tolerance`:          A small number that represents the level of error tolerance.
+- `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
-- `blocked_index`:      Index of blocked reactions.
+- `blocked_index`:      IDs of of blocked reactions.
 - `dualVar`:            Dual variables of a specific constraint.
 
 # EXAMPLES
@@ -102,9 +111,9 @@ See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()
 
 """
 
-function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
+function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=1)
 
-    ## Export data from ModelObject
+    ## Extract relevant information from the input model object
 
     S = ModelObject.S
     Metabolites = ModelObject.Metabolites
@@ -114,12 +123,9 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
     lb = ModelObject.lb
     ub = ModelObject.ub
 
-    ## Determine the reversibility of a reaction
+    ## Identify which reactions are irreversible and which are reversible
 
-    irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
-
-    ## Determine the number of irreversible and reversible reactions
-
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, 0)
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
 
@@ -168,46 +174,45 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
         end
     end
 
-    # Determine the number of irreversible blocked reactions
-
+    # Determine the number of irreversible blocked reactions:
     irr_blocked_num = length(irr_blocked_reactions)
 
     ## Find reversible blocked reactions
 
-    # Creating S_transpose:
+    # Create S_transpose:
     S_transpose = S'
 
-    # Determining the dimensions of the S_transpose matrix:
+    # Determine the dimensions of the S_transpose matrix:
     row_num_trans, col_num_trans = size(S_transpose)
 
-    # Removing irreversibly blocked reactions from the Stoichiometric Matrix:
+    # Remove irreversibly blocked reactions from the Stoichiometric Matrix:
     S_transpose_noIrrBlocked = S_transpose[setdiff(1:end, irr_blocked_reactions), :]
 
-    # Creating the I_reversible Matrix:
+    # Create the I_reversible Matrix:
     I_reversible = zeros(n, n_rev)
 
-    # Populating the I_reversible Matrix with 1 in the rows corresponding to reversible reactions:
+    # Populate the I_reversible Matrix with 1 in the rows corresponding to reversible reactions:
     rev_id = 1
     for col in eachcol(I_reversible)
         col[reversible_reactions_id[rev_id]] = 1.0
         rev_id += 1
     end
 
-    # Removing irreversibly blocked reactions from the I_reversible Matrix:
+    # Remove irreversibe blocked reactions from the I_reversible Matrix:
     I_reversible = I_reversible[setdiff(1:end, irr_blocked_reactions), :]
 
-    # Determining the dimensions of the S_transpose_noIrrBlocked and I_reversible matrices:
+    # Determine the dimensions of the S_transpose_noIrrBlocked and I_reversible matrices:
     S_trans_row, S_trans_col = size(S_transpose_noIrrBlocked)
     I_row, I_col = size(I_reversible)
 
-    # Solving the system of equations using Gaussian elimination to identify blocked reversible reactions:
+    # Solve the system of equations using Gaussian elimination to identify blocked reversible reactions:
     X = S_transpose_noIrrBlocked \ I_reversible
     Sol = (S_transpose_noIrrBlocked*X) - I_reversible
 
-    # Determining the dimensions of the Sol matrix:
+    # Determine the dimensions of the Sol matrix:
     row_sol, col_sol = size(Sol)
 
-    # Finding columns in Sol that correspond to blocked reversible reactions:
+    # Find columns in Sol that correspond to blocked reversible reactions:
     c = 0
     rev_blocked_reactions_col = []
     for col in eachcol(Sol)
@@ -222,14 +227,25 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6)
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end
 
-    # Union reversbile blocked reactions and irreversible blocked reactions
+    ## Union reversbile blocked reactions and irreversible blocked reactions
 
     blocked_index = []
     blocked_index = union(rev_blocked_reactions, irr_blocked_reactions)
 
-    # Returning a list consist of the Ids of the blocked reactions
+    ## Returning a list consist of the Ids of the blocked reactions
 
     blocked_index = sort(blocked_index)
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
+        println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
+        println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")
+        println("Number of blocked reactions              : $(length(blocked_index))")
+    end
+
     return blocked_index, dualVar
 end
 
