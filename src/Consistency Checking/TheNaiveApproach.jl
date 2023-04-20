@@ -1,12 +1,13 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Finding blocked reactions in metabolic network
-    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
+    Purpose:    Identifying Blocked Reactions in a Metabolic Model using Linear Optimization
+    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       April 2022
 =#
 #-------------------------------------------------------------------------------------------
 
 module TheNaiveApproach
+
 export find_blocked_reactions
 
 using GLPK, JuMP, COBREXA
@@ -18,7 +19,14 @@ using .pre_processing
 """
     find_blocked_reactions(myModel)
 
-A function that finds blocked reactions in metabolic network.
+The function identifies blocked reactions in a metabolic model. Blocked reactions are reactions that cannot carry any flux,
+i.e., the flux through the reaction is zero, due to the stoichiometry of the model and the constraints on the reaction rates.
+The function first homogenizes the bounds on the reaction rates, and then identifies blocked irreversible reactions by optimizing
+the flux through each reaction while constraining the flux to be less than or equal to 1. If the optimal flux is approximately zero,
+the reaction is considered blocked. Then, the function identifies blocked reversible reactions by optimizing the flux through each
+reaction in both directions, forward and backward, while constraining the flux to be less than or equal to 1 in the forward direction
+and greater than or equal to -1 in the backward direction. If the optimal flux in both directions is approximately zero,the reaction
+is considered blocked. The function returns the IDs of the blocked reactions.
 
 # INPUTS
 
@@ -27,10 +35,11 @@ A function that finds blocked reactions in metabolic network.
 # OPTIONAL INPUTS
 
 - `Tolerance`:          A small number that represents the level of error tolerance.
+- `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
-- `blocked_index`:      Index of blocked reactions.
+- `blocked_index`:      IDs of of blocked reactions.
 
 # EXAMPLES
 
@@ -43,7 +52,7 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
+function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Export data from model
 
@@ -55,11 +64,10 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
 
     ## Homogenize the upper_bound and lower_bound of reactions
 
-    # Set the maximum value for M
+    # Set the maximum value for M:
+    M = getM()
 
-    M = 1000.0
-
-    # Loop through each value in the array "lb" and "ub"
+    ## Loop through each value in the array "lb" and "ub"
 
     for i in 1:n
         # If the lower bound is greater than zero, set it to zero:
@@ -80,7 +88,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
         end
     end
 
-    ## Find Irreversible blocked reactions:
+    ## Find Irreversible blocked reactions
 
     # Create empty arrays to hold the IDs of blocked and unblocked irreversible reactions:
     irreversible_blocked_reactions_id = []
@@ -95,7 +103,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
     # Add a constraint to enforce that S*V = 0:
     @constraint(model_irr, S * V .== 0)
 
-    # Loop through each irreversible reaction in the irreversible reactions array
+    ## Loop through each irreversible reaction in the irreversible reactions array
 
     for j in irreversible_reactions_id
         # Set the objective to maximize the flux of the current reaction:
@@ -140,7 +148,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
     # Loop through each reversible reaction in the reversible reactions array:
     for j in reversible_reactions_id
 
-        # Forward direction
+        ## Forward direction
 
         @objective(model_rev, Max, V[j]) # Set the objective to maximize the flux of the current reaction
         @constraint(model_rev, c1, V[j] <= 1) # Add a constraint to enforce that the flux of the current reaction is less than or equal to 1
@@ -150,7 +158,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
         delete(model_rev, c1) # Remove the current constraint from the model
         unregister(model_rev, :c1) # Unregister the current constraint from the model
 
-        # Backward direction
+        ## Backward direction
 
         @objective(model_rev, Min, V[j]) # Set the objective to minimize the flux of the current reaction
         @constraint(model_rev, c2, V[j] >= -1) # Add a constraint to enforce that the flux of the current reaction is greater than or equal to -1
@@ -169,10 +177,20 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6)
         end
     end
 
-    ## Combine the IDs of blocked irreversible and reversible reactions into a single array and Sort the array of blocked reaction IDs:
+    ## Combine the IDs of blocked irreversible and reversible reactions into a single array and Sort the array of blocked reaction IDs
 
     blocked_index = union(reversible_blocked_reactions_id, irreversible_blocked_reactions_id)
     blocked_index = sort(blocked_index)
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
+        println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
+        println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")
+        println("Number of blocked reactions              : $(length(blocked_index))")
+    end
 
     return blocked_index
 

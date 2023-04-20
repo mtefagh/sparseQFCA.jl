@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    QFCA computes the table of flux coupling relations for a metabolic network
-    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology - Iran
+    Purpose:    Parallel computation of quantitative flux coupling using swiftCC algorithm and Gaussian elimination
+    Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       October 2022
 =#
 #-------------------------------------------------------------------------------------------
@@ -9,9 +9,7 @@
 module DistributedQFCA
 export addQFCAProcs, removeQFCAProcs, distributedQFCA
 
-using Distributed
-
-@everywhere using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
+using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
 
 include("../Data Processing/pre_processing.jl")
 
@@ -22,78 +20,11 @@ include("../Consistency Checking/SwiftCC.jl")
 using .SwiftCC
 
 """
-    addQFCAProcs(n)
-
-A function that adds n-1 processes to System.
-
-# INPUTS
-
-- `n`:        Number of processes to add.
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
--
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> addQFCAProcs(n)
-```
-
-See also: ``
-
-"""
-
-function addQFCAProcs(n::Int=8)
-   addprocs(n-1)
-   return
-end
-
-"""
-    removeQFCAProcs()
-
-A function that removes n-1 processes from Systems.
-
-# INPUTS
-
--
-
-# OPTIONAL INPUTS
-
--
-
-# OUTPUTS
-
--
-
-# EXAMPLES
-
-- Full input/output example
-```julia
-julia> removeQFCAProcs()
-```
-
-See also: ``
-
-"""
-
-function removeQFCAProcs()
-    procs_vector = procs()
-    for i in procs_vector[2:end]
-       rmprocs(i)
-    end
-    return
-end
-
-"""
     distributedQFCA(myModel)
 
-A function that computes the table of flux coupling relations for a metabolic network.
+The function takes a metabolic model as input and calculates directional couplings and coefficients for each pair of reactions in the model.
+It also has the option to remove reactions from the model and recalculate the couplings. The function uses parallel processing to distribute
+the calculations across multiple processors. The output is a matrix that shows the coupling relations between the reactions in the model.
 
 # INPUTS
 
@@ -103,6 +34,7 @@ A function that computes the table of flux coupling relations for a metabolic ne
 
 - `removing`:                  A boolean variable that indicates whether reactions should be removed from the network in the stages of determining coupling or not.
 - `Tolerance`:                 A small number that represents the level of error tolerance.
+- `printLevel`:                Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
@@ -113,44 +45,44 @@ A function that computes the table of flux coupling relations for a metabolic ne
                                     * 2 - partially coupled reactions
                                     * 3 - reaction i is directionally coupled to reaction j
                                     * 4 - reaction j is directionally coupled to reaction i
-- `Fc_Coefficients`:           fully-coupling coefficients
-- `Dc_Coefficients`:           DCE coefficients.
+- `Fc_Coefficients`:           A list of fully-coupling coefficients for each reaction in the model.
+- `Dc_Coefficients`:           A list of DCE (directional coupling equation) coefficients for each reaction in the model.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> fctable = distributedQFCA(myModel)
+julia> fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
 ```
 
-See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `myModel_Constructor()`
+See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `myModel_Constructor()`, `distributedReversibility_Correction()`
 
 """
 
-function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6)
+function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
-    # Extracting relevant data from input model
+    ## Extracte relevant data from input model
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
 
-    # Separating reactions into reversible and irreversible sets
+    ## Separate reactions into reversible and irreversible sets
 
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
 
-    # Counting the number of reactions in each set
+    ## Ensure that the bounds of all reactions are homogenous
+
+    lb, ub = homogenization(lb, ub)
+
+    ## Count the number of reactions in each set
 
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
 
-    # Ensuring that the bounds of all reactions are homogenous
-
-    lb, ub = homogenization(lb, ub)
-
-    # Creating a new instance of the input model with homogenous bounds
+    ## Create a new instance of the input model with homogenous bounds
 
     ModelObject = MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-    # Removing any reactions that cannot carry flux and is blocked
+    ## Remove any reactions that cannot carry flux and is blocked
 
     blocked_index, dualVar  = swiftCC(ModelObject)
     n_blocked = length(blocked_index)
@@ -158,37 +90,40 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
     ub_noBlocked = ub[setdiff(1:end, blocked_index)]
     S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
+    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, 0)
     row_noBlocked, col_noBlocked = size(S_noBlocked)
 
-    # Creating an empty matrix to store directional couplings
+    ## Correct Reversibility
+
+    S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked)
+
+    ## Create an empty matrix to store directional couplings
 
     DC_Matrix = SharedArray{Int,2}((col_noBlocked, col_noBlocked), init = false)
 
-    # Creating an empty matrix to store directional coupling coefficients
+    ## Create an empty matrix to store directional coupling coefficients
 
     Dc_Coefficients = SharedArray{Float64,2}((col_noBlocked, col_noBlocked), init = false)
 
-    # Calculating directional couplings and coefficients for each pair of reactions
+    ## Calculate directional couplings and coefficients for each pair of reactions
 
-    # This is a parallel loop that distributes iterations across multiple processors
-
+    # This is a parallel loop that distributes iterations across multiple processors:
     @sync @distributed for i in range(1, col_noBlocked)
         if(removing)
-
-            # Storing current values of bounds and stoichiometric matrix before removing the ith reaction from the metabolic network:
+            # Store current values of bounds and stoichiometric matrix before removing the ith reaction from the metabolic network:
             lb_noBlocked_temp = copy(lb_noBlocked)
             ub_noBlocked_temp = copy(ub_noBlocked)
-            S_noBlocked_temp = copy(S_noBlocked)
+            S_noBlocked_temp  = copy(S_noBlocked)
 
-            # Removing the ith reaction from the metabolic network:
+            # Remove the ith reaction from the metabolic network:
             lb_noBlocked = lb_noBlocked[setdiff(1:end, i)]
             ub_noBlocked = ub_noBlocked[setdiff(1:end, i)]
             S_noBlocked  = S_noBlocked[:, setdiff(1:end, i)]
             row_noBlocked, col_noBlocked = size(S_noBlocked)
 
-            # Calculating the set of blocked reactions and dual variables for the modified network:
+            # Calculate the set of blocked reactions and dual variables for the modified network:
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, Tolerance)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance, 0)
 
             # Update indices of blocked reactions after removing ith reaction:
             for j = 1:length(blocked)
@@ -204,23 +139,22 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             lambda = S_noBlocked_temp' * dualVar
             Dc_Coefficients[i, :] = lambda
 
-            # Retrieving the original values of the bounds and stoichiometric matrix:
+            # Retrieve the original values of the bounds and stoichiometric matrix:
             lb_noBlocked = copy(lb_noBlocked_temp)
             ub_noBlocked = copy(ub_noBlocked_temp)
             S_noBlocked  = copy(S_noBlocked_temp)
         else
-
-            # Storing current values of bounds before resetting the bounds of the ith reaction to zero:
+            # Store current values of bounds before resetting the bounds of the ith reaction to zero:
             lb_temp = lb_noBlocked[i]
             ub_temp = ub_noBlocked[i]
 
-            # Resetting the bounds of the ith reaction to zero:
+            # Reset the bounds of the ith reaction to zero:
             lb_noBlocked[i] = 0.0
             ub_noBlocked[i] = 0.0
 
-            # Finding the set of blocked reactions and dual variables for the modified network:
+            # Find the set of blocked reactions and dual variables for the modified network:
             myModel_Constructor(ModelObject ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject, Tolerance)
+            blocked, dualVar = swiftCC(ModelObject, Tolerance, 0)
 
             # Update DC_Matrix based on the blocked reactions:
             DC_Matrix[i,blocked] .= 1.0
@@ -229,48 +163,51 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             lambda = S_noBlocked' * dualVar
             Dc_Coefficients[i, :] = lambda
 
-            # Retrieving the original values of the bounds:
+            # Retrieve the original values of the bounds:
             lb_noBlocked[i] = lb_temp
             ub_noBlocked[i] = ub_temp
         end
     end
 
-    # Defining a matrix to save all coupling relations
+    ## Define a matrix to save all coupling relations
 
     fctable = SharedArray{Int,2}((col_noBlocked, col_noBlocked), init = false)
 
-    # Directional Coupling
+    ## Directional Coupling
 
-    # i-->j
+    ## Update the functional coupling table based on the directional coupling matrix
 
+    # For each reaction i and reaction j in the range of blocked reactions:
     for i in range(1, col_noBlocked)
         for j in range(1, col_noBlocked)
+            # If there is directional coupling from reaction i to reaction j:
             if DC_Matrix[i, j] == 1.0
                 fctable[j,i] = 3.0
             end
         end
     end
 
-    # Self-Coupling:
+    ## Self-Coupling
 
     fctable[diagind(fctable)] .= 1.0
 
-    # Distinguishing between (DC, FC or PC) kinds of coupling
+    ## Distinguish between (DC, FC or PC) kinds of coupling
 
     for i in range(1, col_noBlocked)
         for j in range(i+1, col_noBlocked)
-
-            # i--->j
+            # If i has an arrow pointing to j, but j doesn't have an arrow pointing to i, add an arrow from j to i
             if fctable[i,j] == 3.0 && fctable[j,i] == 0.0
                 fctable[j,i] = 4.0
 
-            # j--->i
+            # If j has an arrow pointing to i, but i doesn't have an arrow pointing to j, add an arrow from i to j
             elseif fctable[i,j] == 0.0 && fctable[j,i] == 3.0
                 fctable[i,j] = 4.0
 
-            # i--->j && j--->i   ----> Partially Coupling
+            # If i and j have arrows pointing in both directions, set the arrows to be bidirectional
             elseif fctable[i,j] == 3.0 && fctable[j,i] == 3.0
                 fctable[i,j] = fctable[j,i] = 2.0
+
+            # If there are no arrows between i and j, or both arrows are already bidirectional, do nothing and continue to the next pair of reactions
             else
                 continue
             end
@@ -286,7 +223,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     # Initialize an empty array to store partially coupled pairs:
     Partially_Couples = []
 
-    # Iterate over all pairs of nodes in the coupling table
+    ## Iterate over all pairs of nodes in the coupling table
 
     for i in range(1, col_noBlocked)
         for j in range(1, col_noBlocked)
@@ -310,16 +247,15 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     # Set the self-coupling coefficients to 1:
     Fc_Coefficients[diagind(Fc_Coefficients)] .= 1.0
 
-    # Create a dictionary to store fully coupled by one Metabolite concept
+    ## Create a dictionary to store fully coupled by one Metabolite concept
 
     FC_OneMet = Dict()
     # Initialize a variable to keep track of fully coupled by one Metabolite:
     met = 1
 
-    # FC_OneMet
-    # Key : #Met  ---> Values : Indices of non-zero values
+    ## FC_OneMet    Key : #Met  ---> Values : Indices of non-zero values
 
-    # Loop through each row in S matrix
+    ## Loop through each row in S matrix
 
     for row in eachrow(S)
         non_zero_indices = []
@@ -338,11 +274,11 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             FC_OneMet[met] = (non_zero_indices[1], non_zero_indices[2])
         end
 
-        # Increment met counter
+        # Increment met counter:
         met += 1
     end
 
-    # Converting FC_OneMet : Vector{any} ---> Tuple{Int64, Int64}
+    ## Convert FC_OneMet : Vector{any} ---> Tuple{Int64, Int64}
 
     # Loop through each key in FC_OneMet dictionary and convert the values from vector to tuple:
     for key in sort(collect(keys(FC_OneMet)))
@@ -350,14 +286,13 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         FC_OneMet[key] = convert(Tuple{Int64, Int64}, FC_OneMet[key])
     end
 
-    # Loop through each key in FC_OneMet dictionary
+    ## Loop through each key in FC_OneMet dictionary
 
     for key in sort(collect(keys(FC_OneMet)))
         # Check if the row index and column index of the key in PC matches the tuple value in FC_OneMet:
         if (PC[key][1] == FC_OneMet[key][1]) && (PC[key][2] == FC_OneMet[key][2])
 
-        # Editing fctable and changing partially Coupling to Fully Coupling
-
+        # Edit fctable and changing partially Coupling to Fully Coupling
         # Set the corresponding entries in the coupling table to 1:
         fctable[PC[key][1],PC[key][2]] = 1.0
         fctable[PC[key][2],PC[key][1]] = 1.0
@@ -368,11 +303,12 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         end
     end
 
-    # Solve an LU decomposition for each pair of partially coupled nodes to determine fully coupling
+    ## Solve an LU decomposition for each pair of partially coupled nodes to determine fully coupling
+
     # Start a distributed loop over keys in PC, sorted in ascending order
     @sync @distributed for key in sort(collect(keys(PC)))
 
-        # Check if the value of fctable at the location given by the key in PC is not equal to 1.0
+        ## Check if the value of fctable at the location given by the key in PC is not equal to 1.0
 
         if fctable[PC[key][1],PC[key][2]] != 1.0
 
@@ -396,15 +332,15 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             # Remove the element at the index given by the second element of the value of key in PC from CO:
             CO = CO[setdiff(1:end, PC[key][2])]
 
-            # Use Gaussian elimination to solve for X in the equation S_noBlocked_transpose_removedC * X = CO
+            ## Use Gaussian elimination to solve for X in the equation S_noBlocked_transpose_removedC * X = CO
 
             X = S_noBlocked_transpose_removedC \ CO
 
-            # Calculate the solution Sol by subtracting CO from S_noBlocked_transpose_removedC * X
+            ## Calculate the solution Sol by subtracting CO from S_noBlocked_transpose_removedC * X
 
             Sol = (S_noBlocked_transpose_removedC*X) - (CO)
 
-            # Check if the solution vector "Sol" is close to the zero vector with a tolerance of "Tolerance"
+            ## Check if the solution vector "Sol" is close to the zero vector with a tolerance of "Tolerance"
 
             if isapprox(norm(Sol), 0.0, atol = Tolerance)
 
@@ -420,7 +356,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
                 # Calculate coefficient:
                 C = sparseMatrix_rowC' * X
 
-                # Set coefficient for i,j
+                ## Set coefficient for i,j
 
                 # V_i = C * V_j
                 Fc_Coefficients[PC[key][1],PC[key][2]] = C[1]
@@ -429,6 +365,30 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             end
         end
     end
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        d_0 = 0
+        d_1 = 0
+        d_2 = 0
+        d_3 = 0
+        d_4 = 0
+        d_0 = sum(fctable .== 0.0)
+        d_1 = sum(fctable .== 1.0)
+        d_2 = sum(fctable .== 2.0)
+        d_3 = sum(fctable .== 3.0)
+        d_4 = sum(fctable .== 4.0)
+        printstyled("Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        println("Final fctable : ")
+        println("Number of 0's (unCoupled) : $d_0")
+        println("Number of 1's (Fully)     : $d_1")
+        println("Number of 2's (Partialy)  : $d_2")
+        println("Number of 3's (DC i-->j)  : $d_3")
+        println("Number of 4's (DC j-->i)  : $d_4")
+    end
+
     return fctable, Fc_Coefficients, Dc_Coefficients
-end
+    end
+
 end
