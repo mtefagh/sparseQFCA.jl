@@ -357,6 +357,10 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     # Get the length of the lb array:
     n = length(lb)
 
+    if printLevel > 0
+        printstyled("Homogenization:\n"; color=:cyan)
+    end
+
     # Set a large number for M:
     M = getM()
 
@@ -421,8 +425,12 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     # Define the number of variables in the model:
     n = length(lb)
 
+    if printLevel > 0
+        printstyled("Reversibility Correction:\n"; color=:cyan)
+    end
+
     # Set the tolerance value:
-    Tolerance = getTolerance(0)
+    Tolerance = getTolerance()
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])

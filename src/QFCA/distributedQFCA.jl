@@ -250,6 +250,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     ## Create a dictionary to store fully coupled by one Metabolite concept
 
     FC_OneMet = Dict()
+    
     # Initialize a variable to keep track of fully coupled by one Metabolite:
     met = 1
 
@@ -324,11 +325,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
             # Remove the row given by the second element of the value of key in PC from S_noBlocked_transpose:
             S_noBlocked_transpose_removedC = S_noBlocked_transpose[1:end .!= PC[key][2], :]
 
-            # Get the size of S_noBlocked_transpose:
-            rowS, colS = size(S_noBlocked_transpose)
-            # Get the size of S_noBlocked_transpose_removedC:
-            rowC, colC = size(S_noBlocked_transpose_removedC)
-
             # Remove the element at the index given by the second element of the value of key in PC from CO:
             CO = CO[setdiff(1:end, PC[key][2])]
 
@@ -358,9 +354,10 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
                 ## Set coefficient for i,j
 
-                # V_i = C * V_j
+                # V_i = C * V_j:
                 Fc_Coefficients[PC[key][1],PC[key][2]] = C[1]
-                # V_j = 1/C * V_i
+
+                # V_j = 1/C * V_i:
                 Fc_Coefficients[PC[key][2],PC[key][1]] = 1 / C[1]
             end
         end

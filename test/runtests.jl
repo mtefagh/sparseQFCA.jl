@@ -78,5 +78,5 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
-fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312)
+fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312,true)
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
