@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Identifying blocked reactions in metabolic networks using linear programming(1LP) and Gaussian elimination
+    Purpose:    Identifying blocked reactions in metabolic networks using Convex Optimization(1LP) and Gaussian Elimination
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       July 2022
 =#

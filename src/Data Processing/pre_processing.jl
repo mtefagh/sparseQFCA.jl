@@ -8,7 +8,7 @@
 
 module pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows,distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
@@ -345,7 +345,7 @@ The function homogenizes the lower and upper bounds of a set of reactions in a m
 
 - Full input/output example
 ```julia
-julia> lb,ub = homogenization(lb,ub)
+julia> lb, ub = homogenization(lb, ub)
 ```
 
 See also: `dataOfModel()`, 'getM()'
@@ -380,6 +380,63 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
+    remove_zeroRows(S,Metabolites)
+
+The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites, with all rows that contain only zeros removed.
+This results in a more compact representation of the metabolic network, with only the relevant reactions and metabolites included.
+
+# INPUTS
+
+- `S`:                      A `m` x `n` matrix representing the stoichiometric coefficients of each metabolite in each reaction.
+- `Metabolites`:            A list of all metabolites in the metabolic network.
+
+# OPTIONAL INPUTS
+
+-
+
+# OUTPUTS
+
+- `S`:                      The stoichiometry matrx of non-zero interactions within the metabolic network.
+- `Metabolites`:            The updated list of all metabolites in the metabolic network.
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> S, Metabolites = remove_zeroRows(S, Metabolites)
+```
+
+See also: `dataOfModel()`
+
+"""
+
+function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1})
+
+    zero_row = [] # create an empty array to store indices of zero rows
+    c = 1 # initialize a counter variable to keep track of row indices
+    for row in eachrow(S) # iterate over each row of the matrix S
+        if row == zeros(length(row)) # check if the current row is all zeros
+            append!(zero_row, c) # if so, append the current row index to zero_row array
+        end
+        c += 1 # increment the row index counter
+    end
+
+    # Remove the zero rows from the matrix S:
+    S = S[setdiff(1:end, zero_row), :]
+
+    # get the length of the Metabolites array:
+    m = length(Metabolites)
+
+    # Remove the corresponding metabolites from the Metabolites array:
+    Metabolites = Metabolites[setdiff(range(1, m), zero_row)]
+
+    # Return the updated S matrix and Metabolites array:
+    return S, Metabolites
+end
+
+#-------------------------------------------------------------------------------------------
+
+"""
     distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
 The function first distributes the list of reversible reactions among worker processes, and for each reversible reaction,
@@ -390,23 +447,23 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # INPUTS
 
-- `S`:                                  A `m` x `n` matrix representing the stoichiometric coefficients of each metabolite in each reaction.
-- `lb`:                                 A `n` x `1` vector representing the lower bounds of each reaction.
-- `ub`:                                 A `n` x `1` vector representing the upper bounds of each reaction.
-- `irreversible_reactions_id`:          IDs of irreversible reactions.
-- `reversible_reactions_id`:            IDs of reversible reactions.
+- `S`:                                      A `m` x `n` matrix representing the stoichiometric coefficients of each metabolite in each reaction.
+- `lb`:                                     A `n` x `1` vector representing the lower bounds of each reaction.
+- `ub`:                                     A `n` x `1` vector representing the upper bounds of each reaction.
+- `irreversible_reactions_id`:              IDs of irreversible reactions.
+- `reversible_reactions_id`:                IDs of reversible reactions.
 
 # OPTIONAL INPUTS
 
-- `printLevel`:                         Verbose level (default: 1). Mute all output with `printLevel = 0`.
+- `printLevel`:                             Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
-- `S`:                                  Stoichiometric matrix with reversible reactions corrected.
-- `lb`:                                 A corrected `n` x `1` vector representing the lower bounds of each reaction.
-- `ub`:                                 A corrected `n` x `1` vector representing the upper bounds of each reaction.
-- `irreversible_reactions_id`:          IDs of corrected irreversible reactions.
-- `corrected_reversible_reactions_id`:  IDs of corrected reversible reactions.
+- `S`:                                      Stoichiometric matrix with corrected reversible reactions.
+- `lb`:                                     A corrected `n` x `1` vector representing the lower bounds of each reaction.
+- `ub`:                                     A corrected `n` x `1` vector representing the upper bounds of each reaction.
+- `irreversible_reactions_id`:              IDs of corrected irreversible reactions.
+- `corrected_reversible_reactions_id`:      IDs of corrected reversible reactions.
 
 # EXAMPLES
 

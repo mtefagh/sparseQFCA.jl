@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Identifying Blocked Reactions in a Metabolic Model using Linear Optimization
+    Purpose:    Identifying Blocked Reactions in a Metabolic Model using Convex Optimization(n_i + 2n_r LP)
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       April 2022
 =#

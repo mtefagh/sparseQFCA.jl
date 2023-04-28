@@ -5,7 +5,7 @@ using Distributed
 export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
        blockedTest_e_coli_core, blockedTest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
 
-using COBREXA, DelimitedFiles
+using COBREXA, DelimitedFiles, SparseArrays
 
 ## Load Metabolic Networks
 
@@ -15,7 +15,9 @@ myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
 ## read the CSV file into a matrix of type String
 
 fctable_FFCA_e_coli_core = readdlm("FCTables/MatlabFFCA_Fctable_Ecolicore.csv", ',', Int, header=false)
+fctable_FFCA_e_coli_core = sparsevec(fctable_FFCA_e_coli_core)
 fctable_FFCA_iIS312 = readdlm("FCTables/MatlabFFCA_Fctable_iIS312.csv", ',', Int, header=false)
+fctable_FFCA_iIS312 = sparsevec(fctable_FFCA_iIS312)
 
 ## Define functions to Comparing Results
 
