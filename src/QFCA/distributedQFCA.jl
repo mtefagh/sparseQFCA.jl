@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Parallel computation of quantitative flux coupling using swiftCC algorithm and Gaussian elimination
+    Purpose:    Parallel computation of quantitative flux coupling using swiftCC algorithm and Gaussian Elimination
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       October 2022
 =#
@@ -92,6 +92,10 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
     irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, 0)
     row_noBlocked, col_noBlocked = size(S_noBlocked)
+
+    ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
+
+    S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked,Metabolites)
 
     ## Correct Reversibility
 
@@ -250,6 +254,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     ## Create a dictionary to store fully coupled by one Metabolite concept
 
     FC_OneMet = Dict()
+
     # Initialize a variable to keep track of fully coupled by one Metabolite:
     met = 1
 
@@ -257,7 +262,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Loop through each row in S matrix
 
-    for row in eachrow(S)
+    for row in eachrow(S_noBlocked)
         non_zero_indices = []
         row = sparsevec(row)
 
@@ -305,7 +310,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Solve an LU decomposition for each pair of partially coupled nodes to determine fully coupling
 
-    # Start a distributed loop over keys in PC, sorted in ascending order
+    # Start a distributed loop over keys in PC, sorted in ascending order:
     @sync @distributed for key in sort(collect(keys(PC)))
 
         ## Check if the value of fctable at the location given by the key in PC is not equal to 1.0
@@ -323,11 +328,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
             # Remove the row given by the second element of the value of key in PC from S_noBlocked_transpose:
             S_noBlocked_transpose_removedC = S_noBlocked_transpose[1:end .!= PC[key][2], :]
-
-            # Get the size of S_noBlocked_transpose:
-            rowS, colS = size(S_noBlocked_transpose)
-            # Get the size of S_noBlocked_transpose_removedC:
-            rowC, colC = size(S_noBlocked_transpose_removedC)
 
             # Remove the element at the index given by the second element of the value of key in PC from CO:
             CO = CO[setdiff(1:end, PC[key][2])]
@@ -358,9 +358,10 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
                 ## Set coefficient for i,j
 
-                # V_i = C * V_j
+                # V_i = C * V_j:
                 Fc_Coefficients[PC[key][1],PC[key][2]] = C[1]
-                # V_j = 1/C * V_i
+
+                # V_j = 1/C * V_i:
                 Fc_Coefficients[PC[key][2],PC[key][1]] = 1 / C[1]
             end
         end
