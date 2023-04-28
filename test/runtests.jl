@@ -107,6 +107,8 @@ printstyled("e_coli_core :\n"; color=:yellow)
 
 # Run distributedQFCA method on the e_coli_core model and time the operation:
 fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+# convert the shared matrix to a regular matrix:
+fctable_distributedQFCA_e_coli_core = convert(Matrix{Int}, fctable_distributedQFCA_e_coli_core)
 # Test that the results of distributedQFCA are correct for the e_coli_core model:
 @test distributedQFCATest_e_coli_core(fctable_distributedQFCA_e_coli_core)
 # Print a separator:
@@ -118,6 +120,8 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 # Run distributedQFCA method on the iIS312 model and time the operation:
 fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312,true)
+# convert the shared matrix to a regular matrix:
+fctable_distributedQFCA_e_coli_core = convert(Matrix{Int}, fctable_distributedQFCA_iIS312)  
 # Test that the results of distributedQFCA are correct for the iIS312 model:
 @test distributedQFCATest_iIS312(fctable_distributedQFCA_iIS312)
 # Print a separator:
