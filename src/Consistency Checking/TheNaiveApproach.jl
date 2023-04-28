@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Identifying Blocked Reactions in a Metabolic Model using Linear Optimization
+    Purpose:    Identifying Blocked Reactions in a Metabolic Model using Convex Optimization(n_i + 2n_r LP)
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       April 2022
 =#
@@ -177,7 +177,7 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
         end
     end
 
-    ## Combine the IDs of blocked irreversible and reversible reactions into a single array and Sort the array of blocked reaction IDs
+    ## Union the IDs of blocked irreversible and reversible reactions into a single array and Sort the array of blocked reaction IDs
 
     blocked_index = union(reversible_blocked_reactions_id, irreversible_blocked_reactions_id)
     blocked_index = sort(blocked_index)
@@ -185,8 +185,8 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
     ## Print out results if requested
 
     if printLevel > 0
-        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
         println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")
         println("Number of blocked reactions              : $(length(blocked_index))")

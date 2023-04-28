@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Identifying blocked reactions in metabolic networks using linear programming(1LP) and Gaussian elimination
+    Purpose:    Identifying blocked reactions in metabolic networks using Convex Optimization(1LP) and Gaussian Elimination
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       July 2022
 =#
@@ -239,8 +239,8 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
     ## Print out results if requested
 
     if printLevel > 0
-        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
         println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")
         println("Number of blocked reactions              : $(length(blocked_index))")
