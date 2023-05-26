@@ -12,9 +12,9 @@ export find_blocked_reactions
 
 using GLPK, JuMP, COBREXA
 
-include("../Data Processing/pre_processing.jl")
+include("../Data Processing/Pre_processing.jl")
 
-using .pre_processing
+using .Pre_processing
 
 """
     find_blocked_reactions(myModel)

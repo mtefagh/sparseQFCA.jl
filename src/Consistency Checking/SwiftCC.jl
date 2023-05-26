@@ -12,9 +12,9 @@ export MyModel, myModel_Constructor, swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 
-include("../Data Processing/pre_processing.jl")
+include("../Data Processing/Pre_processing.jl")
 
-using .pre_processing
+using .Pre_processing
 
 """
     MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
