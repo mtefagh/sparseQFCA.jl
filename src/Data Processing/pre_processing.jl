@@ -6,9 +6,9 @@
 =#
 #-------------------------------------------------------------------------------------------
 
-module pre_processing
+module Pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows,distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
@@ -263,7 +263,7 @@ function reversibility(lb::Array{Float64,1}, printLevel::Int=1)
 
     if printLevel > 0
         println("Number of irreversible reactions : $n_irr ")
-        println("Number of reversibe    reactions : $n_rev ")
+        println("Number of reversible    reactions : $n_rev ")
     end
 
     # Return the IDs of the irreversible and reversible reactions:
@@ -365,9 +365,9 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     M = getM()
 
     # If the lower bound is greater than zero, set it to zero:
-    lb[lb .> 0] .= 0
+    lb[lb .>= 0] .= 0
     # If the upper bound is greater than zero, set it to the constant M:
-    ub[ub .> 0] .= M
+    ub[ub .>= 0] .= M
     # If the lower bound is less than zero, set it to the negative of the constant M:
     lb[lb .< 0] .= -M
     # If the upper bound is less than zero, set it to zero:
