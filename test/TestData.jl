@@ -2,7 +2,7 @@ module TestData
 
 using Distributed
 
-export myModel_e_coli_core, myModel_iIS312, myModel_iMM1415, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
+export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
        blockedTest_e_coli_core, blockedTest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
 
 using COBREXA, DelimitedFiles, SparseArrays
@@ -11,7 +11,6 @@ using COBREXA, DelimitedFiles, SparseArrays
 
 myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
 myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
-myModel_iMM1415 = load_model(StandardModel,"Models/iMM1415.xml")
 
 ## read the CSV file into a matrix of type String
 
