@@ -11,9 +11,9 @@ export addQFCAProcs, removeQFCAProcs, distributedQFCA
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
 
-include("../Data Processing/pre_processing.jl")
+include("../Data Processing/Pre_processing.jl")
 
-using .pre_processing
+using .Pre_processing
 
 include("../Consistency Checking/SwiftCC.jl")
 
@@ -47,12 +47,14 @@ the calculations across multiple processors. The output is a matrix that shows t
                                     * 4 - reaction j is directionally coupled to reaction i
 - `Fc_Coefficients`:           A list of fully-coupling coefficients for each reaction in the model.
 - `Dc_Coefficients`:           A list of DCE (directional coupling equation) coefficients for each reaction in the model.
+- `blocked_index`  :           IDs of of blocked reactions.
+
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
+julia> fctable, blocked_index, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
 ```
 
 See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `myModel_Constructor()`, `distributedReversibility_Correction()`
@@ -84,7 +86,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Remove any reactions that cannot carry flux and is blocked
 
-    blocked_index, dualVar  = swiftCC(ModelObject)
+    blocked_index, dualVar  = swiftCC(ModelObject, Tolerance)
     n_blocked = length(blocked_index)
     Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
@@ -381,6 +383,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         d_3 = sum(fctable .== 3.0)
         d_4 = sum(fctable .== 4.0)
         printstyled("Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")
         println("Number of 1's (Fully)     : $d_1")
@@ -389,7 +392,11 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         println("Number of 4's (DC j-->i)  : $d_4")
     end
 
-    return fctable, Fc_Coefficients, Dc_Coefficients
+    fctable = convert(Matrix{Int}, fctable)
+    Fc_Coefficients = convert(Matrix{Float64}, Fc_Coefficients)
+    Dc_Coefficients = convert(Matrix{Float64}, Dc_Coefficients)
+
+    return fctable, blocked_index, Fc_Coefficients, Dc_Coefficients
     end
 
 end
