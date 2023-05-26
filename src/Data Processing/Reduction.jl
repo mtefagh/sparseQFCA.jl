@@ -9,7 +9,7 @@
 module Reduction
 export reduction
 
-include("../QFCA/DistributedQFCA.jl")
+include("../QFCA/distributedQFCA.jl")
 include("../Data Processing/Pre_processing.jl")
 
 using .DistributedQFCA, .Pre_processing, COBREXA, SparseArrays
