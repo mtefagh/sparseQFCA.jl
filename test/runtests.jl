@@ -26,26 +26,6 @@ printstyled("e_coli_core :\n"; color=:yellow)
 
 # Run QFCA on S and rev, and save the output to fctable:
 fctable = @time QFCA(S, rev)[end]
-
-d_0 = 0
-d_1 = 0
-d_2 = 0
-d_3 = 0
-d_4 = 0
-d_0 = sum(fctable .== 0.0)
-d_1 = sum(fctable .== 1.0)
-d_2 = sum(fctable .== 2.0)
-d_3 = sum(fctable .== 3.0)
-d_4 = sum(fctable .== 4.0)
-
-printstyled("Quantitative Flux Coupling Analysis(sparseQFCA):\n"; color=:cyan)
-println("Final fctable : ")
-println("Number of 0's (unCoupled) : $d_0")
-println("Number of 1's (Fully)     : $d_1")
-println("Number of 2's (Partialy)  : $d_2")
-println("Number of 3's (DC i-->j)  : $d_3")
-println("Number of 4's (DC j-->i)  : $d_4")
-
 # Test the output of QFCA using the fctest function:
 @test fctest(fctable)
 
