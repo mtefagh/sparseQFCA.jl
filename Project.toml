@@ -1,6 +1,6 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
-authors = ["Mojtaba Tefagh <mtefagh@stanford.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
+authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
 version = "1.6.0"
 
 [deps]
@@ -20,4 +20,4 @@ COBREXA = "1.0, 1.2"
 Colors = "0.12"
 GLPK = "0.14, 1.0"
 JuMP = "0.21, 1.0"
-julia = "1.7, 1.8"
+julia = "1.8, 1.9"

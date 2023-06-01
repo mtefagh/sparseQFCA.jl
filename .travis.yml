@@ -1,7 +1,7 @@
 jobs:
   include:
     - stage: "Documentation"
-      julia: 1.8
+      julia: 1.9
       os: linux
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
@@ -20,7 +20,7 @@ jobs:
       os:
         - linux
       julia:
-        - 1.8.5
+        - 1.9.0
       notifications:
         email: true
       sudo: false
