@@ -336,9 +336,9 @@ version = "4.1.1+1"
 
 [[deps.MPIPreferences]]
 deps = ["Libdl", "Preferences"]
-git-tree-sha1 = "71f937129731a29eabe6969db2c90368a4408933"
+git-tree-sha1 = "d86a788b336e8ae96429c0c42740ccd60ac0dfcc"
 uuid = "3da0fdf6-3ccc-4f1b-acd9-58baa6c99267"
-version = "0.1.7"
+version = "0.1.8"
 
 [[deps.MPItrampoline_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
