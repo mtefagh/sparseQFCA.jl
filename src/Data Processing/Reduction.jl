@@ -9,7 +9,7 @@
 module Reduction
 export reduction
 
-include("../QFCA/DistributedQFCA.jl")
+include("../QFCA/distributedQFCA.jl")
 include("../Data Processing/Pre_processing.jl")
 
 using .Pre_processing, .DistributedQFCA, COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
@@ -310,7 +310,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
 
     A = convert(Matrix{Float64}, A)
 
-    ## S̃ Matrix
+    ## Matrix S̃
 
     S̃ = S * A
 
