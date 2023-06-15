@@ -138,5 +138,5 @@ A = reduction(myModel_e_coli_core)
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 printstyled("Reduction :\n"; color=:yellow)
-printstyled("e_coli_core :\n"; color=:yellow)
+printstyled("iIS312 :\n"; color=:yellow)
 A = reduction(myModel_iIS312)
