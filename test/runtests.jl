@@ -14,6 +14,7 @@ include("../src/Data Processing/Pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 @everywhere include("../src/Consistency Checking/SwiftCC.jl")
 @everywhere include("../src/QFCA/distributedQFCA.jl")
+@everywhere include("../src/Data Processing/Reduction.jl")
 
 # Import required Julia modules:
 using .ecoli, .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
@@ -26,6 +27,7 @@ printstyled("e_coli_core :\n"; color=:yellow)
 
 # Run QFCA on S and rev, and save the output to fctable:
 fctable = @time QFCA(S, rev)[end]
+
 # Test the output of QFCA using the fctest function:
 @test fctest(fctable)
 
@@ -105,7 +107,7 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 
 # Run distributedQFCA method on the e_coli_core model and time the operation:
-fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
+blocked_index_e_coli_core, fctable_distributedQFCA_e_coli_core, Fc_Coefficients_e_coli_core, Dc_Coefficients_e_coli_core = @time distributedQFCA(myModel_e_coli_core)
 # convert the shared matrix to a regular matrix:
 fctable_distributedQFCA_e_coli_core = convert(Matrix{Int}, fctable_distributedQFCA_e_coli_core)
 # Test that the results of distributedQFCA are correct for the e_coli_core model:
@@ -118,7 +120,7 @@ printstyled("#------------------------------------------------------------------
 printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 # Run distributedQFCA method on the iIS312 model and time the operation:
-fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312,true)
+blocked_index_iIS312, fctable_distributedQFCA_iIS312, Fc_Coefficients_iIS312, Dc_Coefficients_iIS312 = @time distributedQFCA(myModel_iIS312,true)
 # convert the shared matrix to a regular matrix:
 fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iIS312)
 # Test that the results of distributedQFCA are correct for the iIS312 model:
@@ -128,13 +130,13 @@ printstyled("#------------------------------------------------------------------
 
 ## Reduction
 
-rmprocs(workers())
-
 printstyled("Reduction :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
-
-include("../src/Data Processing/Reduction.jl")
-
 using .Reduction
-
 A = reduction(myModel_e_coli_core)
+
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+
+printstyled("Reduction :\n"; color=:yellow)
+printstyled("iIS312 :\n"; color=:yellow)
+A = reduction(myModel_iIS312)

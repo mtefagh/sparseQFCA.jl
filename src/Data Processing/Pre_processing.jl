@@ -71,6 +71,7 @@ function dataOfModel(myModel::StandardModel, printLevel::Int=1)
     ## Print out results if requested
 
     if printLevel > 0
+        printstyled("Metabolic Network:\n"; color=:cyan)
         println("Number of Metabolites : $m")
         println("Number of Reactions   : $n")
         println("Number of Genes       : $n_genes")
@@ -262,8 +263,9 @@ function reversibility(lb::Array{Float64,1}, printLevel::Int=1)
     ## Print out results if requested
 
     if printLevel > 0
+        printstyled("Reversibility Checking:\n"; color=:cyan)
         println("Number of irreversible reactions : $n_irr ")
-        println("Number of reversible    reactions : $n_rev ")
+        println("Number of reversible   reactions : $n_rev ")
     end
 
     # Return the IDs of the irreversible and reversible reactions:
@@ -362,16 +364,16 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = getM()
+    M = getM(printLevel)
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
     # If the upper bound is greater than zero, set it to the constant M:
-    ub[ub .>= 0] .= M
+    ub[ub .> 0] .= M
     # If the lower bound is less than zero, set it to the negative of the constant M:
     lb[lb .< 0] .= -M
     # If the upper bound is less than zero, set it to zero:
-    ub[ub .< 0] .= 0
+    ub[ub .<= 0] .= 0
 
     # Return the homogenized lower and upper bounds as a tuple:
      return lb, ub
@@ -487,7 +489,7 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     end
 
     # Set the tolerance value:
-    Tolerance = getTolerance()
+    Tolerance = getTolerance(printLevel)
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])

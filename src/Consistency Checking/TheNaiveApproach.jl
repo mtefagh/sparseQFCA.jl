@@ -64,6 +64,8 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
 
     ## Homogenize the upper_bound and lower_bound of reactions
 
+    printstyled("Homogenization:\n"; color=:cyan)
+
     # Set the maximum value for M:
     M = getM()
 
