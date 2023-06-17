@@ -38,6 +38,7 @@ the calculations across multiple processors. The output is a matrix that shows t
 
 # OUTPUTS
 
+- `blocked_index`  :           IDs of blocked reactions.
 - `fctable`:                   The resulting flux coupling matrix.
                                The meaning of the entry (i, j) is:
                                     * 0 - uncoupled reactions
@@ -47,7 +48,7 @@ the calculations across multiple processors. The output is a matrix that shows t
                                     * 4 - reaction j is directionally coupled to reaction i
 - `Fc_Coefficients`:           A list of fully-coupling coefficients for each reaction in the model.
 - `Dc_Coefficients`:           A list of DCE (directional coupling equation) coefficients for each reaction in the model.
-- `blocked_index`  :           IDs of of blocked reactions.
+
 
 
 # EXAMPLES
@@ -65,15 +66,15 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Extracte relevant data from input model
 
-    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
-
-    ## Separate reactions into reversible and irreversible sets
-
-    irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
+    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel, printLevel)
 
     ## Ensure that the bounds of all reactions are homogenous
 
-    lb, ub = homogenization(lb, ub)
+    lb, ub = homogenization(lb, ub, printLevel)
+
+    ## Separate reactions into reversible and irreversible sets
+
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, printLevel)
 
     ## Count the number of reactions in each set
 
@@ -86,7 +87,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Remove any reactions that cannot carry flux and is blocked
 
-    blocked_index, dualVar  = swiftCC(ModelObject, Tolerance)
+    blocked_index, dualVar  = swiftCC(ModelObject, Tolerance, printLevel)
     n_blocked = length(blocked_index)
     Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
@@ -101,7 +102,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Correct Reversibility
 
-    S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked)
+    S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked, printLevel)
 
     ## Create an empty matrix to store directional couplings
 
@@ -396,7 +397,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     Fc_Coefficients = convert(Matrix{Float64}, Fc_Coefficients)
     Dc_Coefficients = convert(Matrix{Float64}, Dc_Coefficients)
 
-    return fctable, blocked_index, Fc_Coefficients, Dc_Coefficients
+    return blocked_index, fctable, Fc_Coefficients, Dc_Coefficients
     end
 
 end
