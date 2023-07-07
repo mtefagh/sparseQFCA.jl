@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:
+    Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossy compression in Innformation Theory.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       May 2023
 =#
@@ -17,6 +17,12 @@ using .Pre_processing, .DistributedQFCA, COBREXA, SparseArrays, GLPK, JuMP, Line
 """
     reduction(myModel)
 
+The function is designed to perform metabolic network reduction by removing blocked reactions, merge all the fully coupled reactions,
+remove the eligible reactions by the DCE-induced reductions.It extracts relevant data, separates reversible and irreversible reactions,
+corrects reversibility, and removes zero rows from the stoichiometric matrix. It processes flux coupling analysis to identify reaction clusters
+and reactions to be removed. The function constructs a reduced metabolic network matrix and performs distributed optimization for DCE-induced reductions.
+Finally, it generates information about the reduction process and returns the reduced metabolic network matrix.
+
 # INPUTS
 
 - `myModel`:                   A model that has been built using COBREXA's `load_model` function.
@@ -29,13 +35,13 @@ using .Pre_processing, .DistributedQFCA, COBREXA, SparseArrays, GLPK, JuMP, Line
 
 # OUTPUTS
 
-- `A`
+- `A`                          A `n` x `ñ` matrix representing the reduced metabolic network matrix.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia>
+julia> A = reduction(myModel)
 ```
 
 See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributedReversibility_Correction()`, `distributedQFCA()`
@@ -44,26 +50,9 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
-    ## Extract data from the model
+    ## Extracte relevant data from input model
 
-    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel, 0)
-
-    ## Homogenize lower and upper bounds
-
-    lb, ub = homogenization(lb, ub, 0)
-
-    ## Determine irreversible and reversible reactions
-
-    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, 0)
-
-    ## Remove zero rows from S matrix
-
-    S, Metabolites = remove_zeroRows(S, Metabolites)
-    m = length(Metabolites)
-
-    ## Perform distributed reversibility correction
-
-    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, 0)
+    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel, printLevel)
 
     ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
 
@@ -72,15 +61,49 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     # Get the dimensions of fctable:
     row, col = size(fctable)
 
-    # Initialize arrays:
-    A_rows_original = Array{Int64}([])
-    A_cols_reduced = Array{Int64}([])
+    ## Ensure that the bounds of all reactions are homogenous
+
+    lb, ub = homogenization(lb, ub, printLevel)
+
+    ## Separate reactions into reversible and irreversible sets
 
     # Create an array of reaction IDs:
     Reaction_Ids = collect(1:n)
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
+
+    ## Correct Reversibility
+
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, printLevel)
+
+    ## Count the number of reactions in each set
+
+    n_irr = length(irreversible_reactions_id)
+    n_rev = length(reversible_reactions_id)
 
     # Remove blocked reactions from Reaction_Ids:
     Reaction_Ids_noBlocked = setdiff(Reaction_Ids, blocked_index)
+
+    ## Remove any reactions that cannot carry flux and is blocked
+
+    Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
+    lb_noBlocked = lb[setdiff(1:end, blocked_index)]
+    ub_noBlocked = ub[setdiff(1:end, blocked_index)]
+    S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
+    irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
+    reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
+    row_S, col_S = size(S_noBlocked)
+
+    ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
+
+    S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked,Metabolites)
+
+    # Sort irreversible_reactions_id and reversible_reactions_id:
+    irreversible_reactions_id = sort(irreversible_reactions_id)
+    reversible_reactions_id = sort(reversible_reactions_id)
+
+    # Initialize arrays:
+    A_rows_original = Array{Int64}([])
+    A_cols_reduced = Array{Int64}([])
 
     # Make copies of Reaction_Ids for later use:
     A_rows_original = copy(Reaction_Ids)
@@ -188,21 +211,12 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
 
     remove_list_DC = Array{Int64}([])
 
-    # Iterate over rows in the range from 1 to 'row':
     for i in range(1, row)
-        DC_row = Dc_Coefficients[i, :]
-        DC_row = sparsevec(DC_row)
-        # Check if the number of non-zero elements in the row is greater than or equal to 2:
-        if nnz(DC_row) >= 2
-            for j = 1:length(DC_row)
-                # Check if the element is approximately zero based on the given tolerance:
-                if isapprox(DC_row[j], 0, atol=Tolerance)
-                    Dc_Coefficients[i, j] = 0.0
-                end
+        for j in range(1, col)
+            if (fctable[i,j] == 4.0)
+                append!(remove_list_DC, Reaction_Ids_noBlocked[i])
+                break
             end
-            DC_row = Dc_Coefficients[i, :]
-            DC_row = sparsevec(DC_row)
-            append!(remove_list_DC, i)
         end
     end
 
@@ -210,9 +224,15 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     blocked_index = sort(blocked_index)
     FC_cluster_members = sort(FC_cluster_members)
     remove_list_DC = sort(remove_list_DC)
+    Reaction_Ids_noBlocked = sort(Reaction_Ids_noBlocked)
+    irreversible_reactions_id = sort(irreversible_reactions_id)
+    reversible_reactions_id = sort(reversible_reactions_id)
 
     # Create the 'Eliminations' array by taking the union of 'blocked_index', 'remove_list_DC', and 'FC_cluster_members':
     Eliminations = union(blocked_index, remove_list_DC, FC_cluster_members)
+
+    # Sort Eliminations:
+    Eliminations = sort(Eliminations)
 
     # Update 'A_cols_reduced' by removing elements in 'Eliminations' from the range 1 to 'n' in 'A_cols_reduced':
     A_cols_reduced = A_cols_reduced[setdiff(range(1, n), Eliminations)]
@@ -257,6 +277,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     ## DC
 
     DCE = Dict()
+    counter = 1
 
     # Perform distributed optimization for each reaction in remove_list_DC:
     @sync @distributed for i in remove_list_DC
@@ -267,8 +288,8 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
         # Create a new optimization model:
         model = Model(GLPK.Optimizer)
 
-        # Define variables lambda, dualVar, and t:
-        @variable(model, lambda[1:n])
+        # Define variables λ, dualVar, and t:
+        @variable(model, λ[1:n])
         @variable(model, dualVar[1:m])
         @variable(model, t)
 
@@ -276,43 +297,48 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
         @objective(model, Min, t)
 
         # Define constraints for the optimization problem:
-        c1 = @constraint(model, [t; lambda] in MOI.NormOneCone(1 + length(lambda)))
-        c2 = @constraint(model, lambda == S' * dualVar)
-        c3 = @constraint(model, [j in Eliminations ∩ DCE_LinearCombination], lambda[j] == 0.0)
-        c4 = @constraint(model, [j in DCE_LinearCombination], lambda[j] >= 0.0)
-        c5 = @constraint(model, lambda[i] == -1.0)
-        c6 = @constraint(model, [j in reversible_reactions_id], lambda[j] == 0.0)
+        @constraint(model, [t; λ] in MOI.NormOneCone(1 + length(λ)))
+        @constraint(model, λ == S' * dualVar)
+        @constraint(model, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
+        #@constraint(model, [j in DCE_LinearCombination], λ[j] >= 0.0)
+        @constraint(model, λ[i] == -1.0)
+        @constraint(model, [j in reversible_reactions_id], λ[j] == 0.0)
 
         # Solve the optimization problem:
         optimize!(model)
 
-        # Get the values of lambda:
-        lambda_vec = value.(lambda)
+        # Incrementing the counter by 1:
+        counter += 1
+
+        # Get the values of λ:
+        λ_vec = value.(λ)
 
         # Create an empty array for storing column indices:
         cols = Array{Int64}([])
 
         # Find the index of the negative value and collect the indices of positive values:
-        for i = 1:length(lambda_vec)
-            if lambda_vec[i] < 0.0
+        for i = 1:length(λ_vec)
+            if λ_vec[i] < 0.0
                 row = i
             end
-            if lambda_vec[i] > 0.0
+            if λ_vec[i] > 0.0
                 append!(cols, i)
             end
         end
 
-        # Update the corresponding elements of A with the values of lambda:
+        # Update the corresponding elements of A with the values of λ:
         for i = 1:length(cols)
-            A[row, i] = lambda_vec[cols[i]]
+            A[row, i] = λ_vec[cols[i]]
         end
     end
 
     A = convert(Matrix{Float64}, A)
+    row_A, col_A = size(A)
 
     ## Matrix S̃
 
     S̃ = S * A
+    row_S̃, col_S̃ = size(S̃)
 
     ## R̃
 
@@ -337,6 +363,18 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
         reduction_map[c] = R̃[c], nonzero_indices
         # Incrementing the counter c by 1:
         c += 1
+    end
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        printstyled("Metabolic Network Reductions:\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        println("S : $(row_S) x $(col_S)")
+        println("R : $(n)")
+        println("S̃ : $(row_S̃) x $(col_S̃)")
+        println("R̃ : $(ñ)")
+        println("A : $(row_A) x $(col_A)")
     end
 
     return A
