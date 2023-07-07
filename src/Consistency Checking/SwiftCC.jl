@@ -127,7 +127,6 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
 
     # Create an array of reaction IDs:
     Reaction_Ids = collect(1:n)
-    
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, 0)
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
