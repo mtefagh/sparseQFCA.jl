@@ -217,7 +217,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
         # Iterate over the columns
         for j in range(1, col)
             # Check if the value at position (i, j) in fctable is equal to 4.0:
-            if (fctable[i, j] == 4.0)
+            if (fctable[i, j] == 4.0 || fctable[i, j] == 2.0 )
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
                 append!(remove_list_DC, Reaction_Ids_noBlocked[i])
                 # Exit the inner loop as the reaction has been found and added to remove_list_DC:
@@ -225,7 +225,6 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
             end
         end
     end
-
 
     # Sort the 'blocked_index', 'FC_cluster_members', and 'remove_list_DC' arrays:
     blocked_index = sort(blocked_index)
