@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossy compression in Innformation Theory.
+    Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossy compression in Information Theory.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       May 2023
 =#
@@ -208,17 +208,24 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     end
 
     ## DC
+    
+    # Initialize an empty array to store the IDs of reactions to be removed:
+    remove_list_DC = Array{Int64}([])  
 
-    remove_list_DC = Array{Int64}([])
-
+    # Iterate over the rows
     for i in range(1, row)
+        # Iterate over the columns
         for j in range(1, col)
-            if (fctable[i,j] == 4.0)
+            # Check if the value at position (i, j) in fctable is equal to 4.0:
+            if (fctable[i, j] == 4.0)
+                # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
                 append!(remove_list_DC, Reaction_Ids_noBlocked[i])
-                break
+                # Exit the inner loop as the reaction has been found and added to remove_list_DC:
+                break  
             end
         end
     end
+
 
     # Sort the 'blocked_index', 'FC_cluster_members', and 'remove_list_DC' arrays:
     blocked_index = sort(blocked_index)
