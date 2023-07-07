@@ -133,10 +133,10 @@ printstyled("#------------------------------------------------------------------
 printstyled("Reduction :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 using .Reduction
-A = reduction(myModel_e_coli_core)
+A = @time reduction(myModel_e_coli_core)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 printstyled("Reduction :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
-A = reduction(myModel_iIS312)
+A = @time reduction(myModel_iIS312)
