@@ -235,7 +235,7 @@ See also: `dataOfModel()`
 
 """
 
-function reversibility(lb::Array{Float64,1}, printLevel::Int=1)
+function reversibility(lb::Array{Float64,1}, Reaction_Ids::Vector{Int64}=1:length(Reaction_Ids), printLevel::Int=1)
 
     # Get the length of the "lb" array:
     n = length(lb)
@@ -249,10 +249,10 @@ function reversibility(lb::Array{Float64,1}, printLevel::Int=1)
     for i in 1:n
         # If the lower bound of the reaction is greater than or equal to zero, add the reaction ID to the irreversible reactions array:
         if lb[i] >= 0
-            append!(irreversible_reactions_id, i)
+            append!(irreversible_reactions_id, Reaction_Ids[i])
         # Otherwise, add the reaction ID to the reversible reactions array:
         else
-            append!(reversible_reactions_id, i)
+            append!(reversible_reactions_id, Reaction_Ids[i])
         end
     end
 
@@ -499,6 +499,8 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     # The initial value of false indicates that no reactions are blocked at the beginning:
     Correction = SharedArray{Int,2}((n, n), init = false)
 
+    n_rev = reversible_reactions_id
+
     # Iterate over all reversible reactions in the model
 
     @sync @distributed for i in reversible_reactions_id
@@ -516,29 +518,21 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
         @objective(local_model, Max, V[i])
 
         # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
-        @constraint(local_model, c1, V[i] <= 1)
+        @constraint(local_model, V[i] <= 1)
 
         # Optimize the model and retrieve the objective value:
         optimize!(local_model)
         opt_fwd = objective_value(local_model)
 
-        # Delete the constraint and unregister it from the model:
-        delete(local_model, c1)
-        unregister(local_model, :c1)
-
         # Set the objective function to minimize the flux through reaction i in the backward direction:
         @objective(local_model, Min, V[i])
 
         # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
-        @constraint(local_model, c2, V[i] >= -1)
+        @constraint(local_model, V[i] >= -1)
 
         # Optimize the model and retrieve the objective value:
         optimize!(local_model)
         opt_back = objective_value(local_model)
-
-        # Delete the constraint and unregister it from the model:
-        delete(local_model, c2)
-        unregister(local_model, :c2)
 
         # The reaction is considered to be blocked:
         if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)

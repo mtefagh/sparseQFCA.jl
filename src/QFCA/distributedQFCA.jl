@@ -55,7 +55,7 @@ the calculations across multiple processors. The output is a matrix that shows t
 
 - Full input/output example
 ```julia
-julia> fctable, blocked_index, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
+julia> blocked_index, fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
 ```
 
 See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `myModel_Constructor()`, `distributedReversibility_Correction()`
@@ -63,8 +63,6 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `my
 """
 
 function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
-
-    ## Extracte relevant data from input model
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel, printLevel)
 
@@ -74,7 +72,14 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     ## Separate reactions into reversible and irreversible sets
 
-    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, printLevel)
+    # Create an array of reaction IDs:
+    Reaction_Ids = collect(1:n)
+
+    irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
+
+    ## Correct Reversibility
+
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, printLevel)
 
     ## Count the number of reactions in each set
 
@@ -88,21 +93,38 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     ## Remove any reactions that cannot carry flux and is blocked
 
     blocked_index, dualVar  = swiftCC(ModelObject, Tolerance, printLevel)
+
+    # Convert to Vector{Int64}
+    blocked_index = convert(Vector{Int64}, blocked_index)
+
+    # Remove blocked reactions from Reaction_Ids:
+    Reaction_Ids_noBlocked = setdiff(Reaction_Ids, blocked_index)
+
     n_blocked = length(blocked_index)
     Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
     ub_noBlocked = ub[setdiff(1:end, blocked_index)]
     S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
-    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, 0)
+    irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
+    reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
+
+    # Convert to Vector{Int64}
+    irreversible_reactions_id = convert(Vector{Int64}, irreversible_reactions_id)
+    # Convert to Vector{Int64}
+    reversible_reactions_id = convert(Vector{Int64}, reversible_reactions_id)
+
     row_noBlocked, col_noBlocked = size(S_noBlocked)
+
+    lb_noBlocked = lb[setdiff(1:end, blocked_index)]
+
+    ub_noBlocked = ub[setdiff(1:end, blocked_index)]
 
     ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
 
     S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked,Metabolites)
 
-    ## Correct Reversibility
-
-    S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S_noBlocked, lb_noBlocked, ub_noBlocked, irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked, printLevel)
+    irreversible_reactions_id = sort(irreversible_reactions_id)
+    reversible_reactions_id = sort(reversible_reactions_id)
 
     ## Create an empty matrix to store directional couplings
 
@@ -187,7 +209,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
     # For each reaction i and reaction j in the range of blocked reactions:
     for i in range(1, col_noBlocked)
         for j in range(1, col_noBlocked)
-            # If there is directional coupling from reaction i to reaction j:
+            # If there is directional coupling from reaction j to reaction i:
             if DC_Matrix[i, j] == 1.0
                 fctable[j,i] = 3.0
             end
@@ -236,6 +258,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         for j in range(1, col_noBlocked)
             # If the nodes are partially coupled in both directions:
             if fctable[i,j] == fctable[j,i] == 2.0
+
                 # Save the partially coupled pair:
                 Partially_Couples = i,j
 
