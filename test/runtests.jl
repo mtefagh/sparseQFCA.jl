@@ -39,9 +39,9 @@ for i in reversible_reactions_id_iIS312
     rev_iIS312[i] = true
 end
 # Run QFCA on S and rev, and save the output to fctable:
-fctable_iIS312 = @time QFCA(S_iIS312, rev_iIS312)[end]
+fctable_QFCA_iIS312 = @time QFCA(S_iIS312, rev_iIS312)[end]
 # Test that the results of QFCA are correct for the iIS312 model:
-@test QFCATest_iIS312(fctable_iIS312)
+@test QFCATest_iIS312(fctable_QFCA_iIS312)
 # Print a separator:
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
