@@ -3,7 +3,7 @@ export QFCA
 
 using LinearAlgebra, SparseArrays, JuMP, GLPK
 
-function QFCA(S, rev, printLevel::Int=1)
+function QFCA(S, rev)
 #=
 QFCA computes the table of flux coupling relations and the list of blocked
 reactions for a metabolic network specified by its stoichiometric matrix
@@ -146,30 +146,6 @@ and irreversible reactions and also returns the DCE positive certificates.
         fctable[indices, coupled] .= [fctable[indices[1], j] == 3 ? 2 : 4 for j in coupled]'
     end
     fctable[X] .= 1
-
-    ## Print out results if requested
-
-    if printLevel > 0
-        d_0 = 0
-        d_1 = 0
-        d_2 = 0
-        d_3 = 0
-        d_4 = 0
-        d_0 = sum(fctable .== 0.0)
-        d_1 = sum(fctable .== 1.0)
-        d_2 = sum(fctable .== 2.0)
-        d_3 = sum(fctable .== 3.0)
-        d_4 = sum(fctable .== 4.0)
-        printstyled("Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
-        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
-        println("Final fctable : ")
-        println("Number of 0's (unCoupled) : $d_0")
-        println("Number of 1's (Fully)     : $d_1")
-        println("Number of 2's (Partialy)  : $d_2")
-        println("Number of 3's (DC i-->j)  : $d_3")
-        println("Number of 4's (DC j-->i)  : $d_4")
-    end
-
     return certificates, finalBlocked, fctable
 end
 

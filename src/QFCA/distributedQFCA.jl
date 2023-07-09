@@ -405,7 +405,7 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         d_2 = sum(fctable .== 2.0)
         d_3 = sum(fctable .== 3.0)
         d_4 = sum(fctable .== 4.0)
-        printstyled("Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        printstyled("Distributed Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")

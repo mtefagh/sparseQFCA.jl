@@ -40,6 +40,26 @@ for i in reversible_reactions_id_iIS312
 end
 # Run QFCA on S and rev, and save the output to fctable:
 fctable_QFCA_iIS312 = @time QFCA(S_iIS312, rev_iIS312)[end]
+# Print fctable_QFCA_iIS312:
+d_0 = 0
+d_1 = 0
+d_2 = 0
+d_3 = 0
+d_4 = 0
+d_0 = sum(fctable_QFCA_iIS312 .== 0.0)
+d_1 = sum(fctable_QFCA_iIS312 .== 1.0)
+d_2 = sum(fctable_QFCA_iIS312 .== 2.0)
+d_3 = sum(fctable_QFCA_iIS312 .== 3.0)
+d_4 = sum(fctable_QFCA_iIS312 .== 4.0)
+Tolerance = eps(Float64)
+printstyled("Sparse Quantitative Flux Coupling Analysis(sparseQFCA):\n"; color=:cyan)
+printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+println("Final fctable : ")
+println("Number of 0's (unCoupled) : $d_0")
+println("Number of 1's (Fully)     : $d_1")
+println("Number of 2's (Partialy)  : $d_2")
+println("Number of 3's (DC i-->j)  : $d_3")
+println("Number of 4's (DC j-->i)  : $d_4")
 # Test that the results of QFCA are correct for the iIS312 model:
 @test QFCATest_iIS312(fctable_QFCA_iIS312)
 # Print a separator:
