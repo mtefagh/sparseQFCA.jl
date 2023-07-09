@@ -74,7 +74,6 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
 
     # Create an array of reaction IDs:
     Reaction_Ids = collect(1:n)
-
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
 
     ## Correct Reversibility
