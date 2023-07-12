@@ -16,7 +16,7 @@ include("../src/Consistency Checking/TheNaiveApproach.jl")
 @everywhere include("../src/Data Processing/Reduction.jl")
 
 # Import required Julia modules:
-using .ecoli, .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
+using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
 
 ### sparseQFCA:
 
