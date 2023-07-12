@@ -8,7 +8,6 @@ addprocs(7)
 ### Import Libraries
 
 # Include the necessary Julia files:
-include("ecoli.jl")
 include("TestData.jl")
 @everywhere include("../src/Data Processing/Pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
