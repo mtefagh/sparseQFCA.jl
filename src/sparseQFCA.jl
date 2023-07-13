@@ -1,18 +1,18 @@
 ﻿module sparseQFCA
 export QFCA
 
-using LinearAlgebra, SparseArrays, JuMP, GLPK       
+using LinearAlgebra, SparseArrays, JuMP, GLPK
 
 function QFCA(S, rev)
 #=
-QFCA computes the table of flux coupling relations and the list of blocked 
-reactions for a metabolic network specified by its stoichiometric matrix 
+QFCA computes the table of flux coupling relations and the list of blocked
+reactions for a metabolic network specified by its stoichiometric matrix
 and irreversible reactions and also returns the DCE positive certificates.
     Usage:
     certificates, blocked, fctable = QFCA(S, rev)
         - S: the associated sparse stoichiometric matrix
         - rev: the boolean vector with trues corresponding to the reversible reactions
-        
+
         - certificates: the fictitious metabolites for the sparse positive certificates
         - blocked: the boolean vector with trues corresponding to the blocked reactions
         - fctable: the resulting flux coupling matrix
@@ -50,7 +50,7 @@ and irreversible reactions and also returns the DCE positive certificates.
     blocked = [norm(Z[j, :]) < norm(S, 2)*eps(Float64) for j in 1:size(Z, 1)]
     finalBlocked[.!finalBlocked] = blocked
     S = S[:, .!finalBlocked]
-    rev = rev[.!finalBlocked] 
+    rev = rev[.!finalBlocked]
     S = unique(S, dims = 1)
     Z = Z[.!blocked, :]
     X = Z*Z'
@@ -70,7 +70,7 @@ and irreversible reactions and also returns the DCE positive certificates.
                 end
             end
         end
-    end   
+    end
     fullModel = Model(GLPK.Optimizer)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
@@ -148,5 +148,5 @@ and irreversible reactions and also returns the DCE positive certificates.
     fctable[X] .= 1
     return certificates, finalBlocked, fctable
 end
-                                    
+
 end
