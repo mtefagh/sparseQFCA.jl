@@ -74,6 +74,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     ## Correct Reversibility
 
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, printLevel)
+    row_S, col_S = size(S)
 
     ## Count the number of reactions in each set
 
@@ -91,7 +92,6 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
     irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
     reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
-    row_S, col_S = size(S_noBlocked)
 
     ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
 

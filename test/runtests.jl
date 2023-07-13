@@ -8,29 +8,59 @@ addprocs(7)
 ### Import Libraries
 
 # Include the necessary Julia files:
-include("ecoli.jl")
 include("TestData.jl")
-include("../src/Data Processing/Pre_processing.jl")
+@everywhere include("../src/Data Processing/Pre_processing.jl")
 include("../src/Consistency Checking/TheNaiveApproach.jl")
 @everywhere include("../src/Consistency Checking/SwiftCC.jl")
 @everywhere include("../src/QFCA/distributedQFCA.jl")
 @everywhere include("../src/Data Processing/Reduction.jl")
 
 # Import required Julia modules:
-using .ecoli, .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
+using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
 
 ### sparseQFCA:
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
 printstyled("sparseQFCA :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
-
+# Get data from the iIS312 model:
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312 = dataOfModel(myModel_iIS312)
+# Ensure that the bounds of all reactions are homogenous:
+lb_iIS312, ub_iIS312 = homogenization(lb_iIS312, ub_iIS312)
+# Create an array of reaction IDs:
+Reaction_Ids_iIS312 = collect(1:n_iIS312)
+irreversible_reactions_id_iIS312, reversible_reactions_id_iIS312 = reversibility(lb_iIS312, Reaction_Ids_iIS312)
+# Correct Reversibility:
+S_iIS312, lb_iIS312, ub_iIS312, irreversible_reactions_id_iIS312, reversible_reactions_id_iIS312 = distributedReversibility_Correction(S_iIS312, lb_iIS312, ub_iIS312, irreversible_reactions_id_iIS312, reversible_reactions_id_iIS312)
+# Create Rev Vector:
+rev_iIS312 = zeros(Bool,n_iIS312)
+for i in reversible_reactions_id_iIS312
+    rev_iIS312[i] = true
+end
 # Run QFCA on S and rev, and save the output to fctable:
-fctable = @time QFCA(S, rev)[end]
-
-# Test the output of QFCA using the fctest function:
-@test fctest(fctable)
-
+fctable_QFCA_iIS312 = @time QFCA(S_iIS312, rev_iIS312)[end]
+# Print fctable_QFCA_iIS312:
+d_0 = 0
+d_1 = 0
+d_2 = 0
+d_3 = 0
+d_4 = 0
+d_0 = sum(fctable_QFCA_iIS312 .== 0.0)
+d_1 = sum(fctable_QFCA_iIS312 .== 1.0)
+d_2 = sum(fctable_QFCA_iIS312 .== 2.0)
+d_3 = sum(fctable_QFCA_iIS312 .== 3.0)
+d_4 = sum(fctable_QFCA_iIS312 .== 4.0)
+Tolerance = eps(Float64)
+printstyled("Sparse Quantitative Flux Coupling Analysis(sparseQFCA):\n"; color=:cyan)
+printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+println("Final fctable : ")
+println("Number of 0's (unCoupled) : $d_0")
+println("Number of 1's (Fully)     : $d_1")
+println("Number of 2's (Partialy)  : $d_2")
+println("Number of 3's (DC i-->j)  : $d_3")
+println("Number of 4's (DC j-->i)  : $d_4")
+# Test that the results of QFCA are correct for the iIS312 model:
+@test QFCATest_iIS312(fctable_QFCA_iIS312)
 # Print a separator:
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
