@@ -4,16 +4,22 @@ jobs:
       julia: 1.9
       os: linux
       script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
+                                               Pkg.instantiate()'
         - julia --project=docs/ docs/make.jl
-      after_success:
-        - julia --project=docs/ -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+        - run: julia --project=docs/ --code-coverage=user docs/make.jl
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        - uses: julia-actions/julia-processcoverage@v1
         - uses: codecov/codecov-action@v1
-
+  include:
     - stage: "Deployment"
       language: julia
-      os: linux
-      julia: 1.9.0
+      os:
+        - linux
+      julia:
+        - 1.9.0
       notifications:
         email: true
       sudo: false
@@ -24,3 +30,5 @@ jobs:
         keep-history: true
         on:
           branch: master
+      after_success:
+        - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(Codecov.process_folder())'
