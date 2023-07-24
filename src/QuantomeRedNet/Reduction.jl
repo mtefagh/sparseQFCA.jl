@@ -1,16 +1,16 @@
-#-------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 #=
     Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossy compression in Information Theory.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       May 2023
 =#
-#-------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 module Reduction
 export reduction
 
-include("../QFCA/distributedQFCA.jl")
-include("../Data Processing/Pre_processing.jl")
+include("../FCA/distributedQFCA.jl")
+include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing, .DistributedQFCA, COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
@@ -208,9 +208,9 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     end
 
     ## DC
-    
+
     # Initialize an empty array to store the IDs of reactions to be removed:
-    remove_list_DC = Array{Int64}([])  
+    remove_list_DC = Array{Int64}([])
 
     # Iterate over the rows
     for i in range(1, row)
@@ -221,7 +221,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
                 append!(remove_list_DC, Reaction_Ids_noBlocked[i])
                 # Exit the inner loop as the reaction has been found and added to remove_list_DC:
-                break  
+                break
             end
         end
     end

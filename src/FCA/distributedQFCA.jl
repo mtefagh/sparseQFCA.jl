@@ -1,21 +1,21 @@
-#-------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------
 #=
     Purpose:    Parallel computation of quantitative flux coupling using swiftCC algorithm and Gaussian Elimination
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       October 2022
 =#
-#-------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------
 
 module DistributedQFCA
 export addQFCAProcs, removeQFCAProcs, distributedQFCA
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
 
-include("../Data Processing/Pre_processing.jl")
+include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
 
-include("../Consistency Checking/SwiftCC.jl")
+include("../Pre_Processing/Consistency Checking/SwiftCC.jl")
 
 using .SwiftCC
 
