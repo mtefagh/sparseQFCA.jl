@@ -5,18 +5,8 @@ using Distributed
 # Add worker processes to the Julia distributed computing environment:
 addprocs(7)
 
-### Import Libraries
-
-# Include the necessary Julia files:
-include("TestData.jl")
-@everywhere include("../src/Data Processing/Pre_processing.jl")
-include("../src/Consistency Checking/TheNaiveApproach.jl")
-@everywhere include("../src/Consistency Checking/SwiftCC.jl")
-@everywhere include("../src/QFCA/distributedQFCA.jl")
-@everywhere include("../src/Data Processing/Reduction.jl")
-
 # Import required Julia modules:
-using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
+using COBREXA, JuMP, sparseQFCA, Test, Distributed
 
 ### sparseQFCA:
 

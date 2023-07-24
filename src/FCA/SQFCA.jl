@@ -1,10 +1,10 @@
-#-------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 #=
     Purpose:    Sparse Quantitative Flux Coupling Analysis (SQFCA)
     Author:     Mojtaba Tefagh - Sharif University of Technology
     Date:       Jan 2020
 =#
-#-------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 module SQFCA
 export QFCA
@@ -189,7 +189,7 @@ function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
         d_2 = sum(fctable .== 2.0)
         d_3 = sum(fctable .== 3.0)
         d_4 = sum(fctable .== 4.0)
-        printstyled("Distributed Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        printstyled("Sparse Quantitative Flux Coupling Analysis(SQFCA):\n"; color=:cyan)
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")
@@ -203,3 +203,5 @@ function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
 end
 
 end
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
