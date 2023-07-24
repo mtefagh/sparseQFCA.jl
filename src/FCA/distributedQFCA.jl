@@ -49,8 +49,6 @@ the calculations across multiple processors. The output is a matrix that shows t
 - `Fc_Coefficients`:           A list of fully-coupling coefficients for each reaction in the model.
 - `Dc_Coefficients`:           A list of DCE (directional coupling equation) coefficients for each reaction in the model.
 
-
-
 # EXAMPLES
 
 - Full input/output example

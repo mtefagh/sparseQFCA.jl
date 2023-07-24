@@ -1,29 +1,58 @@
-﻿module SQFCA
+#-------------------------------------------------------------------------------------------
+#=
+    Purpose:    Sparse Quantitative Flux Coupling Analysis (SQFCA)
+    Author:     Mojtaba Tefagh - Sharif University of Technology
+    Date:       Jan 2020
+=#
+#-------------------------------------------------------------------------------------------
+
+module SQFCA
 export QFCA
 
 using LinearAlgebra, SparseArrays, JuMP, GLPK
 
-function QFCA(S, rev)
-#=
-QFCA computes the table of flux coupling relations and the list of blocked
-reactions for a metabolic network specified by its stoichiometric matrix
-and irreversible reactions and also returns the DCE positive certificates.
-    Usage:
-    certificates, blocked, fctable = QFCA(S, rev)
-        - S: the associated sparse stoichiometric matrix
-        - rev: the boolean vector with trues corresponding to the reversible reactions
+"""
+    QFCA(S, rev)
 
-        - certificates: the fictitious metabolites for the sparse positive certificates
-        - blocked: the boolean vector with trues corresponding to the blocked reactions
-        - fctable: the resulting flux coupling matrix
-            * For the choice of entries, we use the F2C2 convention for the
-            sake of compatibility. The meaning of the entry [i, j] is:
-                0 - uncoupled reactions
-                1 - fully coupled reactions
-                2 - partially coupled reactions
-                3 - reaction i is directionally coupled to reaction j
-                4 - reaction j is directionally coupled to reaction i
-=#
+QFCA computes the table of flux coupling relations and the list of blocked reactions for a metabolic network
+specified by its stoichiometric matrix and irreversible reactions and also returns the DCE positive certificates.
+
+# INPUTS
+
+- S:                          The associated sparse stoichiometric matrix.
+- rev:                        The boolean vector with trues corresponding to the reversible reactions.
+
+# OPTIONAL INPUTS
+
+- `Tolerance`:                A small number that represents the level of error tolerance.
+- `printLevel`:               Verbose level (default: 1). Mute all output with `printLevel = 0`.
+
+# OUTPUTS
+
+- certificates:               The fictitious metabolites for the sparse positive certificates.
+- blocked:                    The boolean vector with trues corresponding to the blocked reactions.
+- fctable:                    The resulting flux coupling matrix.
+                              * For the choice of entries, we use the F2C2 convention for the
+                              sake of compatibility. The meaning of the entry [i, j] is:
+                                  0 - uncoupled reactions
+                                  1 - fully coupled reactions
+                                  2 - partially coupled reactions
+                                  3 - reaction i is directionally coupled to reaction j
+                                  4 - reaction j is directionally coupled to reaction i
+
+# EXAMPLES
+
+- Full input/output example
+```julia
+julia> certificates, blocked, fctable = QFCA(S, rev)
+```
+
+See also:
+
+"""
+
+function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
+
     model = Model(GLPK.Optimizer)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
@@ -47,7 +76,7 @@ and irreversible reactions and also returns the DCE positive certificates.
     blocked = result .≈ -1
     finalBlocked = copy(blocked)
     Z = nullspace(Matrix(S[:, .!blocked]))
-    blocked = [norm(Z[j, :]) < norm(S, 2)*eps(Float64) for j in 1:size(Z, 1)]
+    blocked = [norm(Z[j, :]) < norm(S, 2)*Tolerance for j in 1:size(Z, 1)]
     finalBlocked[.!finalBlocked] = blocked
     S = S[:, .!finalBlocked]
     rev = rev[.!finalBlocked]
@@ -136,7 +165,7 @@ and irreversible reactions and also returns the DCE positive certificates.
             temp = sum(.!blocked)
             Y = sparse(1:temp, 1:temp, 1)/Matrix(S[:, .!blocked])
             Y = Y*Matrix(S[:, .!blocked]) - sparse(1:temp, 1:temp, 1)
-            blocked[.!blocked] = [norm(Y[:, j]) < norm(S[:, .!blocked], 2)*eps(Float64) for j in 1:temp]
+            blocked[.!blocked] = [norm(Y[:, j]) < norm(S[:, .!blocked], 2)*Tolerance for j in 1:temp]
         else
             certificate = [value(x[j]) for j in 1:m]
         end
@@ -146,6 +175,30 @@ and irreversible reactions and also returns the DCE positive certificates.
         fctable[indices, coupled] .= [fctable[indices[1], j] == 3 ? 2 : 4 for j in coupled]'
     end
     fctable[X] .= 1
+
+    ## Print out results if requested
+
+    if printLevel > 0
+        d_0 = 0
+        d_1 = 0
+        d_2 = 0
+        d_3 = 0
+        d_4 = 0
+        d_0 = sum(fctable .== 0.0)
+        d_1 = sum(fctable .== 1.0)
+        d_2 = sum(fctable .== 2.0)
+        d_3 = sum(fctable .== 3.0)
+        d_4 = sum(fctable .== 4.0)
+        printstyled("Distributed Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
+        println("Final fctable : ")
+        println("Number of 0's (unCoupled) : $d_0")
+        println("Number of 1's (Fully)     : $d_1")
+        println("Number of 2's (Partialy)  : $d_2")
+        println("Number of 3's (DC i-->j)  : $d_3")
+        println("Number of 4's (DC j-->i)  : $d_4")
+    end
+
     return certificates, finalBlocked, fctable
 end
 
