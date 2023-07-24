@@ -9,11 +9,11 @@ addprocs(7)
 
 # Include the necessary Julia files:
 include("TestData.jl")
-@everywhere include("../src/Data Processing/Pre_processing.jl")
-include("../src/Consistency Checking/TheNaiveApproach.jl")
-@everywhere include("../src/Consistency Checking/SwiftCC.jl")
-@everywhere include("../src/QFCA/distributedQFCA.jl")
-@everywhere include("../src/Data Processing/Reduction.jl")
+@everywhere include("../src/Pre_Processing/Pre_processing.jl")
+include("../src/Pre_Processing/Consistency Checking/TheNaiveApproach.jl")
+@everywhere include("../src/Pre_Processing/Consistency Checking/SwiftCC.jl")
+@everywhere include("../src/FCA/distributedQFCA.jl")
+@everywhere include("../src/QuantomeRedNet/Reduction.jl")
 
 # Import required Julia modules:
 using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
