@@ -13,10 +13,11 @@ include("TestData.jl")
 include("../src/Pre_Processing/Consistency Checking/TheNaiveApproach.jl")
 @everywhere include("../src/Pre_Processing/Consistency Checking/SwiftCC.jl")
 @everywhere include("../src/FCA/distributedQFCA.jl")
+@everywhere include("../src/FCA/SQFCA.jl")
 @everywhere include("../src/QuantomeRedNet/Reduction.jl")
 
 # Import required Julia modules:
-using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, sparseQFCA, Test, Distributed
+using .TestData, .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, COBREXA, JuMP, .SQFCA, Test, Distributed
 
 ### sparseQFCA:
 
