@@ -1,4 +1,4 @@
-﻿module sparseQFCA
+﻿module SQFCA
 export QFCA
 
 using LinearAlgebra, SparseArrays, JuMP, GLPK
