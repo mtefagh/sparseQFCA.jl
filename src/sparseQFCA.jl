@@ -8,6 +8,8 @@
 
 module sparseQFCA
 
+    using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
+
     include("../test/TestData.jl")
     include("Pre_Processing/Pre_processing.jl")
     include("Pre_Processing/Consistency Checking/TheNaiveApproach.jl")
