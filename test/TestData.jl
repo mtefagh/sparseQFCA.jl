@@ -24,7 +24,7 @@ model_file_path = joinpath(output_directory, "e_coli_core.xml")
 open(model_file_path, "w") do file
        write(file, e_coli_core_model)
 end
-myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core_model.xml")
+myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
 
 ## iIS312
 
@@ -34,7 +34,7 @@ model_file_path = joinpath(output_directory, "iIS312.xml")
 open(model_file_path, "w") do file
        write(file, iIS312_model)
 end
-myModel_iIS312 = load_model(StandardModel,"Models/iIS312_model.xml")
+myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
 
 ## read the CSV file into a matrix of type String
 
