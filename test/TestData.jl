@@ -5,7 +5,7 @@ using Distributed
 export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
        blockedTest_e_coli_core, blockedTest_iIS312, QFCATest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
 
-using COBREXA, DelimitedFiles, SparseArrays
+using COBREXA, DelimitedFiles, SparseArrays, HTTP
 
 ## Load Metabolic Networks
 
