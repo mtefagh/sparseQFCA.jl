@@ -20,7 +20,7 @@ end
 
 e_coli_core_model = HTTP.get("http://bigg.ucsd.edu/static/models/e_coli_core.xml")
 # Save the e_coli_core_model to a file with the corresponding model name:
-model_file_path = joinpath(output_directory, "$e_coli_core.xml")
+model_file_path = joinpath(output_directory, "e_coli_core.xml")
 open(model_file_path, "w") do file
        write(file, e_coli_core_model)
 end
@@ -30,7 +30,7 @@ myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core_model.xml")
 
 iIS312_model = HTTP.get("http://bigg.ucsd.edu/static/models/iIS312.xml")
 # Save the iIS312_model to a file with the corresponding model name:
-model_file_path = joinpath(output_directory, "$iIS312.xml")
+model_file_path = joinpath(output_directory, "iIS312.xml")
 open(model_file_path, "w") do file
        write(file, iIS312_model)
 end
