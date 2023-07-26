@@ -9,8 +9,15 @@ using COBREXA, DelimitedFiles, SparseArrays
 
 ## Load Metabolic Networks
 
-myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
-myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
+# e_coli_core:
+e_coli_core_model = HTTP.get("http://bigg.ucsd.edu/static/models/e_coli_core.xml")
+write("Models/e_coli_core_model.xml",e_coli_core_model.body)
+myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core_model.xml")
+
+# iIS312:
+iIS312_model = HTTP.get("http://bigg.ucsd.edu/static/models/iIS312.xml")
+write("Models/iIS312_model.xml",ecoli_model.body)
+myModel_iIS312 = load_model(StandardModel,"Models/iIS312_model.xml")
 
 ## read the CSV file into a matrix of type String
 
