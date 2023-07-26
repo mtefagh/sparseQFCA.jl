@@ -8,7 +8,6 @@
 
 module sparseQFCA
 
-    import Pkg
     using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
     include("../test/TestData.jl")
