@@ -12,7 +12,7 @@ export MyModel, myModel_Constructor, swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 
-include("../Pre_processing.jl")
+include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
 
@@ -242,6 +242,8 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
 
     if printLevel > 0
         printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
+        println("Number of Proccess : $(nprocs())")
+        println("Number of Workers  : $(nworkers())")
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
         println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")

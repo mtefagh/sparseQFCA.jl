@@ -9,7 +9,7 @@
 module SQFCA
 export QFCA
 
-using LinearAlgebra, SparseArrays, JuMP, GLPK
+using LinearAlgebra, SparseArrays, JuMP, GLPK, Distributed
 
 """
     QFCA(S, rev)
@@ -190,6 +190,8 @@ function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
         d_3 = sum(fctable .== 3.0)
         d_4 = sum(fctable .== 4.0)
         printstyled("Sparse Quantitative Flux Coupling Analysis(SQFCA):\n"; color=:cyan)
+        println("Number of Proccess : $(nprocs())")
+        println("Number of Workers  : $(nworkers())")
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")

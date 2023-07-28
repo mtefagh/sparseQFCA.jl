@@ -611,6 +611,9 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     ## Print out results if requested
 
     if printLevel > 0
+        printstyled("Distributed Reversibility Correction :\n"; color=:cyan)
+        println("Number of Proccess : $(nprocs())")
+        println("Number of Workers  : $(nworkers())")
         println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
         println("Number of reversibe blocked in backward direction : $(length(rev_blocked_back))")
         println("Number of irreversible reactions after Correction : $(length(irreversible_reactions_id))")

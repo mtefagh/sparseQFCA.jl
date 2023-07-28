@@ -15,7 +15,7 @@ include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
 
-include("../Pre_Processing/Consistency Checking/SwiftCC.jl")
+include("../ConsistencyChecking/SwiftCC.jl")
 
 using .SwiftCC
 
@@ -404,6 +404,8 @@ function distributedQFCA(myModel::StandardModel, removing::Bool=false, Tolerance
         d_3 = sum(fctable .== 3.0)
         d_4 = sum(fctable .== 4.0)
         printstyled("Distributed Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
+        println("Number of Proccess : $(nprocs())")
+        println("Number of Workers  : $(nworkers())")
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")

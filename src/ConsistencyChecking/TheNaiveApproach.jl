@@ -10,9 +10,9 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA
+using GLPK, JuMP, COBREXA, Distributed
 
-include("../Pre_processing.jl")
+include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
 
@@ -192,6 +192,8 @@ function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6,
 
     if printLevel > 0
         printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
+        println("Number of Proccess : $(nprocs())")
+        println("Number of Workers  : $(nworkers())")
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
         println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")
