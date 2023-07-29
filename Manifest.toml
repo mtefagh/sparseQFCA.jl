@@ -243,9 +243,9 @@ version = "0.21.4"
 
 [[deps.JuMP]]
 deps = ["LinearAlgebra", "MathOptInterface", "MutableArithmetics", "OrderedCollections", "Printf", "SnoopPrecompile", "SparseArrays"]
-git-tree-sha1 = "b0ded4f36829f7cfd4400b11289faf9b4f0b795a"
+git-tree-sha1 = "3cacc9aa90f3313e0375b1c4ac4641c8d57349ef"
 uuid = "4076af6c-e467-56ae-b986-b466b2749572"
-version = "1.12.0"
+version = "1.13.0"
 
 [[deps.LLVMOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -435,9 +435,9 @@ version = "1.6.2"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
-git-tree-sha1 = "4b2e829ee66d4218e0cef22c0a64ee37cf258c29"
+git-tree-sha1 = "716e24b21538abc91f6205fd1d8363f39b442851"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.7.1"
+version = "2.7.2"
 
 [[deps.PikaParser]]
 deps = ["DocStringExtensions"]
