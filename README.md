@@ -6,6 +6,10 @@
 
 *sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) package for the sparse [Quantitative Flux Coupling Analysis](https://mtefagh.github.io/qfca/). Moreover, a Julia implementation of [Swift Consistency Checking](https://mtefagh.github.io/swiftcore/) is also available as a preprocessing subroutine. The example data files `S.csv` and `rev.csv` are extracted from the [core *E. coli* model](http://systemsbiology.ucsd.edu/Downloads/EcoliCore).
 
+## How to get started
+
+### Prerequisites and requirements
+
 - **Operating system**: Use Linux (Debian, Ubuntu or centOS), MacOS, or Windows
   10 as your operating system. `sparseQFCA` has been tested on these systems.
 - **Julia language**: In order to use `sparseQFCA`, you need to install Julia 1.0
