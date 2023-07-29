@@ -7,7 +7,7 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 module DistributedQFCA
-export addQFCAProcs, removeQFCAProcs, distributedQFCA
+export distributedQFCA
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
 

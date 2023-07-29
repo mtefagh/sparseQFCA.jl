@@ -217,12 +217,14 @@ one containing the IDs of irreversible reactions, and the other containing the I
 
 # OPTIONAL INPUTS
 
-- `printLevel`:                     Verbose level (default: 1). Mute all output with `printLevel = 0`.
+
+- `Reaction_Ids`:                   Array of reaction IDs.
+- `printLevel`  :                   Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
 - `irreversible_reactions_id`:      IDs of irreversible reactions.
-- `reversible_reactions_id`:        IDs of reversible reactions.
+- `reversible_reactions_id`  :      IDs of reversible reactions.
 
 # EXAMPLES
 
