@@ -441,9 +441,9 @@ version = "2.7.2"
 
 [[deps.PikaParser]]
 deps = ["DocStringExtensions"]
-git-tree-sha1 = "b113069dd39d580cc171b017a1056f3621b6f37c"
+git-tree-sha1 = "f3704297ffe759cca50881d19326b31da99188a4"
 uuid = "3bbf5609-3e7b-44cd-8549-7c69f321e792"
-version = "0.5.1"
+version = "0.5.2"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -597,9 +597,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.Unitful]]
 deps = ["Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "1cd9b6d3f637988ca788007b7466c132feebe263"
+git-tree-sha1 = "64eb17acef1d9734cf09967539818f38093d9b35"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.16.1"
+version = "1.16.2"
 
     [deps.Unitful.extensions]
     ConstructionBaseUnitfulExt = "ConstructionBase"
