@@ -7,12 +7,19 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 module Reduction
+
 export reduction
 
-include("../FCA/distributedQFCA.jl")
-include("../Pre_Processing/Pre_processing.jl")
+using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
-using .Pre_processing, .DistributedQFCA, COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
+include("../Pre_Processing/Pre_processing.jl")
+using .Pre_processing
+
+include("../ConsistencyChecking/SwiftCC.jl")
+using .SwiftCC
+
+include("../FCA/distributedQFCA.jl")
+using .DistributedQFCA
 
 """
     reduction(myModel)
@@ -54,12 +61,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
 
     S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel, printLevel)
 
-    ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
-
-    blocked_index, fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel, removing, Tolerance, 0)
-
-    # Get the dimensions of fctable:
-    row, col = size(fctable)
+    row_S, col_S = size(S)
 
     ## Ensure that the bounds of all reactions are homogenous
 
@@ -71,10 +73,31 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
     Reaction_Ids = collect(1:n)
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
 
+    ## Create a new instance of the input model with homogenous bounds
+
+    ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+    blocked_index, dualVar  = swiftCC(ModelObject_CC, Tolerance, printLevel)
+    blocked_index_rev = blocked_index ∩ reversible_reactions_id
+    # Convert to Vector{Int64}
+    blocked_index_rev = convert(Vector{Int64}, blocked_index_rev)
+
     ## Correct Reversibility
 
-    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id, printLevel)
-    row_S, col_S = size(S)
+    ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, printLevel)
+    row, col = size(S)
+    model_correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+
+    ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
+
+    row, col = size(S)
+    ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    # Convert to Vector{Int64}
+    blocked_index = convert(Vector{Int64}, blocked_index)
+    fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index)
+
+    # Get the dimensions of fctable:
+    row, col = size(fctable)
 
     ## Count the number of reactions in each set
 
@@ -306,7 +329,7 @@ function reduction(myModel::StandardModel, removing::Bool=false, Tolerance::Floa
         @constraint(model, [t; λ] in MOI.NormOneCone(1 + length(λ)))
         @constraint(model, λ == S' * dualVar)
         @constraint(model, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
-        #@constraint(model, [j in DCE_LinearCombination], λ[j] >= 0.0)
+        @constraint(model, [j in DCE_LinearCombination], λ[j] >= 0.0)
         @constraint(model, λ[i] == -1.0)
         @constraint(model, [j in reversible_reactions_id], λ[j] == 0.0)
 

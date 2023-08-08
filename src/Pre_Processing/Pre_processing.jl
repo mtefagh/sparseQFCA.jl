@@ -8,19 +8,18 @@
 
 module Pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_correction_Constructor, distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
 """
-    dataOfModel(myModel)
+    dataOfModel(model)
 
-The function extracts various data from a given metabolic network model,
-represented by a StandardModel object, and returns it as a tuple.
+The function extracts various data from a given metabolic network model, represented by a StandardModel object, and returns it as a tuple.
 
 # INPUTS
 
-- `myModel`:        A StandardModel that has been built using COBREXA's `load_model` function.
+- `model`:          A StandardModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -41,24 +40,26 @@ represented by a StandardModel object, and returns it as a tuple.
 
 - Full input/output example
 ```julia
-julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
+julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(model)
 ```
+
+See also: `COBREXA.load_model()`
 
 """
 
-function dataOfModel(myModel::StandardModel, printLevel::Int=1)
+function dataOfModel(model::StandardModel, printLevel::Int=1)
 
     ## Extracting Data
 
-    S = stoichiometry(myModel) # Stoichiometric matrix
-    Metabolites = metabolites(myModel) # Array of metabolite IDs
-    Reactions = reactions(myModel) # Array of reaction IDs
-    Genes = genes(myModel) # Array of gene IDs
-    m = length(metabolites(myModel)) # Number of metabolites
-    n = length(reactions(myModel)) # Number of reactions
-    n_genes = length(genes(myModel)) # Number of genes
-    lb = lower_bounds(myModel) # Array of lower bounds for each reaction
-    ub = upper_bounds(myModel) # Array of upper bounds for each reaction
+    S = stoichiometry(model) # Stoichiometric matrix
+    Metabolites = metabolites(model) # Array of metabolite IDs
+    Reactions = reactions(model) # Array of reaction IDs
+    Genes = genes(model) # Array of gene IDs
+    m = length(metabolites(model)) # Number of metabolites
+    n = length(reactions(model)) # Number of reactions
+    n_genes = length(genes(model)) # Number of genes
+    lb = lower_bounds(model) # Array of lower bounds for each reaction
+    ub = upper_bounds(model) # Array of upper bounds for each reaction
 
     ## Sorting Reactions
 
@@ -205,7 +206,7 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    reversibility(lb)
+    reversibility(lb, Reaction_Ids)
 
 The function determines the reversibility of reactions in a metabolic network,
 based on their lower bounds. It takes an array of lower bounds as input, and returns two arrays:
@@ -214,11 +215,10 @@ one containing the IDs of irreversible reactions, and the other containing the I
 # INPUTS
 
 - `lb`:                             Array of lower bounds.
+- `Reaction_Ids`:                   Array of reaction IDs.
 
 # OPTIONAL INPUTS
 
-
-- `Reaction_Ids`:                   Array of reaction IDs.
 - `printLevel`  :                   Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -230,14 +230,14 @@ one containing the IDs of irreversible reactions, and the other containing the I
 
 - Full input/output example
 ```julia
-julia> irreversible_reactions_id, reversible_reactions_id = reversibility(lb)
+julia> irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids)
 ```
 
 See also: `dataOfModel()`
 
 """
 
-function reversibility(lb::Array{Float64,1}, Reaction_Ids::Vector{Int64}=1:length(Reaction_Ids), printLevel::Int=1)
+function reversibility(lb::Array{Float64,1}, Reaction_Ids::Vector{Int64}, printLevel::Int=1)
 
     # Get the length of the "lb" array:
     n = length(lb)
@@ -366,7 +366,7 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = getM(printLevel)
+    M = getM()
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
@@ -384,7 +384,7 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    remove_zeroRows(S,Metabolites)
+    remove_zeroRows(S, Metabolites)
 
 The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites, with all rows that contain only zeros removed.
 This results in a more compact representation of the metabolic network, with only the relevant reactions and metabolites included.
@@ -441,7 +441,78 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+
+A general type for storing a StandardModel which contains the following fields to run distributedReversibility_Correction():
+
+- `S`:                              LHS matrix (m x n)
+- `Metabolites`:                    List of metabolic network metabolites.
+- `Reactions`:                      List of metabolic network reactions.
+- `Genes`:                          List of metabolic network reactions.
+- `m`:                              Number of rows of stoichiometric matrix.
+- `n`:                              Number of columns of stoichiometric matrix.
+- `lb`:                             Lower bound vector (n x 1)
+- `ub`:                             Upper bound vector (n x 1)
+- `irreversible_reactions_id`:      IDs of irreversible reactions.
+- `reversible_reactions_id`  :      IDs of reversible reactions.
+
+"""
+
+mutable struct Model_Correction
+    S                               ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
+    Metabolites                     ::Array{String,1}
+    Reactions                       ::Array{String,1}
+    Genes                           ::Array{String,1}
+    m                               ::Int
+    n                               ::Int
+    lb                              ::Array{Float64,1}
+    ub                              ::Array{Float64,1}
+    irreversible_reactions_id       ::Array{Int64}
+    reversible_reactions_id         ::Array{Int64}
+end
+
+#-------------------------------------------------------------------------------------------
+
+"""
+    model_correction_Constructor(ModelObject_Correction, S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+
+The function takes in several arguments, including a ModelObject of type Model_Correction,
+and assigns values to its fields based on the other arguments passed in.
+
+# INPUTS
+
+-'ModelObject_Correction':          A newly object of Model_Correction.
+- `S`:                              LHS matrix (m x n)
+- `Metabolites`:                    List of metabolic network metabolites.
+- `Reactions`:                      List of metabolic network reactions.
+- `Genes`:                          List of metabolic network reactions.
+- `m`:                              Number of rows of stoichiometric matrix.
+- `n`:                              Number of columns of stoichiometric matrix.
+- `lb`:                             Lower bound vector (n x 1)
+- `ub`:                             Upper bound vector (n x 1)
+- `irreversible_reactions_id`:      IDs of irreversible reactions.
+- `reversible_reactions_id`  :      IDs of reversible reactions.
+
+"""
+
+function model_correction_Constructor(ModelObject_Correction::Model_Correction, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
+                                      Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Array{Int64}, reversible_reactions_id::Array{Int64})
+     ModelObject_Correction.S = S
+     ModelObject_Correction.Metabolites = Metabolites
+     ModelObject_Correction.Reactions = Reactions
+     ModelObject_Correction.Genes = Genes
+     ModelObject_Correction.m = m
+     ModelObject_Correction.n = n
+     ModelObject_Correction.lb = lb
+     ModelObject_Correction.ub = ub
+     ModelObject_Correction.irreversible_reactions_id = irreversible_reactions_id
+     ModelObject_Correction.reversible_reactions_id = reversible_reactions_id
+end
+
+#-------------------------------------------------------------------------------------------
+
+"""
+    distributedReversibility_Correction(ModelObject_Correction, blocked_index_rev)
 
 The function first distributes the list of reversible reactions among worker processes, and for each reversible reaction,
 solves two linear programming problems to maximize the flux through the reaction in the forward direction and minimize the flux
@@ -451,11 +522,8 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # INPUTS
 
-- `S`:                                      A `m` x `n` matrix representing the stoichiometric coefficients of each metabolite in each reaction.
-- `lb`:                                     A `n` x `1` vector representing the lower bounds of each reaction.
-- `ub`:                                     A `n` x `1` vector representing the upper bounds of each reaction.
-- `irreversible_reactions_id`:              IDs of irreversible reactions.
-- `reversible_reactions_id`:                IDs of reversible reactions.
+-'ModelObject_Correction':                  A newly object of Model_Correction.
+- `blocked_index`:                          IDs of reversible blocked reactions.
 
 # OPTIONAL INPUTS
 
@@ -473,25 +541,28 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 - Full input/output example
 ```julia
-julia> S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+julia> S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Correction, blocked_index_rev)
 ```
 
-See also: `dataOfModel()`, `reversibility()`, 'getTolerance()'
+See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance()'
 
 """
 
-function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, lb::Array{Float64,1}, ub::Array{Float64,1},
-                                             irreversible_reactions_id::Vector{Int64}, reversible_reactions_id::Vector{Int64}, printLevel::Int=1)
+function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, printLevel::Int=1)
+
+    ## Extract relevant information from the input model object
+
+    S = ModelObject_Correction.S
+    lb = ModelObject_Correction.lb
+    ub = ModelObject_Correction.ub
+    irreversible_reactions_id = ModelObject_Correction.irreversible_reactions_id
+    reversible_reactions_id = ModelObject_Correction.reversible_reactions_id
 
     # Define the number of variables in the model:
     n = length(lb)
 
-    if printLevel > 0
-        printstyled("Reversibility Correction:\n"; color=:cyan)
-    end
-
     # Set the tolerance value:
-    Tolerance = getTolerance(printLevel)
+    Tolerance = getTolerance()
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
@@ -501,54 +572,58 @@ function distributedReversibility_Correction(S::Union{SparseMatrixCSC{Float64,In
     # The initial value of false indicates that no reactions are blocked at the beginning:
     Correction = SharedArray{Int,2}((n, n), init = false)
 
-    n_rev = reversible_reactions_id
-
-    # Iterate over all reversible reactions in the model
-
+    # Iterate over all reversible reactions in the model:
     @sync @distributed for i in reversible_reactions_id
 
-        # Create a local model object for each worker process:
-        local_model = Model(GLPK.Optimizer)
-
-        # Define variables V:
-        @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
-
-        # Add the stoichiometric constraints to the model:
-        @constraint(local_model, S * V .== 0)
-
-        # Set the objective function to maximize the flux through reaction i in the forward direction:
-        @objective(local_model, Max, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
-        @constraint(local_model, V[i] <= 1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_fwd = objective_value(local_model)
-
-        # Set the objective function to minimize the flux through reaction i in the backward direction:
-        @objective(local_model, Min, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
-        @constraint(local_model, V[i] >= -1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_back = objective_value(local_model)
-
-        # The reaction is considered to be blocked:
-        if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
+        if i in blocked_index_rev
             Correction[i,i] = +2.0
             continue
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
-        elseif isapprox(opt_fwd, 0, atol=Tolerance)
-            Correction[i,i] = +1.0
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
-        elseif isapprox(opt_back, 0, atol=Tolerance)
-            Correction[i,i] = -1.0
         else
-            continue
+
+            # Create a local model object for each worker process:
+            local_model = Model(GLPK.Optimizer)
+
+            # Define variables V:
+            @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+
+            # Add the stoichiometric constraints to the model:
+            @constraint(local_model, S * V .== 0)
+
+            # Set the objective function to maximize the flux through reaction i in the forward direction:
+            @objective(local_model, Max, V[i])
+
+            # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
+            @constraint(local_model, V[i] <= 1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_fwd = objective_value(local_model)
+
+            # Set the objective function to minimize the flux through reaction i in the backward direction:
+            @objective(local_model, Min, V[i])
+
+            # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
+            @constraint(local_model, V[i] >= -1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_back = objective_value(local_model)
+
+            # The reaction is considered to be blocked:
+            if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
+                Correction[i,i] = +2.0
+                continue
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
+            elseif isapprox(opt_fwd, 0, atol=Tolerance)
+                Correction[i,i] = +1.0
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
+            elseif isapprox(opt_back, 0, atol=Tolerance)
+                Correction[i,i] = -1.0
+            else
+                continue
+            end
         end
+
     end
 
     for i = 1 : n

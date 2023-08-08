@@ -8,7 +8,7 @@
 
 module SwiftCC
 
-export MyModel, myModel_Constructor, swiftCC
+export Model_CC, model_CC_Constructor, swiftCC
 
 using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 
@@ -17,9 +17,9 @@ include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
 
 """
-    MyModel(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+    Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A general type for storing a StandardModel which contains the following fields:
+A general type for storing a StandardModel which contains the following fields to run swiftCC():
 
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.
@@ -32,7 +32,7 @@ A general type for storing a StandardModel which contains the following fields:
 
 """
 
-mutable struct MyModel
+mutable struct Model_CC
     S              ::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}
     Metabolites    ::Array{String,1}
     Reactions      ::Array{String,1}
@@ -46,82 +46,82 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    myModel_Constructor(ModelObject, S, Metabolites, Reactions, Genes, m, n, lb, ub)
+    model_CC_Constructor(ModelObject_CC, S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-The function takes in several arguments, including a ModelObject of type MyModel,
+The function takes in several arguments, including a ModelObject of type Model_CC,
 and assigns values to its fields based on the other arguments passed in.
 
 # INPUTS
 
--'ModelObject':     A newly object of MyModel.
-- `S`:              LHS matrix (m x n)
-- `Metabolites`:    List of metabolic network metabolites.
-- `Reactions`:      List of metabolic network reactions.
-- `Genes`:          List of metabolic network reactions.
-- `m`:              Number of rows of stoichiometric matrix.
-- `n`:              Number of columns of stoichiometric matrix.
-- `lb`:             Lower bound vector (n x 1)
-- `ub`:             Upper bound vector (n x 1)
+-'ModelObject_CC':     A newly object of Model_CC.
+- `S`:                 LHS matrix (m x n)
+- `Metabolites`:       List of metabolic network metabolites.
+- `Reactions`:         List of metabolic network reactions.
+- `Genes`:             List of metabolic network reactions.
+- `m`:                 Number of rows of stoichiometric matrix.
+- `n`:                 Number of columns of stoichiometric matrix.
+- `lb`:                Lower bound vector (n x 1)
+- `ub`:                Upper bound vector (n x 1)
 
 """
 
-function myModel_Constructor(ModelObject::MyModel, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
-                                         Genes::Array{String,1}, m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
-     ModelObject.S = S
-     ModelObject.Metabolites = Metabolites
-     ModelObject.Reactions = Reactions
-     ModelObject.Genes = Genes
-     ModelObject.m = m
-     ModelObject.n = n
-     ModelObject.lb = lb
-     ModelObject.ub = ub
+function model_CC_Constructor(ModelObject_CC::Model_CC, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1},
+                              Reactions::Array{String,1}, Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
+     ModelObject_CC.S = S
+     ModelObject_CC.Metabolites = Metabolites
+     ModelObject_CC.Reactions = Reactions
+     ModelObject_CC.Genes = Genes
+     ModelObject_CC.m = m
+     ModelObject_CC.n = n
+     ModelObject_CC.lb = lb
+     ModelObject_CC.ub = ub
 end
 
 #-------------------------------------------------------------------------------------------
 
 """
-    swiftCC(ModelObject)
+    swiftCC(ModelObject_CC)
 
-The function first exports data from ModelObject and performs some calculations to determine the reversibility of reactions
+The function first exports data from ModelObject_CC and performs some calculations to determine the reversibility of reactions
 and the number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
 and uses Gaussian elimination to identify blocked reversible reactions.
 
 # INPUTS
 
-- `ModelObject`:        A newly object of MyModel.
+- `ModelObject_CC`:        A newly object of Model_CC.
 
 # OPTIONAL INPUTS
 
-- `Tolerance`:          A small number that represents the level of error tolerance.
-- `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
+- `Tolerance`:             A small number that represents the level of error tolerance.
+- `printLevel`:            Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
 
-- `blocked_index`:      IDs of of blocked reactions.
-- `dualVar`:            Dual variables of a specific constraint.
+- `blocked_index`:         IDs of of blocked reactions.
+- `dualVar`:               Dual variables of a specific constraint.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> blocked_index, dual_var = swiftCC(ModelObject)
+julia> blocked_index, dual_var = swiftCC(ModelObject_CC)
 ```
 
-See also: `MyModel`, myModel_Constructor(), `reversibility()`, `homogenization()`
+See also: `Model_CC`, model_CC_Constructor(), `reversibility()`, `homogenization()`
 
 """
 
-function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=1)
+function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extract relevant information from the input model object
 
-    S = ModelObject.S
-    Metabolites = ModelObject.Metabolites
-    Reactions = ModelObject.Reactions
-    m = ModelObject.m
-    n = ModelObject.n
-    lb = ModelObject.lb
-    ub = ModelObject.ub
+    S = ModelObject_CC.S
+    Metabolites = ModelObject_CC.Metabolites
+    Reactions = ModelObject_CC.Reactions
+    m = ModelObject_CC.m
+    n = ModelObject_CC.n
+    lb = ModelObject_CC.lb
+    ub = ModelObject_CC.ub
 
     ## Identify which reactions are irreversible and which are reversible
 
@@ -130,10 +130,6 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, 0)
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
-
-    ## Calculate the dimensions of the S matrix
-
-    row_num, col_num = size(S)
 
     ## Find irreversible blocked reactions in 1 LP problem
 
@@ -183,9 +179,6 @@ function swiftCC(ModelObject::MyModel, Tolerance::Float64=1e-6, printLevel::Int=
 
     # Create S_transpose:
     S_transpose = S'
-
-    # Determine the dimensions of the S_transpose matrix:
-    row_num_trans, col_num_trans = size(S_transpose)
 
     # Remove irreversibly blocked reactions from the Stoichiometric Matrix:
     S_transpose_noIrrBlocked = S_transpose[setdiff(1:end, irr_blocked_reactions), :]
