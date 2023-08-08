@@ -1,7 +1,7 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
 authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
-version = "1.7.0"
+version = "1.8.0"
 
 [deps]
 COBREXA = "babc4406-5200-4a30-9033-bf5ae714c842"
@@ -14,12 +14,10 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 SharedArrays = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
-HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 
 [compat]
-COBREXA = "1.5"
+COBREXA = "1.0, 1.2"
 Colors = "0.12"
-GLPK = "1.1"
-JuMP = "1.13"
-julia = "1.9"
-HTTP = "1.9"
+GLPK = "0.14, 1.0"
+JuMP = "0.21, 1.0"
+julia = "1.8, 1.9"
