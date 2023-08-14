@@ -1,6 +1,5 @@
-coverage:
-  status:
-    project:
-      default:
-        threshold: 15
-    patch: off
+steps:
+- uses: actions/checkout@master
+- uses: codecov/codecov-action@v3
+  with:
+    token: ${{ secrets.CODECOV_TOKEN }}
