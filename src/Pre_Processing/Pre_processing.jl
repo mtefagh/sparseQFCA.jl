@@ -8,7 +8,7 @@
 
 module Pre_processing
 
-export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_correction_Constructor, distributedReversibility_Correction
+export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
 
@@ -327,7 +327,7 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    homogenization(lb,ub)
+    homogenization(lb, ub)
 
 The function homogenizes the lower and upper bounds of a set of reactions in a metabolic network model, represented as arrays lb and ub.
 
@@ -474,14 +474,14 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    model_correction_Constructor(ModelObject_Correction, S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    model_Correction_Constructor(ModelObject_Correction, S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
 The function takes in several arguments, including a ModelObject of type Model_Correction,
 and assigns values to its fields based on the other arguments passed in.
 
 # INPUTS
 
--'ModelObject_Correction':          A newly object of Model_Correction.
+-`ModelObject_Correction`:          A newly object of Model_Correction.
 - `S`:                              LHS matrix (m x n)
 - `Metabolites`:                    List of metabolic network metabolites.
 - `Reactions`:                      List of metabolic network reactions.
@@ -495,7 +495,7 @@ and assigns values to its fields based on the other arguments passed in.
 
 """
 
-function model_correction_Constructor(ModelObject_Correction::Model_Correction, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
+function model_Correction_Constructor(ModelObject_Correction::Model_Correction, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
                                       Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Array{Int64}, reversible_reactions_id::Array{Int64})
      ModelObject_Correction.S = S
      ModelObject_Correction.Metabolites = Metabolites
@@ -522,7 +522,7 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # INPUTS
 
--'ModelObject_Correction':                  A newly object of Model_Correction.
+-`ModelObject_Correction`:                  A newly object of Model_Correction.
 - `blocked_index`:                          IDs of reversible blocked reactions.
 
 # OPTIONAL INPUTS
