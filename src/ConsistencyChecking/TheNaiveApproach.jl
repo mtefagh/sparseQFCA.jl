@@ -10,7 +10,7 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA
+using GLPK, JuMP, COBREXA, Distributed
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -30,7 +30,7 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 
 # INPUTS
 
-- `model`:              A StandardModel that has been built using COBREXA's `load_model` function.
+- `model`:              A CoreModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -52,11 +52,11 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(model::StandardModel, Tolerance::Float64=1e-6, printLevel::Int=1)
+function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Export data from model
 
-    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(model)
+    S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
 
     ## Determine the reversibility of a reaction
 

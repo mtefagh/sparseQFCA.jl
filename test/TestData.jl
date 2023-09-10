@@ -9,8 +9,8 @@ using COBREXA, DelimitedFiles, SparseArrays
 
 ## Load Metabolic Networks
 
-myModel_e_coli_core = load_model(StandardModel,"Models/e_coli_core.xml")
-myModel_iIS312 = load_model(StandardModel,"Models/iIS312.xml")
+myModel_e_coli_core = load_model(CoreModel,"Models/e_coli_core.xml")
+myModel_iIS312 = load_model(CoreModel,"Models/iIS312.xml")
 
 ## read the CSV file into a matrix of type String
 

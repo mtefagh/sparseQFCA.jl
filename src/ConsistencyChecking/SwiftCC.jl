@@ -10,7 +10,7 @@ module SwiftCC
 
 export Model_CC, model_CC_Constructor, swiftCC
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays
+using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
 
 include("../Pre_Processing/Pre_processing.jl")
 

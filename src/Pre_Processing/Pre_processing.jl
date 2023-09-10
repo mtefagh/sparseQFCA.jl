@@ -10,7 +10,7 @@ module Pre_processing
 
 export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
-using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays
+using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed
 
 """
     dataOfModel(model)
@@ -19,7 +19,7 @@ The function extracts various data from a given metabolic network model, represe
 
 # INPUTS
 
-- `model`:          A StandardModel that has been built using COBREXA's `load_model` function.
+- `model`:          A CoreModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -47,19 +47,20 @@ See also: `COBREXA.load_model()`
 
 """
 
-function dataOfModel(model::StandardModel, printLevel::Int=1)
+function dataOfModel(model::CoreModel, printLevel::Int=1)
 
     ## Extracting Data
 
-    S = stoichiometry(model) # Stoichiometric matrix
-    Metabolites = metabolites(model) # Array of metabolite IDs
-    Reactions = reactions(model) # Array of reaction IDs
-    Genes = genes(model) # Array of gene IDs
-    m = length(metabolites(model)) # Number of metabolites
-    n = length(reactions(model)) # Number of reactions
+    S = model.S # Stoichiometric matrix
+    Metabolites = model.mets # Array of metabolite IDs
+    Reactions = model.rxns # Array of reaction IDs
+    Genes = genes(model)
+    Genes_Reactions = model.grrs # Array of gene IDs
+    m = length(model.mets) # Number of metabolites
+    n = length(model.rxns) # Number of reactions
     n_genes = length(genes(model)) # Number of genes
-    lb = lower_bounds(model) # Array of lower bounds for each reaction
-    ub = upper_bounds(model) # Array of upper bounds for each reaction
+    lb = model.xl # Array of lower bounds for each reaction
+    ub = model.xu# Array of upper bounds for each reaction
 
     ## Sorting Reactions
 
@@ -80,7 +81,7 @@ function dataOfModel(model::StandardModel, printLevel::Int=1)
     end
 
     # Return the extracted data as a tuple:
-    return S, Metabolites, Reactions, Genes, m, n, lb, ub
+    return S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub
 end
 
 #-------------------------------------------------------------------------------------------
@@ -366,7 +367,7 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = getM()
+    M = 1000000.0
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
@@ -562,7 +563,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     n = length(lb)
 
     # Set the tolerance value:
-    Tolerance = getTolerance()
+    Tolerance = 1e-6
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
@@ -688,7 +689,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     ## Print out results if requested
 
     if printLevel > 0
-        printstyled("Distributed Reversibility Correction :\n"; color=:cyan)
+        printstyled("Distributed Reversibility Correction:\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
         println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
