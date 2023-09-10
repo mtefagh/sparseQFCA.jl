@@ -230,8 +230,8 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
             DC_Matrix[i,blocked] .= 1.0
 
             # Calculate the coefficients for DC(i, j) for all blocked reactions j:
-            lambda = S_noBlocked_temp' * ν
-            Dc_Coefficients[i, :] = lambda
+            λ = S_noBlocked_temp' * ν
+            Dc_Coefficients[i, :] = λ
 
             # Retrieve the original values of the bounds and stoichiometric matrix:
             lb_noBlocked = copy(lb_noBlocked_temp)
@@ -254,8 +254,8 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
             DC_Matrix[i,blocked] .= 1.0
 
             # Calculate the coefficients for DC(i, j) for all blocked reactions j:
-            lambda = S_noBlocked' * ν
-            Dc_Coefficients[i, :] = lambda
+            λ = S_noBlocked' * ν
+            Dc_Coefficients[i, :] = λ
 
             # Retrieve the original values of the bounds:
             lb_noBlocked[i] = lb_temp
