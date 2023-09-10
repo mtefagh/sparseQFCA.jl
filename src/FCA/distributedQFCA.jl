@@ -19,13 +19,12 @@ include("../ConsistencyChecking/SwiftCC.jl")
 
 using .SwiftCC
 
-
 """
     Model_QFCA(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
 A general type for storing a StandardModel which contains the following fields to run distributedQFCA():
 
--'ModelObject_QFCA':                A newly object of Model_Correction.
+-`ModelObject_QFCA`:                A newly object of Model_Correction.
 - `S`:                              LHS matrix (m x n)
 - `Metabolites`:                    List of metabolic network metabolites.
 - `Reactions`:                      List of metabolic network reactions.
@@ -64,7 +63,7 @@ and assigns values to its fields based on the other arguments passed in.
 
 # INPUTS
 
--'ModelObject_QFCA':                A newly object of Model_Correction.
+-`ModelObject_QFCA`:                A newly object of Model_Correction.
 - `S`:                              LHS matrix (m x n)
 - `Metabolites`:                    List of metabolic network metabolites.
 - `Reactions`:                      List of metabolic network reactions.
@@ -80,29 +79,29 @@ and assigns values to its fields based on the other arguments passed in.
 
 function model_QFCA_Constructor(ModelObject::Model_QFCA, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
                                 Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Array{Int64}, reversible_reactions_id::Array{Int64})
-     ModelObject.S = S
-     ModelObject.Metabolites = Metabolites
-     ModelObject.Reactions = Reactions
-     ModelObject.Genes = Genes
-     ModelObject.m = m
-     ModelObject.n = n
-     ModelObject.lb = lb
-     ModelObject.ub = ub
-     ModelObject.irreversible_reactions_id = irreversible_reactions_id
-     ModelObject.reversible_reactions_id = reversible_reactions_id
+     ModelObject_QFCA.S = S
+     ModelObject_QFCA.Metabolites = Metabolites
+     ModelObject_QFCA.Reactions = Reactions
+     ModelObject_QFCA.Genes = Genes
+     ModelObject_QFCA.m = m
+     ModelObject_QFCA.n = n
+     ModelObject_QFCA.lb = lb
+     ModelObject_QFCA.ub = ub
+     ModelObject_QFCA.irreversible_reactions_id = irreversible_reactions_id
+     ModelObject_QFCA.reversible_reactions_id = reversible_reactions_id
 end
 
 
 """
     distributedQFCA(myModel)
 
-The function takes a metabolic model as input and calculates directional couplings and coefficients for each pair of reactions in the model.
+The function first exports data from ModelObject_QFCA and calculates directional couplings and coefficients for each pair of reactions in the model.
 It also has the option to remove reactions from the model and recalculate the couplings. The function uses parallel processing to distribute
 the calculations across multiple processors. The output is a matrix that shows the coupling relations between the reactions in the model.
 
 # INPUTS
 
--'ModelObject_CC':             A newly object of Model_QFCA.
+-`ModelObject_QFCA`:           A newly object of Model_QFCA.
 - `blocked_index`:             IDs of of blocked reactions.
 
 # OPTIONAL INPUTS
@@ -127,10 +126,10 @@ the calculations across multiple processors. The output is a matrix that shows t
 
 - Full input/output example
 ```julia
-julia> fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(myModel)
+julia> fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index)
 ```
 
-See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `MyModel`, `model_CC_Constructor()`, `distributedReversibility_Correction()`
+See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `Model_QFCA`, `model_QFCA_Constructor()`, `distributedReversibility_Correction()`
 
 """
 
@@ -218,7 +217,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Calculate the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject_CC, Tolerance, 0)
+            blocked, ν = swiftCC(ModelObject_CC, Tolerance, 0)
 
             # Update indices of blocked reactions after removing ith reaction:
             for j = 1:length(blocked)
@@ -231,7 +230,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
             DC_Matrix[i,blocked] .= 1.0
 
             # Calculate the coefficients for DC(i, j) for all blocked reactions j:
-            lambda = S_noBlocked_temp' * dualVar
+            lambda = S_noBlocked_temp' * ν
             Dc_Coefficients[i, :] = lambda
 
             # Retrieve the original values of the bounds and stoichiometric matrix:
@@ -249,13 +248,13 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Find the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, dualVar = swiftCC(ModelObject_CC, Tolerance, 0)
+            blocked, ν = swiftCC(ModelObject_CC, Tolerance, 0)
 
             # Update DC_Matrix based on the blocked reactions:
             DC_Matrix[i,blocked] .= 1.0
 
             # Calculate the coefficients for DC(i, j) for all blocked reactions j:
-            lambda = S_noBlocked' * dualVar
+            lambda = S_noBlocked' * ν
             Dc_Coefficients[i, :] = lambda
 
             # Retrieve the original values of the bounds:
