@@ -10,14 +10,14 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA, Distributed
+using GLPK, JuMP, COBREXA
 
 include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
 
 """
-    find_blocked_reactions(myModel)
+    find_blocked_reactions(model)
 
 The function identifies blocked reactions in a metabolic model. Blocked reactions are reactions that cannot carry any flux,
 i.e., the flux through the reaction is zero, due to the stoichiometry of the model and the constraints on the reaction rates.
@@ -30,7 +30,7 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 
 # INPUTS
 
-- `myModel`:            A StandardModel that has been built using COBREXA's `load_model` function.
+- `model`:              A StandardModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -45,18 +45,18 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 
 - Full input/output example
 ```julia
-julia> blocked_index = find_blocked_reactions(myModel)
+julia> blocked_index = find_blocked_reactions(model)
 ```
 
 See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(myModel::StandardModel, Tolerance::Float64=1e-6, printLevel::Int=1)
+function find_blocked_reactions(model::StandardModel, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Export data from model
 
-    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(myModel)
+    S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(model)
 
     ## Determine the reversibility of a reaction
 
