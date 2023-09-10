@@ -10,7 +10,7 @@ module QuantomeReducer
 
 export quantomeReducer
 
-using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays, OrderedCollections
+using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
