@@ -19,7 +19,7 @@ using .Pre_processing
 """
     Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A general type for storing a StandardModel which contains the following fields to run swiftCC():
+A general type for storing a CoreModel which contains the following fields to run swiftCC():
 
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.

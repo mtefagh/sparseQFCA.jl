@@ -40,7 +40,7 @@ The function extracts various data from a given metabolic network model, represe
 
 - Full input/output example
 ```julia
-julia> S, Metabolites, Reactions, Genes, m, n, lb, ub = dataOfModel(model)
+julia> S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
 ```
 
 See also: `COBREXA.load_model()`
@@ -444,7 +444,7 @@ end
 """
     Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
-A general type for storing a StandardModel which contains the following fields to run distributedReversibility_Correction():
+A general type for storing a CoreModel which contains the following fields to run distributedReversibility_Correction():
 
 - `S`:                              LHS matrix (m x n)
 - `Metabolites`:                    List of metabolic network metabolites.

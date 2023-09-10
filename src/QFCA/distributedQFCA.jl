@@ -22,7 +22,7 @@ using .SwiftCC
 """
     Model_QFCA(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
-A general type for storing a StandardModel which contains the following fields to run distributedQFCA():
+A general type for storing a CoreModel which contains the following fields to run distributedQFCA():
 
 -`ModelObject_QFCA`:                A newly object of Model_Correction.
 - `S`:                              LHS matrix (m x n)

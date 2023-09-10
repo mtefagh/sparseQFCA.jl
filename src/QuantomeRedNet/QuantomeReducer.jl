@@ -78,7 +78,7 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-    blocked_index, dualVar  = swiftCC(ModelObject_CC, Tolerance, printLevel)
+    blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
     # Convert to Vector{Int64}
     blocked_index_rev = convert(Vector{Int64}, blocked_index_rev)
@@ -319,9 +319,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
         # Create a new optimization model:
         model = Model(GLPK.Optimizer)
 
-        # Define variables λ, dualVar, and t:
+        # Define variables λ, ν, and t:
         @variable(model, λ[1:n])
-        @variable(model, dualVar[1:m])
+        @variable(model, ν[1:m])
         @variable(model, t)
 
         # Set the objective function to minimize t:
@@ -329,7 +329,7 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
 
         # Define constraints for the optimization problem:
         @constraint(model, [t; λ] in MOI.NormOneCone(1 + length(λ)))
-        @constraint(model, λ == S' * dualVar)
+        @constraint(model, λ == S' * ν)
         @constraint(model, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
         @constraint(model, [j in DCE_LinearCombination], λ[j] >= 0.0)
         @constraint(model, λ[i] == -1.0)

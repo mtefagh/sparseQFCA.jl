@@ -71,7 +71,7 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, print
     printstyled("Homogenization:\n"; color=:cyan)
 
     # Set the maximum value for M:
-    M = getM()
+    M = 1000000.0
 
     ## Loop through each value in the array "lb" and "ub"
 
