@@ -42,13 +42,15 @@ Finally, it generates information about the reduction process and returns the re
 
 # OUTPUTS
 
-- `A`                          A `n` x `ñ` matrix representing the reduced metabolic network matrix.
+- `reducedModel`               A reduced metabolic network.
+- `A`                          A `n` x `ñ` matrix representing the coefficients betwee reactions of original networks and reactions of reduced network.
+- `reduct-map`                 A dictionary to save the representatives of eliminations.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> model, A, reduct_map = quantomeReducer(model)
+julia> reducedModel, A, reduct_map = quantomeReducer(model)
 ```
 
 See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributedReversibility_Correction()`, `distributedQFCA()`
