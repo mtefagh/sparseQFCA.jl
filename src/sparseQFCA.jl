@@ -13,11 +13,11 @@ module sparseQFCA
     include("Pre_Processing/Pre_processing.jl")
     include("ConsistencyChecking/TheNaiveApproach.jl")
     include("ConsistencyChecking/SwiftCC.jl")
-    include("FCA/distributedQFCA.jl")
-    include("FCA/SQFCA.jl")
-    include("QuantomeRedNet/Reduction.jl")
+    include("QFCA/distributedQFCA.jl")
+    include("QFCA/SQFCA.jl")
+    include("QuantomeRedNet/QuantomeReducer.jl")
 
-    using .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, .SQFCA, .Reduction
+    using .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, .SQFCA, .QuantomeReducer
 
 end
 
