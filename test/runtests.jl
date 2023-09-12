@@ -21,10 +21,11 @@ using .TestData, .sparseQFCA
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
 printstyled("sparseQFCA :\n"; color=:yellow)
-printstyled("e_coli_core :\n"; color=:yellow)
+printstyled("iIS312 :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
 # Ensure that the bounds of all reactions are homogenous:
 lb_iIS312, ub_iIS312 = sparseQFCA.homogenization(lb_iIS312, ub_iIS312)
 # Separate reactions into reversible and irreversible sets:
@@ -72,7 +73,8 @@ printstyled("#------------------------------------------------------------------
 printstyled("CC_SwiftCC :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 # Get the necessary data from myModel_e_coli_core:
-S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
+
+S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, Genes_Reactions_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
 # Check for duplicate reactions in Reactions_e_coli_core:
 check_duplicate = sparseQFCA.check_duplicate_reactions(Reactions_e_coli_core)
 # Homogenize the lower and upper bounds of the reactions in myModel_e_coli_core:
@@ -103,7 +105,7 @@ printstyled("CC_SwiftCC :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 
 # Get data from the iIS312 model:
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
 # Check for duplicate reactions in the iIS312 model:
 check_duplicate = sparseQFCA.check_duplicate_reactions(Reactions_iIS312)
 # Homogenize the lower and upper bounds for reactions in the iIS312 model:
@@ -125,7 +127,7 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
-S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
+S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, Genes_Reactions_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
 # Ensure that the bounds of all reactions are homogenous
 lb_e_coli_core, ub_e_coli_core = sparseQFCA.homogenization(lb_e_coli_core, ub_e_coli_core)
 # Separate reactions into reversible and irreversible sets:
@@ -161,7 +163,7 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
 # Ensure that the bounds of all reactions are homogenous
 lb_iIS312, ub_iIS312 = sparseQFCA.homogenization(lb_iIS312, ub_iIS312)
 # Separate reactions into reversible and irreversible sets:
@@ -195,12 +197,12 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
-A = @time sparseQFCA.reduction(myModel_e_coli_core)
+model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
-A = @time sparseQFCA.reduction(myModel_iIS312)
+model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_iIS312)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)

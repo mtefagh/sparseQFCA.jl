@@ -1,0 +1,3218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version2/core" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" level="3" version="2" fbc:required="false">
+  <model fbc:strict="true">
+    <listOfCompartments>
+      <compartment id="compartment" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species metaid="M_ergst_c" id="M_ergst_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ac_c" id="M_ac_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ttdca_c" id="M_ttdca_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_lys__L_c" id="M_lys__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ala__L_e" id="M_ala__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_succoa_m" id="M_succoa_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_coa_m" id="M_coa_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pmtcoa_c" id="M_pmtcoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_oaa_c" id="M_oaa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ump_c" id="M_ump_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_arg__L_c" id="M_arg__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_gly_c" id="M_gly_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ala__L_c" id="M_ala__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_coa_c" id="M_coa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadh_c" id="M_nadh_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_phe__L_c" id="M_phe__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pi_x" id="M_pi_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pyr_c" id="M_pyr_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadph_m" id="M_nadph_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_q6h2_m" id="M_q6h2_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_1pyr5c_m" id="M_1pyr5c_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_3pg_c" id="M_3pg_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h_x" id="M_h_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ac_e" id="M_ac_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_co2_m" id="M_co2_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_atp_x" id="M_atp_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_succ_m" id="M_succ_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_val__L_c" id="M_val__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_gmp_c" id="M_gmp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_fadh2_m" id="M_fadh2_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_adp_c" id="M_adp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadph_c" id="M_nadph_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ppi_c" id="M_ppi_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ru5p__D_c" id="M_ru5p__D_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_akg_c" id="M_akg_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pep_c" id="M_pep_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_oaa_m" id="M_oaa_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_strcoa_c" id="M_strcoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_adp_x" id="M_adp_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_asp__L_m" id="M_asp__L_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_r5p_c" id="M_r5p_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_gly_e" id="M_gly_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_s7p_c" id="M_s7p_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_a_D_glucose_c" id="M_a_D_glucose_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_his__L_c" id="M_his__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_alpla_c" id="M_alpla_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ile__L_c" id="M_ile__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_succ_c" id="M_succ_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nad_m" id="M_nad_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_hdca_c" id="M_hdca_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ac_m" id="M_ac_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_o2_m" id="M_o2_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_olcoa_c" id="M_olcoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_g6p_A_c" id="M_g6p_A_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_atp_m" id="M_atp_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_glu__L_e" id="M_glu__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pi_c" id="M_pi_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_cys__L_c" id="M_cys__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_e4p_c" id="M_e4p_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nad_c" id="M_nad_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_gln__L_c" id="M_gln__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_glu__L_c" id="M_glu__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_mal__L_c" id="M_mal__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_g6p_B_c" id="M_g6p_B_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_fum_m" id="M_fum_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_g6p_B_x" id="M_g6p_B_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_asn__L_c" id="M_asn__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_fad_m" id="M_fad_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_oaa_x" id="M_oaa_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pi_m" id="M_pi_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_xu5p__D_c" id="M_xu5p__D_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_b_D_glucose_x" id="M_b_D_glucose_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_akg_m" id="M_akg_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_his__L_e" id="M_his__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pyr_m" id="M_pyr_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadh_m" id="M_nadh_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_lpam_m" id="M_lpam_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_met__L_c" id="M_met__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_alincoa_c" id="M_alincoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nh4_c" id="M_nh4_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadp_c" id="M_nadp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_thr__L_e" id="M_thr__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_q6_m" id="M_q6_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_prpp_c" id="M_prpp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h_e" id="M_h_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_asp__L_e" id="M_asp__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_glyc3p_x" id="M_glyc3p_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h2o_x" id="M_h2o_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pi_e" id="M_pi_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_cit_m" id="M_cit_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pro__L_c" id="M_pro__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_glu__L_m" id="M_glu__L_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_glincoa_c" id="M_glincoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_6pgl_c" id="M_6pgl_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_co2_c" id="M_co2_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_fdp_x" id="M_fdp_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h2o_c" id="M_h2o_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_6pgc_c" id="M_6pgc_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_accoa_c" id="M_accoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_mal__L_x" id="M_mal__L_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nad_x" id="M_nad_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_13dpg_x" id="M_13dpg_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_adp_m" id="M_adp_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_dhap_x" id="M_dhap_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h_c" id="M_h_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nh3_c" id="M_nh3_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ocdcea_c" id="M_ocdcea_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadp_m" id="M_nadp_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_thr__L_c" id="M_thr__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_tdcoa_c" id="M_tdcoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_dhlam_m" id="M_dhlam_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_focytc_m" id="M_focytc_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_f6p_x" id="M_f6p_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ocdca_c" id="M_ocdca_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_accoa_m" id="M_accoa_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h_m" id="M_h_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_g3p_c" id="M_g3p_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_g3p_x" id="M_g3p_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nh4_m" id="M_nh4_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_gamla_c" id="M_gamla_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_nadh_x" id="M_nadh_x" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_leu__L_c" id="M_leu__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ser__L_c" id="M_ser__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ocdcya_c" id="M_ocdcya_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_asp__L_c" id="M_asp__L_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_ficytc_m" id="M_ficytc_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_amp_c" id="M_amp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_atp_c" id="M_atp_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_mal__L_m" id="M_mal__L_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_f6p_c" id="M_f6p_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_lincoa_c" id="M_lincoa_c" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_h2o_m" id="M_h2o_m" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species metaid="M_pro__L_e" id="M_pro__L_e" compartment="compartment" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction metaid="R_G3PD2m" id="R_G3PD2m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_dhap_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_fadh2_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01026"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLYATm" id="R_GLYATm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_gly_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_09537"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01461"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CYSt2r" id="R_CYSt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_cys__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACtm" id="R_ACtm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ac_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999998863" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999998863" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ac_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.999999999998864" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1.23638473196892e-15" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999998863" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLUt2r_copy1" id="R_GLUt2r_copy1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_glu__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_G6PI3" id="R_G6PI3" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_B_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_f6p_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GAPDg" id="R_GAPDg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g3p_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_13dpg_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_13011"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLNS" id="R_GLNS" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh4_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_gln__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_13663"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASCTmr" id="R_ASCTmr" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1.380053908357" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="7.13179515443585e-14" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1.380053908357" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1.380053908357" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_succ_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="7.13179515443585e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ac_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1.380053908357" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="7.1348230354121e-14" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1.380053908357" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_succoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="7.13179515443585e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01578"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_THRt2r_copy2" id="R_THRt2r_copy2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_gthrd_e" id="R_EX_gthrd_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_cys__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_gly_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="2" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_09878"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05422"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PRPPS_copy1" id="R_PRPPS_copy1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_r5p_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_amp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_prpp_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07491"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALATA_L" id="R_ALATA_L" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="4.9960036108132e-15" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_pyr_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="4.9960036108132e-15" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_akg_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_ala__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="5.02628242057571e-15" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.02788097625042e-17" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="4.9960036108132e-15" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05026"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FBP26" id="R_FBP26" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01231"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01740"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PGI1c" id="R_PGI1c" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_A_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_f6p_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_nh3_e" id="R_EX_nh3_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_nh3_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACSm" id="R_ACSm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ac_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_atp_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.99999999999909" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.99999999999909" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_adp_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.33333333333242" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1.99999999999998" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_pi_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.99999999999909" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08350"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_14420"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_13977"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_AKGDam" id="R_AKGDam" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="0.999999999999991" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="8.60422844084496e-14" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="0.999999999999991" constant="true"/>
+          <speciesReference species="M_lpam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="0.999999999999991" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="8.60422844084496e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhlam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="0.999999999999991" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="8.62364711989919e-14" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="0.999999999999991" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1.94186790542272e-16" constant="true"/>
+          <speciesReference species="M_succoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="8.60422844084496e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02290"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07647"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_06392"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_gln__L_e" id="R_EX_gln__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_gln__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASNS3" id="R_ASNS3" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="4.00000000000127" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="2.07700157454475e-14" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.00000000000127" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="58.2094335363912" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="2.07700157454475e-14" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="2.07700157454475e-14" constant="true"/>
+          <speciesReference species="M_nh3_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.00000000000127" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="58.2094335363912" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="4.00000000000127" constant="true"/>
+          <speciesReference species="M_asn__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="2.07700157454475e-14" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="61.2094335363925" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="2.07700157454475e-14" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="4.00000000000127" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.00000000000127" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="58.2094335363912" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01307"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPt2r_copy1" id="R_ASPt2r_copy1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_asp__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1.00000000000048" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="4.84945417156268e-13" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="9.00000000000408" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="8.00000000000359" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="4.84945417156268e-13" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_nh4_e" id="R_EX_nh4_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_nh4_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLUt2r_copy2" id="R_GLUt2r_copy2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_glu__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PROt2r_copy2" id="R_PROt2r_copy2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_SUCD1m" id="R_SUCD1m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_fadh2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_fum_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_06962"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPGLU2m" id="R_ASPGLU2m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_asp__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1.17520215633472" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999998629" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1.17520215633472" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1.17520215633472" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999998629" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1.17520215633472" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="2.99999999999955" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1.17520215633472" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="2.00000000000092" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999998629" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_thr__L_e" id="R_EX_thr__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_thr__L_e" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPt2r_copy2" id="R_ASPt2r_copy2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_asp__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1.99999999999949" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999999488" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.99999999999957" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="7.94919685631612e-14" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999999488" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_SUCOASm" id="R_SUCOASm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succoa_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08325"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPTAm" id="R_ASPTAm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_asp__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1.08882605326766e-13" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="1.08882605326766e-13" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.79048700483075e-13" constant="true"/>
+          <speciesReference species="M_oaa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1.08882605326766e-13" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03633"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLYt2r" id="R_GLYt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_gly_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_gly_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_MAL_Ltx" id="R_MAL_Ltx" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ME1m" id="R_ME1m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00812"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ATPS3m" id="R_ATPS3m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_adp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="2.00000000000137" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999998629" constant="true"/>
+          <speciesReference species="M_pi_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999998629" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_atp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999998629" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03646"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04251"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07023"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08090"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08665"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11273"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_14522"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_ser__L_e" id="R_EX_ser__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_ser__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_MDHp" id="R_MDHp" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_oaa_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10378"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_OAtm1" id="R_OAtm1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_oaa_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_oaa_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CYSS_2" id="R_CYSS_2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_accoa_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_ser__L_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ac_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_coa_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_cys__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02303"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02781"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PRPPS_copy2" id="R_PRPPS_copy2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_r5p_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_amp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_prpp_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07491"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_H2Otp" id="R_H2Otp" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h2o_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_NH4tm" id="R_NH4tm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_nh4_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_nh4_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_glyc_e" id="R_EX_glyc_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_adp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_atp_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00189"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_DTDPtn" id="R_DTDPtn" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02792"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02792"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02792"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02792"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_a_D_glucose_e" id="R_EX_a_D_glucose_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_a_D_glucose_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_ala__L_e" id="R_EX_ala__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ala__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PGI1" id="R_PGI1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_B_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_f6p_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PYK" id="R_PYK" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pep_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00417"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ARGt2r" id="R_ARGt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_3pg_c" stoichiometry="0.3173237" constant="true"/>
+          <speciesReference species="M_6pgl_c" stoichiometry="4.16333634234434e-17" constant="true"/>
+          <speciesReference species="M_accoa_c" stoichiometry="0.5362029" constant="true"/>
+          <speciesReference species="M_akg_c" stoichiometry="0.287746654215454" constant="true"/>
+          <speciesReference species="M_ala__L_c" stoichiometry="0.10946517" constant="true"/>
+          <speciesReference species="M_asn__L_c" stoichiometry="0.02383124" constant="true"/>
+          <speciesReference species="M_asp__L_c" stoichiometry="0.04418496" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="8.9789055" constant="true"/>
+          <speciesReference species="M_cys__L_c" stoichiometry="0.01718304" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_e4p_c" stoichiometry="0.38900341260266" constant="true"/>
+          <speciesReference species="M_g6p_B_c" stoichiometry="0.277305364165984" constant="true"/>
+          <speciesReference species="M_gln__L_c" stoichiometry="0.03728106" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="0.0828649257845458" constant="true"/>
+          <speciesReference species="M_gly_c" stoichiometry="0.05873429" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="8.68310300995053" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="83.7038471189681" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_his__L_e" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_nad_c" stoichiometry="0.7709355" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nadph_c" stoichiometry="3.46456602588349" constant="true"/>
+          <speciesReference species="M_nh4_c" stoichiometry="2.03417765421545" constant="true"/>
+          <speciesReference species="M_oaa_c" stoichiometry="0.4564245" constant="true"/>
+          <speciesReference species="M_pep_c" stoichiometry="0.1641594" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.0526486299999996" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_prpp_c" stoichiometry="6.81148425999647" constant="true"/>
+          <speciesReference species="M_pyr_c" stoichiometry="0.7655658" constant="true"/>
+          <speciesReference species="M_r5p_c" stoichiometry="0.245114549988569" constant="true"/>
+          <speciesReference species="M_ru5p__D_c" stoichiometry="0.287434611229374" constant="true"/>
+          <speciesReference species="M_s7p_c" stoichiometry="6.66133814775094e-16" constant="true"/>
+          <speciesReference species="M_ser__L_c" stoichiometry="0.08164501" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="61.209433536389" constant="true"/>
+          <speciesReference species="M_xu5p__D_c" stoichiometry="0.703299069036914" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_6pgc_c" stoichiometry="1.38777878078145e-16" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="8.9789055" constant="true"/>
+          <speciesReference species="M_arg__L_c" stoichiometry="0.93461751" constant="true"/>
+          <speciesReference species="M_co2_c" stoichiometry="0.824503364165984" constant="true"/>
+          <speciesReference species="M_coa_c" stoichiometry="0.5362029" constant="true"/>
+          <speciesReference species="M_ergst_c" stoichiometry="4.51121666681416" constant="true"/>
+          <speciesReference species="M_f6p_c" stoichiometry="0.907369300481448" constant="true"/>
+          <speciesReference species="M_g3p_c" stoichiometry="0.487990306542053" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_gmp_c" stoichiometry="2.47335313144673" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="92.4821970930846" constant="true"/>
+          <speciesReference species="M_his__L_c" stoichiometry="2.63899446666667" constant="true"/>
+          <speciesReference species="M_ile__L_c" stoichiometry="2.3851599509434" constant="true"/>
+          <speciesReference species="M_leu__L_c" stoichiometry="0.698078659012534" constant="true"/>
+          <speciesReference species="M_lys__L_c" stoichiometry="2.12935349837838" constant="true"/>
+          <speciesReference species="M_met__L_c" stoichiometry="3.15978997870647" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nadh_c" stoichiometry="0.7709355" constant="true"/>
+          <speciesReference species="M_nadp_c" stoichiometry="3.46456602588349" constant="true"/>
+          <speciesReference species="M_phe__L_c" stoichiometry="2.41073665055291" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="8.60468156028306" constant="true"/>
+          <speciesReference species="M_pi_e" stoichiometry="6.93889390390723e-18" constant="true"/>
+          <speciesReference species="M_ppi_c" stoichiometry="6.81148425999647" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="61.154867156389" constant="true"/>
+          <speciesReference species="M_ump_c" stoichiometry="4.29681000854975" constant="true"/>
+          <speciesReference species="M_val__L_c" stoichiometry="0.937541598039216" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11676"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10134"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00158"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01382"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11574"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00120"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_14453"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08056"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07253"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07253"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07304"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ENO" id="R_ENO" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_3pg_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pep_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04067"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_09487"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_asp__L_e" id="R_EX_asp__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_asp__L_e" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACCOAtm_1" id="R_ACCOAtm_1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="6.37945062583697e-15" constant="true"/>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_coa_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="7.88106381094093e-14" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="6.37945062583697e-15" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999999486" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="7.88106381094093e-14" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="7.88106381094093e-14" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="0.999999999999994" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_accoa_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="6.37945062583697e-15" constant="true"/>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="7.88106381094093e-14" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.999999999999492" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="7.88106381094093e-14" constant="true"/>
+          <speciesReference species="M_pi_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="6.37945062583697e-15" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.999999999999994" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FUMm" id="R_FUMm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fum_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_06503"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_P5CDm" id="R_P5CDm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_1pyr5c_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_09940"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FBAg" id="R_FBAg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_b_D_glucose_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_fdp_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_g3p_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_g6p_B_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_01107"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_06590"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_HMR_9680" id="R_HMR_9680" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_oaa_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_oaa_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FRDm_1" id="R_FRDm_1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fum_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07892"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FBPg" id="R_FBPg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fdp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_f6p_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05648"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLYt" id="R_GLYt" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_gly_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_gly_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PFKg" id="R_PFKg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_f6p_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_fdp_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00278"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACtr" id="R_ACtr" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ac_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="9.86988268891764e-14" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="9.86988268891764e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ac_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.333333333333423" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="4.44089209850063e-16" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.333333333333324" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="9.86988268891764e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALAt2r" id="R_ALAt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ala__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="0.999999999999989" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="0.999999999999989" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="0.999999999999989" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="2.20023150038295e-15" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_ala__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="0.999999999999989" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="0.999999999999989" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="5.77276690767416e-17" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="2.20023150038295e-15" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_DICtm" id="R_DICtm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_gly_e" id="R_EX_gly_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_gly_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_NADH2_u6m" id="R_NADH2_u6m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02932"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_glu__L_e" id="R_EX_glu__L_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_glu__L_e" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CSm" id="R_CSm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_oaa_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_cit_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02367"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_ac_e" id="R_EX_ac_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ac_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PROt2r_copy1" id="R_PROt2r_copy1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_AKGMALtm" id="R_AKGMALtm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.99999999999978" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.99999999999978" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_akg_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.999999999999781" constant="true"/>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="707.748907236515" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="2.22044604925031e-16" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.99999999999978" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_h_e" id="R_EX_h_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_G6PI_1" id="R_G6PI_1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_A_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_g6p_B_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALAR" id="R_ALAR" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ala__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="3.99999999999995" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.999999999999855" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="3.99999999999995" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="3.99999999999995" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="1.44752867862253e-13" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="3.99999999999995" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999999855" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="3.99999999999995" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1.75506024053396e-16" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1.44752867862253e-13" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08914"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_G6PI4" id="R_G6PI4" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_B_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_f6p_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05039"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PYRt2m" id="R_PYRt2m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALAPAT4te" id="R_ALAPAT4te" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ala__L_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="2.74225087082414e-14" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="2.99999999999679" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="2.74225087082414e-14" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="2.74225087082414e-14" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="2.99999999999679" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_ala__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="2.74225087082414e-14" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="3.33333333333013" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="2.74225087082414e-14" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="2.99999999999679" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALATA_Lm" id="R_ALATA_Lm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="4.59632332194815e-14" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_pyr_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="4.59632332194815e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_ala__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="4.5993512029244e-14" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.02788097625043e-17" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="4.59632332194815e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05026"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ATPS" id="R_ATPS" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="0.999999999999486" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="5.14255305006373e-13" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05654"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_NH3c" id="R_NH3c" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh3_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_nh4_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_succ_e" id="R_EX_succ_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_FRDgr" id="R_FRDgr" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_mal__L_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h2o_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_succ_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07892"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00874"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_G5SADrm" id="R_G5SADrm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_1pyr5c_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadp_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadph_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_09940"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CYOO6m_1" id="R_CYOO6m_1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_focytc_m" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="10.75" constant="true"/>
+          <speciesReference species="M_o2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="0.5" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ficytc_m" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="7.75" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="0.5" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05015"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05651"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03402"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07981"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_NADH2_u6am" id="R_NADH2_u6am" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_m" stoichiometry="5" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="4" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07055"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_SUCD3_u6m" id="R_SUCD3_u6m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_fadh2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_fad_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_06962"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CITt2r" id="R_CITt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1.00000000000032" constant="true"/>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="3.16746628925557e-13" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_cit_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.00000000000032" constant="true"/>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="3.16746628925557e-13" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_b_D_glucose_e" id="R_EX_b_D_glucose_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_b_D_glucose_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="0"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PDHam1m" id="R_PDHam1m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_coa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_lpam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_accoa_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhlam_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05264"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03948"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04768"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_A1Eg" id="R_A1Eg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_a_D_glucose_c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_amp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="2.33333333333333" constant="true"/>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="6.66133814775094e-15" constant="true"/>
+          <speciesReference species="M_dhlam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1.33333333333333" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="7.61612994892857e-14" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="6.66133814775094e-15" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="6.66133814775094e-15" constant="true"/>
+          <speciesReference species="M_nadph_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh4_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="5.03076521965845" constant="true"/>
+          <speciesReference species="M_ppi_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.666666666666667" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="7.61612994892857e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_1pyr5c_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="3.33333333333333" constant="true"/>
+          <speciesReference species="M_b_D_glucose_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_g6p_A_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="6.66133814775094e-15" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.33333333333341" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_lpam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="6.66133814775094e-15" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_o2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_x" stoichiometry="7.36409855299179" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.666666666666667" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="7.61612994892857e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08335"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_14420"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10742"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10134"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04644"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_13977"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02525"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_13DPGtg" id="R_13DPGtg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_13dpg_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_a_D_glucose_c" stoichiometry="8.3832616347282" constant="true"/>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_amp_c" stoichiometry="0.631990614000782" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="9.01525224872897" constant="true"/>
+          <speciesReference species="M_co2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_dhlam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1.63199061400077" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="5.55111512312578e-15" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nadph_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh4_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_ppi_c" stoichiometry="0.631990614000782" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="9.32587340685131e-15" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.194759483770034" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="5.55111512312578e-15" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_1pyr5c_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_3pg_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="9.64724286272975" constant="true"/>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_g6p_A_c" stoichiometry="8.3832616347282" constant="true"/>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="9.01525224872898" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_lpam_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_nadp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_o2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1.26398122800155" constant="true"/>
+          <speciesReference species="M_pi_x" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="5.55111512312578e-15" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_14420"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10742"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10134"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04644"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04469"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_13977"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02525"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPt3m" id="R_ASPt3m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1.26565424807268e-13" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="1.26565424807268e-13" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_asp__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.26565424807268e-13" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1.26565424807268e-13" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ALTOXIDm2" id="R_ALTOXIDm2" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="2.63982899423266e-15" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_o2_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="2.63982899423266e-15" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="3.01326764797021e-15" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="8.88178419700125e-16" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.73438653737553e-16" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="2.63982899423266e-15" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02901"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_THRt2r_copy1" id="R_THRt2r_copy1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_Htx" id="R_Htx" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ATPtm" id="R_ATPtm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="2.19491091968393e-13" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.99999999999978" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.99999999999978" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.99999999999978" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_DAGAT_LM" id="R_DAGAT_LM" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_alpla_c" stoichiometry="12.42" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="85.9230233368164" constant="true"/>
+          <speciesReference species="M_coa_c" stoichiometry="84.9230233368164" constant="true"/>
+          <speciesReference species="M_gamla_c" stoichiometry="12.42" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_hdca_c" stoichiometry="11.0211111111111" constant="true"/>
+          <speciesReference species="M_ocdca_c" stoichiometry="9.9" constant="true"/>
+          <speciesReference species="M_ocdcea_c" stoichiometry="2.70030303030303" constant="true"/>
+          <speciesReference species="M_ocdcya_c" stoichiometry="3.15827586206897" constant="true"/>
+          <speciesReference species="M_ttdca_c" stoichiometry="33.3033333333333" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_alincoa_c" stoichiometry="12.42" constant="true"/>
+          <speciesReference species="M_amp_c" stoichiometry="85.9230233368164" constant="true"/>
+          <speciesReference species="M_glincoa_c" stoichiometry="12.42" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_lincoa_c" stoichiometry="3.15827586206897" constant="true"/>
+          <speciesReference species="M_olcoa_c" stoichiometry="2.70030303030303" constant="true"/>
+          <speciesReference species="M_pmtcoa_c" stoichiometry="11.0211111111111" constant="true"/>
+          <speciesReference species="M_ppi_c" stoichiometry="85.9230233368164" constant="true"/>
+          <speciesReference species="M_strcoa_c" stoichiometry="9.9" constant="true"/>
+          <speciesReference species="M_tdcoa_c" stoichiometry="33.3033333333333" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05768"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_11993"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_10538"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLUt7m" id="R_GLUt7m" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_H2Otm" id="R_H2Otm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_MDH" id="R_MDH" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_oaa_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07857"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASNt2r" id="R_ASNt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="0.288409703504154" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="1.99999999999965" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="0.288409703504154" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="0.288409703504154" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999999649" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_asn__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="0.288409703504154" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="10.0000000000031" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="0.288409703504154" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="8.00000000000342" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999999649" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACt2r" id="R_ACt2r" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_ac_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="0.999999999999996" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="13.999999999988" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="0.999999999999996" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="0.999999999999996" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="12.999999999988" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_ac_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_adp_c" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="0.999999999999996" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="13.999999999988" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="0.999999999999996" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="3.27815961559535e-16" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="12.999999999988" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ACONTm" id="R_ACONTm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_cit_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="0.999999999999968" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="0.999999999999486" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="0.999999999999968" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="0.999999999999968" constant="true"/>
+          <speciesReference species="M_nadp_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="0.999999999999968" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1.33333333333282" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="0.999999999999968" constant="true"/>
+          <speciesReference species="M_nadph_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="0.333333333333333" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="0.999999999999486" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02343"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07659"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_inost_e" id="R_EX_inost_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_g6p_B_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_e" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_05171"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_08270"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_MDHm" id="R_MDHm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_oaa_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_04024"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_CO2t" id="R_CO2t" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfProducts>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_EX_h2o_e" id="R_EX_h2o_e" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ME1" id="R_ME1" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_mal__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_co2_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pyr_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00813"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_NADH2_u6cm" id="R_NADH2_u6cm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_nad_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_q6h2_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_02932"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GDHm" id="R_GDHm" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_glu__L_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_m" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_akg_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_m" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh4_m" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03103"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_GLUDxi" id="R_GLUDxi" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nad_c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_akg_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nadh_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_nh4_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03103"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_PROabc" id="R_PROabc" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_atp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="0"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and/>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_TPIg" id="R_TPIg" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_dhap_x" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_g3p_x" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_00802"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction metaid="R_ASPTA" id="R_ASPTA" reversible="true" fbc:lowerFluxBound="LOWER_BOUND" fbc:upperFluxBound="UPPER_BOUND">
+        <listOfReactants>
+          <speciesReference species="M_akg_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_asp__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_atp_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_dhap_x" stoichiometry="1.17520215633547" constant="true"/>
+          <speciesReference species="M_h2o_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_h_e" stoichiometry="2.94209101525666e-14" constant="true"/>
+          <speciesReference species="M_h_x" stoichiometry="1.17520215633547" constant="true"/>
+          <speciesReference species="M_nadh_x" stoichiometry="1.17520215633547" constant="true"/>
+          <speciesReference species="M_pro__L_e" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_thr__L_e" stoichiometry="2.94209101525666e-14" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_adp_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_glu__L_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_glyc3p_x" stoichiometry="1.17520215633547" constant="true"/>
+          <speciesReference species="M_h_c" stoichiometry="9.95870053088765e-14" constant="true"/>
+          <speciesReference species="M_nad_x" stoichiometry="1.17520215633547" constant="true"/>
+          <speciesReference species="M_oaa_c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_pi_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_pro__L_c" stoichiometry="7.01660951563099e-14" constant="true"/>
+          <speciesReference species="M_thr__L_c" stoichiometry="2.94209101525666e-14" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="LOWER_BOUND" value="-1000"/>
+            <localParameter id="UPPER_BOUND" value="1000"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+        <fbc:geneProductAssociation>
+          <fbc:or>
+            <fbc:and>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_03633"/>
+              <fbc:geneProductRef fbc:geneProduct="G_TCDM_07435"/>
+            </fbc:and>
+          </fbc:or>
+        </fbc:geneProductAssociation>
+      </reaction>
+    </listOfReactions>
+    <fbc:listOfObjectives fbc:activeObjective="objective">
+      <fbc:objective fbc:id="objective" fbc:type="maximize">
+        <fbc:listOfFluxObjectives>
+          <fbc:fluxObjective fbc:reaction="R_FRDm_1" fbc:coefficient="1"/>
+        </fbc:listOfFluxObjectives>
+      </fbc:objective>
+    </fbc:listOfObjectives>
+    <fbc:listOfGeneProducts>
+      <fbc:geneProduct metaid="G_TCDM_04469" fbc:id="G_TCDM_04469" fbc:label="G_TCDM_04469"/>
+      <fbc:geneProduct metaid="G_TCDM_08325" fbc:id="G_TCDM_08325" fbc:label="G_TCDM_08325"/>
+      <fbc:geneProduct metaid="G_TCDM_04768" fbc:id="G_TCDM_04768" fbc:label="G_TCDM_04768"/>
+      <fbc:geneProduct metaid="G_TCDM_07659" fbc:id="G_TCDM_07659" fbc:label="G_TCDM_07659"/>
+      <fbc:geneProduct metaid="G_TCDM_05171" fbc:id="G_TCDM_05171" fbc:label="G_TCDM_05171"/>
+      <fbc:geneProduct metaid="G_TCDM_02525" fbc:id="G_TCDM_02525" fbc:label="G_TCDM_02525"/>
+      <fbc:geneProduct metaid="G_TCDM_08090" fbc:id="G_TCDM_08090" fbc:label="G_TCDM_08090"/>
+      <fbc:geneProduct metaid="G_TCDM_13011" fbc:id="G_TCDM_13011" fbc:label="G_TCDM_13011"/>
+      <fbc:geneProduct metaid="G_TCDM_01740" fbc:id="G_TCDM_01740" fbc:label="G_TCDM_01740"/>
+      <fbc:geneProduct metaid="G_TCDM_14522" fbc:id="G_TCDM_14522" fbc:label="G_TCDM_14522"/>
+      <fbc:geneProduct metaid="G_TCDM_10538" fbc:id="G_TCDM_10538" fbc:label="G_TCDM_10538"/>
+      <fbc:geneProduct metaid="G_TCDM_07892" fbc:id="G_TCDM_07892" fbc:label="G_TCDM_07892"/>
+      <fbc:geneProduct metaid="G_TCDM_01231" fbc:id="G_TCDM_01231" fbc:label="G_TCDM_01231"/>
+      <fbc:geneProduct metaid="G_TCDM_02901" fbc:id="G_TCDM_02901" fbc:label="G_TCDM_02901"/>
+      <fbc:geneProduct metaid="G_TCDM_08056" fbc:id="G_TCDM_08056" fbc:label="G_TCDM_08056"/>
+      <fbc:geneProduct metaid="G_TCDM_00189" fbc:id="G_TCDM_00189" fbc:label="G_TCDM_00189"/>
+      <fbc:geneProduct metaid="G_TCDM_05015" fbc:id="G_TCDM_05015" fbc:label="G_TCDM_05015"/>
+      <fbc:geneProduct metaid="G_TCDM_00812" fbc:id="G_TCDM_00812" fbc:label="G_TCDM_00812"/>
+      <fbc:geneProduct metaid="G_TCDM_02343" fbc:id="G_TCDM_02343" fbc:label="G_TCDM_02343"/>
+      <fbc:geneProduct metaid="G_TCDM_06503" fbc:id="G_TCDM_06503" fbc:label="G_TCDM_06503"/>
+      <fbc:geneProduct metaid="G_TCDM_07981" fbc:id="G_TCDM_07981" fbc:label="G_TCDM_07981"/>
+      <fbc:geneProduct metaid="G_TCDM_00874" fbc:id="G_TCDM_00874" fbc:label="G_TCDM_00874"/>
+      <fbc:geneProduct metaid="G_TCDM_04024" fbc:id="G_TCDM_04024" fbc:label="G_TCDM_04024"/>
+      <fbc:geneProduct metaid="G_TCDM_04251" fbc:id="G_TCDM_04251" fbc:label="G_TCDM_04251"/>
+      <fbc:geneProduct metaid="G_TCDM_13977" fbc:id="G_TCDM_13977" fbc:label="G_TCDM_13977"/>
+      <fbc:geneProduct metaid="G_TCDM_00813" fbc:id="G_TCDM_00813" fbc:label="G_TCDM_00813"/>
+      <fbc:geneProduct metaid="G_TCDM_02290" fbc:id="G_TCDM_02290" fbc:label="G_TCDM_02290"/>
+      <fbc:geneProduct metaid="G_TCDM_11993" fbc:id="G_TCDM_11993" fbc:label="G_TCDM_11993"/>
+      <fbc:geneProduct metaid="G_TCDM_08914" fbc:id="G_TCDM_08914" fbc:label="G_TCDM_08914"/>
+      <fbc:geneProduct metaid="G_TCDM_05648" fbc:id="G_TCDM_05648" fbc:label="G_TCDM_05648"/>
+      <fbc:geneProduct metaid="G_TCDM_14420" fbc:id="G_TCDM_14420" fbc:label="G_TCDM_14420"/>
+      <fbc:geneProduct metaid="G_TCDM_01382" fbc:id="G_TCDM_01382" fbc:label="G_TCDM_01382"/>
+      <fbc:geneProduct metaid="G_TCDM_07435" fbc:id="G_TCDM_07435" fbc:label="G_TCDM_07435"/>
+      <fbc:geneProduct metaid="G_TCDM_02303" fbc:id="G_TCDM_02303" fbc:label="G_TCDM_02303"/>
+      <fbc:geneProduct metaid="G_TCDM_11676" fbc:id="G_TCDM_11676" fbc:label="G_TCDM_11676"/>
+      <fbc:geneProduct metaid="G_TCDM_03633" fbc:id="G_TCDM_03633" fbc:label="G_TCDM_03633"/>
+      <fbc:geneProduct metaid="G_TCDM_01026" fbc:id="G_TCDM_01026" fbc:label="G_TCDM_01026"/>
+      <fbc:geneProduct metaid="G_TCDM_05654" fbc:id="G_TCDM_05654" fbc:label="G_TCDM_05654"/>
+      <fbc:geneProduct metaid="G_TCDM_10378" fbc:id="G_TCDM_10378" fbc:label="G_TCDM_10378"/>
+      <fbc:geneProduct metaid="G_TCDM_02781" fbc:id="G_TCDM_02781" fbc:label="G_TCDM_02781"/>
+      <fbc:geneProduct metaid="G_TCDM_08665" fbc:id="G_TCDM_08665" fbc:label="G_TCDM_08665"/>
+      <fbc:geneProduct metaid="G_TCDM_01307" fbc:id="G_TCDM_01307" fbc:label="G_TCDM_01307"/>
+      <fbc:geneProduct metaid="G_TCDM_01461" fbc:id="G_TCDM_01461" fbc:label="G_TCDM_01461"/>
+      <fbc:geneProduct metaid="G_TCDM_04067" fbc:id="G_TCDM_04067" fbc:label="G_TCDM_04067"/>
+      <fbc:geneProduct metaid="G_TCDM_13663" fbc:id="G_TCDM_13663" fbc:label="G_TCDM_13663"/>
+      <fbc:geneProduct metaid="G_TCDM_00278" fbc:id="G_TCDM_00278" fbc:label="G_TCDM_00278"/>
+      <fbc:geneProduct metaid="G_TCDM_06962" fbc:id="G_TCDM_06962" fbc:label="G_TCDM_06962"/>
+      <fbc:geneProduct metaid="G_TCDM_02932" fbc:id="G_TCDM_02932" fbc:label="G_TCDM_02932"/>
+      <fbc:geneProduct metaid="G_TCDM_03402" fbc:id="G_TCDM_03402" fbc:label="G_TCDM_03402"/>
+      <fbc:geneProduct metaid="G_TCDM_08270" fbc:id="G_TCDM_08270" fbc:label="G_TCDM_08270"/>
+      <fbc:geneProduct metaid="G_TCDM_05039" fbc:id="G_TCDM_05039" fbc:label="G_TCDM_05039"/>
+      <fbc:geneProduct metaid="G_TCDM_02367" fbc:id="G_TCDM_02367" fbc:label="G_TCDM_02367"/>
+      <fbc:geneProduct metaid="G_TCDM_00158" fbc:id="G_TCDM_00158" fbc:label="G_TCDM_00158"/>
+      <fbc:geneProduct metaid="G_TCDM_05422" fbc:id="G_TCDM_05422" fbc:label="G_TCDM_05422"/>
+      <fbc:geneProduct metaid="G_TCDM_07857" fbc:id="G_TCDM_07857" fbc:label="G_TCDM_07857"/>
+      <fbc:geneProduct metaid="G_TCDM_04644" fbc:id="G_TCDM_04644" fbc:label="G_TCDM_04644"/>
+      <fbc:geneProduct metaid="G_TCDM_00120" fbc:id="G_TCDM_00120" fbc:label="G_TCDM_00120"/>
+      <fbc:geneProduct metaid="G_TCDM_07647" fbc:id="G_TCDM_07647" fbc:label="G_TCDM_07647"/>
+      <fbc:geneProduct metaid="G_TCDM_07491" fbc:id="G_TCDM_07491" fbc:label="G_TCDM_07491"/>
+      <fbc:geneProduct metaid="G_TCDM_11273" fbc:id="G_TCDM_11273" fbc:label="G_TCDM_11273"/>
+      <fbc:geneProduct metaid="G_TCDM_05768" fbc:id="G_TCDM_05768" fbc:label="G_TCDM_05768"/>
+      <fbc:geneProduct metaid="G_TCDM_14453" fbc:id="G_TCDM_14453" fbc:label="G_TCDM_14453"/>
+      <fbc:geneProduct metaid="G_TCDM_02792" fbc:id="G_TCDM_02792" fbc:label="G_TCDM_02792"/>
+      <fbc:geneProduct metaid="G_TCDM_01578" fbc:id="G_TCDM_01578" fbc:label="G_TCDM_01578"/>
+      <fbc:geneProduct metaid="G_TCDM_10134" fbc:id="G_TCDM_10134" fbc:label="G_TCDM_10134"/>
+      <fbc:geneProduct metaid="G_TCDM_05026" fbc:id="G_TCDM_05026" fbc:label="G_TCDM_05026"/>
+      <fbc:geneProduct metaid="G_TCDM_00802" fbc:id="G_TCDM_00802" fbc:label="G_TCDM_00802"/>
+      <fbc:geneProduct metaid="G_TCDM_00417" fbc:id="G_TCDM_00417" fbc:label="G_TCDM_00417"/>
+      <fbc:geneProduct metaid="G_TCDM_09940" fbc:id="G_TCDM_09940" fbc:label="G_TCDM_09940"/>
+      <fbc:geneProduct metaid="G_TCDM_01107" fbc:id="G_TCDM_01107" fbc:label="G_TCDM_01107"/>
+      <fbc:geneProduct metaid="G_TCDM_08335" fbc:id="G_TCDM_08335" fbc:label="G_TCDM_08335"/>
+      <fbc:geneProduct metaid="G_TCDM_07253" fbc:id="G_TCDM_07253" fbc:label="G_TCDM_07253"/>
+      <fbc:geneProduct metaid="G_TCDM_03646" fbc:id="G_TCDM_03646" fbc:label="G_TCDM_03646"/>
+      <fbc:geneProduct metaid="G_TCDM_03103" fbc:id="G_TCDM_03103" fbc:label="G_TCDM_03103"/>
+      <fbc:geneProduct metaid="G_TCDM_06590" fbc:id="G_TCDM_06590" fbc:label="G_TCDM_06590"/>
+      <fbc:geneProduct metaid="G_TCDM_07023" fbc:id="G_TCDM_07023" fbc:label="G_TCDM_07023"/>
+      <fbc:geneProduct metaid="G_TCDM_07304" fbc:id="G_TCDM_07304" fbc:label="G_TCDM_07304"/>
+      <fbc:geneProduct metaid="G_TCDM_11574" fbc:id="G_TCDM_11574" fbc:label="G_TCDM_11574"/>
+      <fbc:geneProduct metaid="G_TCDM_09487" fbc:id="G_TCDM_09487" fbc:label="G_TCDM_09487"/>
+      <fbc:geneProduct metaid="G_TCDM_09537" fbc:id="G_TCDM_09537" fbc:label="G_TCDM_09537"/>
+      <fbc:geneProduct metaid="G_TCDM_10742" fbc:id="G_TCDM_10742" fbc:label="G_TCDM_10742"/>
+      <fbc:geneProduct metaid="G_TCDM_03948" fbc:id="G_TCDM_03948" fbc:label="G_TCDM_03948"/>
+      <fbc:geneProduct metaid="G_TCDM_07055" fbc:id="G_TCDM_07055" fbc:label="G_TCDM_07055"/>
+      <fbc:geneProduct metaid="G_TCDM_09878" fbc:id="G_TCDM_09878" fbc:label="G_TCDM_09878"/>
+      <fbc:geneProduct metaid="G_TCDM_05264" fbc:id="G_TCDM_05264" fbc:label="G_TCDM_05264"/>
+      <fbc:geneProduct metaid="G_TCDM_08350" fbc:id="G_TCDM_08350" fbc:label="G_TCDM_08350"/>
+      <fbc:geneProduct metaid="G_TCDM_06392" fbc:id="G_TCDM_06392" fbc:label="G_TCDM_06392"/>
+      <fbc:geneProduct metaid="G_TCDM_05651" fbc:id="G_TCDM_05651" fbc:label="G_TCDM_05651"/>
+    </fbc:listOfGeneProducts>
+  </model>
+</sbml>

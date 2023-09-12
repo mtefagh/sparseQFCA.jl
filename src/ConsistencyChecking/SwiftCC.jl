@@ -19,7 +19,7 @@ using .Pre_processing
 """
     Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A general type for storing a StandardModel which contains the following fields to run swiftCC():
+A general type for storing a CoreModel which contains the following fields to run swiftCC():
 
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.
@@ -98,16 +98,16 @@ and uses Gaussian elimination to identify blocked reversible reactions.
 # OUTPUTS
 
 - `blocked_index`:         IDs of of blocked reactions.
-- `dualVar`:               Dual variables of a specific constraint.
+- `ν`:                     Dual variables of a specific constraint.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> blocked_index, dual_var = swiftCC(ModelObject_CC)
+julia> blocked_index, ν = swiftCC(ModelObject_CC)
 ```
 
-See also: `Model_CC`, model_CC_Constructor(), `reversibility()`, `homogenization()`
+See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 """
 
@@ -160,7 +160,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::
     optimize!(model)
 
     # Get the dual variables for the stoichiometric constraint:
-    dualVar = dual.(c1)
+    ν = dual.(c1)
 
     # Initialize an empty list to store the IDs of blocked irreversible reactions:
     irr_blocked_reactions = []
@@ -243,7 +243,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::
         println("Number of blocked reactions              : $(length(blocked_index))")
     end
 
-    return blocked_index, dualVar
+    return blocked_index, ν
 end
 
 end
