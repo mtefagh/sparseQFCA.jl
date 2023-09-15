@@ -1,8 +1,8 @@
 # Sparse Quantitative Flux Coupling Analysis
 
-| **Tests** | **Coverage** | **Documentation** |
-|:---:|:---:|:---:|
-| [![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl) | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mtefagh/sparseQFCA.jl/master?labpath=sparseQFCA.jl%2Fexample%2FdistributedQFCA.ipynb) |
+| **Tests** | **Coverage** |
+|:---:|:---:|
+| [![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl) 
 
 ## sparseQFCA architecture
 *sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package providing a sparse Quantitative flux coupling analysis(QFCA). It uses parallel processing and is designed for finding flux coupling table and metabolic network reductions, specifically for QuantomeRedNet. Moreover, a Julia implementation of Swift Consistency Checking is also available as a preprocessing subroutine.
@@ -43,7 +43,7 @@ channel](https://discourse.julialang.org/) is another fast and easy way to find
 answers to Julia specific questions.
 
 ## Quick Start
-To get started, first run `import Pkg; Pkg.add("sparseQFCA")` to install the *sparseQFCA* package, and then see [this Jupyter notebook](https://nbviewer.org/github/mtefagh/sparseQFCA/blob/master/example/sparseQFCA.ipynb) for a demonstration on how to use it.
+To get started, first run `import Pkg; Pkg.add("sparseQFCA")` to install the *sparseQFCA* package.
 
 ## License
 *sparseQFCA* is distributed under the [GNU General Public License v3.0](http://www.gnu.org/copyleft/gpl.html).
