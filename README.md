@@ -7,7 +7,7 @@
 ## sparseQFCA architecture
 *sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package providing a sparse Quantitative flux coupling analysis(QFCA). It uses parallel processing and is designed for finding flux coupling table and metabolic network reductions, specifically for QuantomeRedNet. Moreover, a Julia implementation of Swift Consistency Checking is also available as a preprocessing subroutine.
 
-![sparseQFCA architecture](/example/sparseQFCA_architecture.png "sparseQFCA architecture")
+![sparseQFCA architecture](/example/sparseQFCA.png "sparseQFCA architecture")
 
 ## How to get started
 
