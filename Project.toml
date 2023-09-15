@@ -1,7 +1,7 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
 authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
-version = "1.8.0"
+version = "1.9.0"
 
 [deps]
 COBREXA = "babc4406-5200-4a30-9033-bf5ae714c842"
