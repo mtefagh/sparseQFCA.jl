@@ -89,9 +89,9 @@ version = "1.0.5+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
-git-tree-sha1 = "5372dbbf8f0bdb8c700db5367132925c0771ef7e"
+git-tree-sha1 = "8cfa272e8bdedfa88b6aefbbca7c19f1befac519"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
-version = "2.2.1"
+version = "2.3.0"
 
 [[deps.Coverage]]
 deps = ["CoverageTools", "HTTP", "JSON", "LibGit2", "MbedTLS"]
@@ -379,9 +379,9 @@ version = "2.28.2+0"
 
 [[deps.MicrosoftMPI_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "a7023883872e52bc29bcaac74f19adf39347d2d5"
+git-tree-sha1 = "b01beb91d20b0d1312a9471a36017b5b339d26de"
 uuid = "9237b28f-5490-5468-be7b-bb81f5f5e6cf"
-version = "10.1.4+0"
+version = "10.1.4+1"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -654,9 +654,9 @@ version = "5.8.0+0"
 
 [[deps.libevent_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "OpenSSL_jll"]
-git-tree-sha1 = "7dcec01ff5bf9c2febffaa7ec00d3199172ade8b"
+git-tree-sha1 = "f04ec6d9a186115fb38f858f05c0c4e1b7fc9dcb"
 uuid = "1080aeaf-3a6a-583e-a51c-c537b09f60ec"
-version = "2.1.13+0"
+version = "2.1.13+1"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
