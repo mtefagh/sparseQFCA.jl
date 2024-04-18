@@ -133,7 +133,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `Model_QFCA`, 
 
 """
 
-function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int64}, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
+function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int64}, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
 
     ## Extract relevant information from the input model object
@@ -217,7 +217,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Calculate the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, ν = swiftCC(ModelObject_CC, Tolerance, 0)
+            blocked, ν = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, 0)
 
             # Update indices of blocked reactions after removing ith reaction:
             for j = 1:length(blocked)
@@ -248,7 +248,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Find the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, ν = swiftCC(ModelObject_CC, Tolerance, 0)
+            blocked, ν = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, 0)
 
             # Update DC_Matrix based on the blocked reactions:
             DC_Matrix[i,blocked] .= 1.0

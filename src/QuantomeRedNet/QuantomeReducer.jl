@@ -57,7 +57,7 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
+function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
@@ -80,7 +80,7 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-    blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, printLevel)
+    blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
     # Convert to Vector{Int64}
     blocked_index_rev = convert(Vector{Int64}, blocked_index_rev)
