@@ -16,6 +16,7 @@ Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 SharedArrays = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 Clarabel = "61c947e1-3e6d-4ee4-985a-eec8c727bd6e"
 CDDLib = "3391f64e-dcde-5f30-b752-e11513730f60"
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 
 [compat]
 COBREXA = "1.0, 1.2"
