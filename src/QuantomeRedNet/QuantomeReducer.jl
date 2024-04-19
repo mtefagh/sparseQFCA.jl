@@ -89,7 +89,7 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
 
-    # Convert to Vector{Int64}
+    # Convert to Vector{Int64}:
     blocked_index_rev = convert(Vector{Int64}, blocked_index_rev)
 
     ## Correct Reversibility
@@ -324,10 +324,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     counter = 1
 
     # Create a new optimization model:
-    #model_local = Model(GLPK.Optimizer)
     model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
     settings = Clarabel.Settings()
-    settings = Clarabel.Settings(verbose = true, time_limit = 5)
+    settings = Clarabel.Settings(verbose = false, time_limit = 5)
 
     # Define variables λ, ν, and t:
     @variable(model_local, λ[1:n])
