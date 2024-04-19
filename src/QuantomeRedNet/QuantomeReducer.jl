@@ -10,7 +10,9 @@ module QuantomeReducer
 
 export quantomeReducer
 
-using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
+using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, Clarabel
+
+import CDDLib
 
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
@@ -26,9 +28,9 @@ using .DistributedQFCA
 
 The function is designed to perform metabolic network reduction by removing blocked reactions, merge all the fully coupled reactions,
 remove the eligible reactions by the DCE-induced reductions.It extracts relevant data, separates reversible and irreversible reactions,
-corrects reversibility, and removes zero rows from the stoichiometric matrix. It processes flux coupling analysis to identify reaction clusters
-and reactions to be removed. The function constructs a reduced metabolic network matrix and performs distributed optimization for DCE-induced reductions.
-Finally, it generates information about the reduction process and returns the reduced metabolic network matrix.
+corrects reversibility, and removes zero rows from the stoichiometric matrix. It processes flux coupling analysis to identify reaction
+clusters and reactions to be removed. The function constructs a reduced metabolic network matrix and performs distributed optimization
+for DCE-induced reductions. Finally, it generates information about the reduction process and returns the reduced metabolic network matrix.
 
 # INPUTS
 
@@ -63,7 +65,11 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
 
     S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model, printLevel)
 
-    #S, Metabolites = remove_zeroRows(S, Metabolites)
+    ## Find Biomass
+
+    index_c = findfirst(x -> x == 1.0, model.c)
+    Biomass = model.rxns[index_c]
+    index_c = findfirst(x -> x == Biomass, model.rxns)
 
     row_S, col_S = size(S)
 
@@ -82,15 +88,14 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
     blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
+
     # Convert to Vector{Int64}
     blocked_index_rev = convert(Vector{Int64}, blocked_index_rev)
 
     ## Correct Reversibility
 
     ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
-    @time begin
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, OctuplePrecision, printLevel)
-    end
     row, col = size(S)
     model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
@@ -98,7 +103,8 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
 
     row, col = size(S)
     ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
-    # Convert to Vector{Int64}
+
+    # Convert to Vector{Int64}:
     blocked_index = convert(Vector{Int64}, blocked_index)
     fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index)
 
@@ -123,8 +129,6 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
 
     ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
-
-    #S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked, Metabolites)
 
     # Sort irreversible_reactions_id and reversible_reactions_id:
     irreversible_reactions_id = sort(irreversible_reactions_id)
@@ -226,6 +230,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     for key in sort(collect(keys(FC_Final)))
         append!(FC_cluster_members, FC_Final[key][2])
         append!(FC_representatives, FC_Final[key][1])
+        if index_c == FC_Final[key][2]
+            global index_newC = FC_Final[key][1]
+        end
     end
 
     # Create FC_Clusters dictionary:
@@ -241,9 +248,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     # Initialize an empty array to store the IDs of reactions to be removed:
     remove_list_DC = Array{Int64}([])
 
-    # Iterate over the rows
+    # Iterate over the rows:
     for i in range(1, row)
-        # Iterate over the columns
+        # Iterate over the columns:
         for j in range(1, col)
             # Check if the value at position (i, j) in fctable is equal to 4.0:
             if 4.0 ∈ fctable[i, :] && 2.0 ∉ fctable[i, :]
@@ -263,7 +270,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     irreversible_reactions_id = sort(irreversible_reactions_id)
     reversible_reactions_id = sort(reversible_reactions_id)
 
+
     # Create the 'Eliminations' array by taking the union of 'blocked_index', 'remove_list_DC', and 'FC_cluster_members':
+
     Eliminations = union(blocked_index, remove_list_DC, FC_cluster_members)
 
     # Sort Eliminations:
@@ -314,33 +323,40 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     DCE = Dict()
     counter = 1
 
+    # Create a new optimization model:
+    #model_local = Model(GLPK.Optimizer)
+    model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+    settings = Clarabel.Settings()
+    settings = Clarabel.Settings(verbose = true, time_limit = 5)
+
+    # Define variables λ, ν, and t:
+    @variable(model_local, λ[1:n])
+    @variable(model_local, ν[1:m])
+    @variable(model_local, t)
+
+    # Set the objective function to minimize t:
+    @objective(model_local, Min, t)
+
+    @constraint(model_local, [j in reversible_reactions_id], λ[j] == 0.0)
+
     # Perform distributed optimization for each reaction in remove_list_DC:
     @sync @distributed for i in remove_list_DC
+
+        # save i as row number:
+        row = i
 
         # Compute the linear combination for DCE:
         DCE_LinearCombination = setdiff(1:n, i)
 
-        # Create a new optimization model:
-        model = Model(GLPK.Optimizer)
-
-        # Define variables λ, ν, and t:
-        @variable(model, λ[1:n])
-        @variable(model, ν[1:m])
-        @variable(model, t)
-
-        # Set the objective function to minimize t:
-        @objective(model, Min, t)
-
         # Define constraints for the optimization problem:
-        @constraint(model, [t; λ] in MOI.NormOneCone(1 + length(λ)))
-        @constraint(model, λ == S' * ν)
-        @constraint(model, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
-        @constraint(model, [j in DCE_LinearCombination], λ[j] >= 0.0)
-        @constraint(model, λ[i] == -1.0)
-        @constraint(model, [j in reversible_reactions_id], λ[j] == 0.0)
+        con1 = @constraint(model_local, [t; λ] in MOI.NormOneCone(1 + length(λ)))
+        con2 = @constraint(model_local, λ == S' * ν)
+        con3 = @constraint(model_local, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
+        con4 = @constraint(model_local, [j in DCE_LinearCombination], λ[j] >= 0.0)
+        @constraint(model_local, con5, λ[i] == -1.0)
 
         # Solve the optimization problem:
-        optimize!(model)
+        optimize!(model_local)
 
         # Incrementing the counter by 1:
         counter += 1
@@ -351,21 +367,46 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
         # Create an empty array for storing column indices:
         cols = Array{Int64}([])
 
-        # Find the index of the negative value and collect the indices of positive values:
         for i = 1:length(λ_vec)
-            if λ_vec[i] < 0.0
-                row = i
-            end
-            if λ_vec[i] > 0.0
-                append!(cols, i)
+            if λ_vec[i] > Tolerance
+                index = findfirst(x -> x == i, A_cols_reduced)
+                A[row, index] = λ_vec[i]
             end
         end
 
-        # Update the corresponding elements of A with the values of λ:
-        for i = 1:length(cols)
-            A[row, i] = λ_vec[cols[i]]
+        ## Condition 1
+
+        delete(model_local, con1) # Remove the current constraint from the model
+        unregister(model_local, :con1) # Unregister the current constraint from the model
+
+        ## Condition 2
+
+        delete(model_local, con2) # Remove the current constraint from the model
+        unregister(model_local, :con2) # Unregister the current constraint from the model
+
+        ## Condition 3
+
+        constraint_refs_con3 = [con3[i] for i in eachindex(con3)]
+        for i in constraint_refs_con3
+            delete(model_local, i)
+            unregister(model_local, :i)
         end
+
+        ## Condition 4
+
+        constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
+        for i in constraint_refs_con4
+            delete(model_local, i)
+            unregister(model_local, :i)
+        end
+
+        ## Condition 5
+
+        delete(model_local, con5) # Remove the current constraint from the model
+        unregister(model_local, :con5) # Unregister the current constraint from the model
+
     end
+
 
     A = convert(Matrix{Float64}, A)
     row_A, col_A = size(A)
@@ -393,9 +434,9 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     model.xl = model.xl[R̃]
     model.xu = model.xu[R̃]
 
-    index_c = findfirst(x -> x == 1.0, model.c)
-    Biomass = model.rxns[index_c]
-    index_newC = findfirst(x -> x == Biomass, model.rxns)
+    if index_c in A_cols_reduced
+        index_newC = findfirst(x -> x == Biomass, model.rxns)
+    end
 
     ## Reduction Map
 
@@ -413,13 +454,15 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
         nonzero_indices, nonzero_values = findnz(col)
         # Assigning the tuple (R̃[c], nonzero_indices) to the key c in reduction_map:
         reduction_map[c] = R̃[c], nonzero_indices
-        if index_newC in nonzero_indices
-            index_newC = R̃[c]
+        if index_c in nonzero_indices
+            index = findfirst(x -> x == R̃[c], A_cols_reduced)
+            index_newC = index
         end
         # Incrementing the counter c by 1:
         c += 1
     end
 
+    #println(A_cols_reduced[104])
     # Assuming model is your CoreModel object and new_c is your new objective coefficient vector:
     model.c = zeros(length(R̃))
     model.c[index_newC] = 1.0
@@ -448,10 +491,8 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
     for key in 1:length(R̃)
         # Get the list of values to merge:
         value_to_merge = reduction_map[key][2]
-
         # Initialize an empty list to store the merged values:
         merged_values = String[]
-
         # Iterate over the values in value_to_merge and merge them from gene_dict:
         for value in value_to_merge
             if value in keys(gene_dict)
@@ -462,7 +503,6 @@ function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Floa
                 end
             end
         end
-
         # Add the merged values to gene_dict_reduced:
         gene_dict_reduced[key] = merged_values
     end
