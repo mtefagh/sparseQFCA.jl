@@ -10,7 +10,9 @@ module Pre_processing
 
 export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
-using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed
+using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
+
+import CDDLib
 
 """
     dataOfModel(model)
@@ -549,7 +551,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance(
 
 """
 
-function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, printLevel::Int=1)
+function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extract relevant information from the input model object
 
@@ -563,7 +565,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     n = length(lb)
 
     # Set the tolerance value:
-    Tolerance = 1e-6
+    Tolerance = getTolerance()
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
@@ -576,53 +578,65 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     # Iterate over all reversible reactions in the model:
     @sync @distributed for i in reversible_reactions_id
 
-        if i in blocked_index_rev
+        # Create a local model object for each worker process:
+        if OctuplePrecision
+            local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+            settings = Clarabel.Settings()
+            settings = Clarabel.Settings(verbose = false, time_limit = 5)
+        else
+            local_model = Model(GLPK.Optimizer)
+        end
+
+        # Define variables V:
+        @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+
+        # Add the stoichiometric constraints to the model:
+        @constraint(local_model, S * V .== 0)
+
+        # Set the objective function to maximize the flux through reaction i in the forward direction:
+        @objective(local_model, Max, V[i])
+
+        # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
+        @constraint(local_model, c_irr, V[i] <= 1)
+
+        # Optimize the model and retrieve the objective value:
+        optimize!(local_model)
+        opt_fwd = objective_value(local_model)
+
+        # Remove the current constraint from the model:
+        delete(local_model, c_irr)
+
+        # Unregister the current constraint from the model:
+        unregister(local_model, :c_irr)
+
+        # Set the objective function to minimize the flux through reaction i in the backward direction:
+        @objective(local_model, Min, V[i])
+
+        # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
+        @constraint(local_model, c_rev, V[i] >= -1)
+
+        # Optimize the model and retrieve the objective value:
+        optimize!(local_model)
+        opt_back = objective_value(local_model)
+
+        # Remove the current constraint from the model:
+        delete(local_model, c_rev)
+
+        # Unregister the current constraint from the model:
+        unregister(local_model, :c_rev)
+
+        # The reaction is considered to be blocked:
+        if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
             Correction[i,i] = +2.0
             continue
+        # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
+        elseif isapprox(opt_fwd, 0, atol=Tolerance)
+            Correction[i,i] = +1.0
+        # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
+        elseif isapprox(opt_back, 0, atol=Tolerance)
+            Correction[i,i] = -1.0
         else
-
-            # Create a local model object for each worker process:
-            local_model = Model(GLPK.Optimizer)
-
-            # Define variables V:
-            @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
-
-            # Add the stoichiometric constraints to the model:
-            @constraint(local_model, S * V .== 0)
-
-            # Set the objective function to maximize the flux through reaction i in the forward direction:
-            @objective(local_model, Max, V[i])
-
-            # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
-            @constraint(local_model, V[i] <= 1)
-
-            # Optimize the model and retrieve the objective value:
-            optimize!(local_model)
-            opt_fwd = objective_value(local_model)
-
-            # Set the objective function to minimize the flux through reaction i in the backward direction:
-            @objective(local_model, Min, V[i])
-
-            # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
-            @constraint(local_model, V[i] >= -1)
-
-            # Optimize the model and retrieve the objective value:
-            optimize!(local_model)
-            opt_back = objective_value(local_model)
-
-            # The reaction is considered to be blocked:
-            if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
-                Correction[i,i] = +2.0
-                continue
-            # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
-            elseif isapprox(opt_fwd, 0, atol=Tolerance)
-                Correction[i,i] = +1.0
-            # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
-            elseif isapprox(opt_back, 0, atol=Tolerance)
-                Correction[i,i] = -1.0
-            else
-                continue
-            end
+            continue
         end
 
     end
