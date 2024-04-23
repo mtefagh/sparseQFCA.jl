@@ -1,7 +1,7 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
 authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
-version = "1.9.0"
+version = "2.0.0"
 
 [deps]
 COBREXA = "babc4406-5200-4a30-9033-bf5ae714c842"
@@ -20,9 +20,9 @@ MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 
 [compat]
 COBREXA = "1.0, 1.2"
-MathOptInterface = "0.5, 0.10"
-GLPK = "0.14, 1.2"
-Clarabel = "0.7"
+MathOptInterface = "1.28, 1.29"
+GLPK = "1.0, 1.2"
+Clarabel = "0.6, 0.7"
 Colors = "0.12"
 JuMP = "0.21, 1.0"
 julia = "1.2, 1.8, 1.9"
