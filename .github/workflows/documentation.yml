@@ -17,16 +17,15 @@ jobs:
           version: '1.9.2' # Specify the required Julia version here
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-      - name: Change Directory and Generate Coverage Report
-        run: |
-          cd sparseQFCA.jl/test/
-          JULIA_COVERAGE=true julia runtests.jl
+      - name: Generate Coverage Report
+        run: JULIA_COVERAGE=true julia test/runtests.jl # Adjust this line based on how you generate coverage reports
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} 
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Build and deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}=
+          DOCUMENTER_KEY: $${ secrets.DOCUMENTER_KEY }} 
         run: julia --project=docs/ docs/make.jl
+
