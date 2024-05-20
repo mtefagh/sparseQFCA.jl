@@ -1,5 +1,10 @@
 steps:
 - uses: actions/checkout@master
+- name: Generate Coverage Data
+  run: |
+    JULIA_COVERAGE=true julia runtests.jl
 - uses: codecov/codecov-action@v3
   with:
     token: ${{ secrets.CODECOV_TOKEN }}
+    commit: HEAD~5..HEAD # Analyze the last 5 commits
+
