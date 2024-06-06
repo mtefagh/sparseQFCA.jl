@@ -10,7 +10,9 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA, Distributed
+using GLPK, JuMP, COBREXA, Distributed, Clarabel
+
+import CDDLib
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -52,7 +54,7 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, printLevel::Int=1)
+function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Export data from model
 
@@ -71,7 +73,7 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, print
     printstyled("Homogenization:\n"; color=:cyan)
 
     # Set the maximum value for M:
-    M = 1000000.0
+    M = getM()
 
     ## Loop through each value in the array "lb" and "ub"
 
@@ -101,7 +103,14 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, print
     irreversible_unblocked_reactions_id = []
 
     # Create a new optimization model using the GLPK optimizer:
-    model_irr = Model(GLPK.Optimizer)
+
+    if OctuplePrecision
+        model_irr = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+        settings = Clarabel.Settings()
+        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+    else
+        model_irr = Model(GLPK.Optimizer)
+    end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
     @variable(model_irr, lb[i] <= V[i = 1:n] <= ub[i])
@@ -143,7 +152,14 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, print
     reversible_blocked_reactions_id = []
 
     # Create a new optimization model using the GLPK optimizer:
-    model_rev = Model(GLPK.Optimizer)
+
+    if OctuplePrecision
+        model_rev = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+        settings = Clarabel.Settings()
+        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+    else
+        model_rev = Model(GLPK.Optimizer)
+    end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
     @variable(model_rev, lb[i] <= V[i = 1:n] <= ub[i])

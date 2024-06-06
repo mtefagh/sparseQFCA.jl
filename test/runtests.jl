@@ -200,9 +200,3 @@ printstyled("e_coli_core :\n"; color=:yellow)
 model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-printstyled("iIS312 :\n"; color=:yellow)
-model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_iIS312)
-
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)

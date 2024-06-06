@@ -10,7 +10,9 @@ module SwiftCC
 
 export Model_CC, model_CC_Constructor, swiftCC
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed
+using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
+
+import CDDLib
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -66,7 +68,7 @@ and assigns values to its fields based on the other arguments passed in.
 """
 
 function model_CC_Constructor(ModelObject_CC::Model_CC, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1},
-                              Reactions::Array{String,1}, Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
+                              Reactions::Array{String,1}, Genes::Array{String,1}, m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1})
      ModelObject_CC.S = S
      ModelObject_CC.Metabolites = Metabolites
      ModelObject_CC.Reactions = Reactions
@@ -111,7 +113,7 @@ See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 """
 
-function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::Int=1)
+function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extract relevant information from the input model object
 
@@ -127,6 +129,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::
 
     # Create an array of reaction IDs:
     Reaction_Ids = collect(1:n)
+
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, 0)
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
@@ -138,7 +141,13 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, printLevel::
     ub_u = ones(n_irr)
 
     # Create a new optimization model using the GLPK optimizer:
-    model = Model(GLPK.Optimizer)
+    if OctuplePrecision
+        model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+        settings = Clarabel.Settings()
+        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+    else
+        model = Model(GLPK.Optimizer)
+    end
 
     # Define variables V and u with their lower and upper bounds:
     @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
