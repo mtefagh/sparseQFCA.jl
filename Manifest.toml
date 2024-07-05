@@ -44,9 +44,9 @@ version = "1.0.8+1"
 
 [[deps.CDDLib]]
 deps = ["LinearAlgebra", "MathOptInterface", "Polyhedra", "SparseArrays", "cddlib_jll"]
-git-tree-sha1 = "f49ad6ace210dc96b88f5c66bd1693c1aa05fefe"
+git-tree-sha1 = "51aa81effbae3c42c4829266288e15051a612f46"
 uuid = "3391f64e-dcde-5f30-b752-e11513730f60"
-version = "0.9.3"
+version = "0.9.4"
 
 [[deps.COBREXA]]
 deps = ["Distributed", "DistributedData", "DocStringExtensions", "HDF5", "JSON", "JuMP", "LinearAlgebra", "MAT", "MacroTools", "OrderedCollections", "PikaParser", "Pkg", "Random", "SBML", "Serialization", "SparseArrays", "StableRNGs", "Statistics"]
@@ -786,10 +786,10 @@ uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 version = "1.2.13+0"
 
 [[deps.cddlib_jll]]
-deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "c25e5fe14395ea7b1d702f4eb90c52bdf50e3450"
+deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "08f5df03703af917b9bfec47b9767eb943220d08"
 uuid = "f07e07eb-5685-515a-97c8-3014f6152feb"
-version = "0.94.13+0"
+version = "0.94.14+0"
 
 [[deps.libaec_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
