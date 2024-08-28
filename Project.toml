@@ -1,7 +1,7 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
 authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
-version = "2.0.0"
+version = "2.1.0"
 
 [deps]
 CDDLib = "3391f64e-dcde-5f30-b752-e11513730f60"
@@ -20,7 +20,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 CDDLib = "0.9"
-COBREXA = "1.5.1"
+COBREXA = "2.0"
 Clarabel = "0.7.1, 0.9"
 Colors = "0.12.10"
 GLPK = "1.1.3"
