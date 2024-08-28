@@ -12,7 +12,7 @@ export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions
 
 using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
 
-import CDDLib
+import CDDLib, SBMLFBCModels
 
 """
     dataOfModel(model)
@@ -49,7 +49,7 @@ See also: `COBREXA.load_model()`
 
 """
 
-function dataOfModel(model::CoreModel, printLevel::Int=1)
+function dataOfModel(model::SBMLFBCModels.SBMLFBCModel, printLevel::Int=1)
 
     ## Extracting Data
 

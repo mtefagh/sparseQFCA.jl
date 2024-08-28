@@ -12,7 +12,7 @@ export quantomeReducer
 
 using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, Clarabel
 
-import CDDLib
+import CDDLib, SBMLFBCModels
 
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
@@ -59,7 +59,7 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model::CoreModel, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 

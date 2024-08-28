@@ -12,7 +12,7 @@ export find_blocked_reactions
 
 using GLPK, JuMP, COBREXA, Distributed, Clarabel
 
-import CDDLib
+import CDDLib, SBMLFBCModels
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -54,7 +54,7 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function find_blocked_reactions(model::SBMLFBCModels.SBMLFBCModel, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Export data from model
 
