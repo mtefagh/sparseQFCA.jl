@@ -2,6 +2,8 @@ module TestData
 
 using Distributed
 
+import SBMLFBCModels
+
 export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
        blockedTest_e_coli_core, blockedTest_iIS312, QFCATest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
 
@@ -9,8 +11,8 @@ using COBREXA, DelimitedFiles, SparseArrays
 
 ## Load Metabolic Networks
 
-myModel_e_coli_core = load_model(CoreModel,"Models/e_coli_core.xml")
-myModel_iIS312 = load_model(CoreModel,"Models/iIS312.xml")
+myModel_e_coli_core = load_model("Models/e_coli_core.xml")
+myModel_iIS312 = load_model("Models/iIS312.xml")
 
 ## read the CSV file into a matrix of type String
 
