@@ -14,6 +14,8 @@ using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed,
 
 import CDDLib, SBMLFBCModels
 
+import AbstractFBCModels as A
+
 """
     dataOfModel(model)
 
@@ -53,16 +55,25 @@ function dataOfModel(model::SBMLFBCModels.SBMLFBCModel, printLevel::Int=1)
 
     ## Extracting Data
 
-    S = model.S # Stoichiometric matrix
-    Metabolites = model.mets # Array of metabolite IDs
-    Reactions = model.rxns # Array of reaction IDs
-    Genes = genes(model)
-    Genes_Reactions = model.grrs # Array of gene IDs
-    m = length(model.mets) # Number of metabolites
-    n = length(model.rxns) # Number of reactions
-    n_genes = length(genes(model)) # Number of genes
-    lb = model.xl # Array of lower bounds for each reaction
-    ub = model.xu# Array of upper bounds for each reaction
+    S = A.stoichiometry(model) # Stoichiometric matrix
+    Metabolites = A.metabolites(model) # Array of metabolite IDs
+    Reactions = A.reactions(model) # Array of reaction IDs
+    Genes = A.genes(model)
+    m = A.n_metabolites(model) # Number of metabolites
+    n = A.n_reactions(model) # Number of reactions
+    n_genes = A.n_genes(model) # Number of genes
+    # Array of lower bounds and upper bounds for each reaction
+    lb, ub = A.bounds(model)
+    # Objective coefficients
+    c_vector = A.objective(model)
+
+    println(typeof(c_vector))
+    c = 1
+    for i in c_vector
+        println("$c = $i")
+        c += 1
+    end
+    println(c_vector)
 
     ## Sorting Reactions
 
@@ -83,7 +94,7 @@ function dataOfModel(model::SBMLFBCModels.SBMLFBCModel, printLevel::Int=1)
     end
 
     # Return the extracted data as a tuple:
-    return S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub
+    return S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector
 end
 
 #-------------------------------------------------------------------------------------------

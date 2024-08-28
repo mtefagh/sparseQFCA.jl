@@ -14,6 +14,8 @@ using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArray
 
 import CDDLib, SBMLFBCModels
 
+import AbstractFBCModels as A
+
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
 
@@ -63,13 +65,12 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
 
     ## Extracte relevant data from input model
 
-    S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model, printLevel)
+    S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model, printLevel)
 
     ## Find Biomass
 
-    index_c = findfirst(x -> x == 1.0, model.c)
-    Biomass = model.rxns[index_c]
-    index_c = findfirst(x -> x == Biomass, model.rxns)
+    index_c = findfirst(x -> x == 1.0, c_vector)
+    Biomass = Reactions[index_c]
 
     row_S, col_S = size(S)
 
@@ -406,15 +407,13 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
 
     end
 
-
     A = convert(Matrix{Float64}, A)
+    row_A, col_A = size(A)
     row_A, col_A = size(A)
 
     ## Matrix S̃
 
     row_S, col_S = size(S)
-    row_A, col_A = size(A)
-
     S̃ = S * A
     S̃, Metabolites_reduced = remove_zeroRows(S̃, Metabolites)
     row_S̃, col_S̃ = size(S̃)
@@ -423,6 +422,11 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
 
     # Copying A_cols_reduced and assigning it to R̃:
     R̃ = copy(A_cols_reduced)
+
+    ## M̃
+
+    # Copying Metabolites_reduced and assigning it to M̃:
+    M̃ = copy(Metabolites_reduced)
 
     ## Modify Model
 

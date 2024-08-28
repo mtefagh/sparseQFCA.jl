@@ -58,7 +58,7 @@ function find_blocked_reactions(model::SBMLFBCModels.SBMLFBCModel, Tolerance::Fl
 
     ## Export data from model
 
-    S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
+    S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub = dataOfModel(model)
 
     ## Determine the reversibility of a reaction
 
