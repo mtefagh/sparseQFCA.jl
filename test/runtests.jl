@@ -3,7 +3,7 @@
 using Distributed
 
 # Add worker processes to the Julia distributed computing environment:
-addprocs(7)
+#addprocs(7)
 println("Number of Proccess : $(nprocs())")
 println("Number of Workers  : $(nworkers())")
 
@@ -16,7 +16,7 @@ include("TestData.jl")
 # Import required Julia modules:
 using COBREXA, JuMP, Test, Distributed
 using .TestData, .sparseQFCA
-
+#=
 ### sparseQFCA:
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
@@ -199,4 +199,138 @@ printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
 
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+=#
+## ToyModel
+
+using COBREXA
+
+import AbstractFBCModels as A
+import AbstractFBCModels.CanonicalModel: Model
+
+import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
+import JSONFBCModels: JSONFBCModel
+
+import HiGHS
+
+m = Model()
+
+# Genes:
+m.genes["g1"] = Gene()
+m.genes["g2"] = Gene()
+m.genes["g3"] = Gene()
+m.genes["g4"] = Gene()
+m.genes["g5"] = Gene()
+m.genes["g6"] = Gene()
+
+## Metabolites
+
+# IntraCellular:
+
+#m1c
+m.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
+#m2c
+m.metabolites["m2"] = Metabolite(name = "M2_c", compartment = "inside")
+#m3c
+m.metabolites["m3"] = Metabolite(name = "M3_c", compartment = "inside")
+#m4c
+m.metabolites["m4"] = Metabolite(name = "M4_c", compartment = "inside")
+
+# ExtraCellular:
+
+#m1e
+m.metabolites["m5"] = Metabolite(name = "M1_e", compartment = "outside")
+#m3e
+m.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
+
+
+## Reactions
+
+M = 1000000.0
+
+# Forward:
+
+m.reactions["M1t"] = Reaction(
+    name = "transport m1",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m5" => -1.0, "m1" => 1.0),
+    gene_association_dnf = [["g1"]],
+    objective_coefficient = 0.0,
+)
+
+m.reactions["rxn1"] = Reaction(
+    name = "rxn1",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => -2.0, "m2" => 1.0, "m3" => 1.0),
+    gene_association_dnf = [["g2"]],
+    objective_coefficient = 0.0,
+)
+
+m.reactions["rxn2"] = Reaction(
+    name = "rxn2",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m2" => -1.0, "m3" => 1.0),
+    gene_association_dnf = [["g3"]],
+    objective_coefficient = 0.0,
+)
+
+m.reactions["M2t"] = Reaction(
+    name = "transport m2",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m2" => -1.0, "m5" => 1.0),
+    gene_association_dnf = [["g4"]],
+    objective_coefficient = 0.0,
+)
+
+# Foward and Backward:
+
+m.reactions["rxn3"] = Reaction(
+    name = "rxn3",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => -1.0, "m4" => 1.0),
+    gene_association_dnf = [["g5"]],
+    objective_coefficient = 0.0,
+)
+
+m.reactions["M3t"] = Reaction(
+    name = "transport m3",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m3" => -1.0, "m6" => 1.0),
+    gene_association_dnf = [["g6"]],
+    objective_coefficient = 0.0,
+)
+
+# Exchange:
+
+m.reactions["EX_1"] = Reaction(
+    name = "exchange m5",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m5" => -1.0),
+    gene_association_dnf = [[]],
+    objective_coefficient = 0.0,
+)
+
+m.reactions["EX_2"] = Reaction(
+    name = "exchange m6",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m6" => -1.0),
+    gene_association_dnf = [],
+    objective_coefficient = 1.0,
+)
+
+## QuantomeRedNet
+
+printstyled("QuantomeRedNet :\n"; color=:yellow)
+printstyled("ToyModel :\n"; color=:yellow)
+model = @time sparseQFCA.quantomeReducer(m)
+
+println("Finish...")
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)

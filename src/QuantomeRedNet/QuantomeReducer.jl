@@ -61,16 +61,30 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
+    println("typeof(model) : $(typeof(model))")
+
     S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model, printLevel)
+
+    println("Original Network:")
+    display(S)
+
+    println("Reactions")
+    println(Reactions)
+    println("Metabolites")
+    println(Metabolites)
 
     ## Find Biomass
 
     index_c = findfirst(x -> x == 1.0, c_vector)
     Biomass = Reactions[index_c]
+
+    println(Reactions)
+    println("index_c = $index_c")
+    println("Biomass = $Biomass")
 
     row_S, col_S = size(S)
 
@@ -210,6 +224,16 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
         end
     end
 
+    println("FC")
+    for key in sort(collect(keys(FC)))
+        println("$key ---> $(FC[key])")
+    end
+
+    println("FC_Coef")
+    for key in sort(collect(keys(FC_Coef)))
+        println("$key ---> $(FC_Coef[key])")
+    end
+
     # Remove duplicate FC cluster members:
     remove_list_FC = unique(remove_list_FC)
 
@@ -227,14 +251,39 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
     FC_representatives = Array{Int64}([])
     FC_cluster_members = Array{Int64}([])
 
+    println("FC_Final")
+    for key in sort(collect(keys(FC_Final)))
+        println("$key ---> $(FC_Final[key])")
+    end
+
+    # Iterate through the items in the dictionary
+    for (key, value) in FC_Final
+        # Check if the second element of the tuple is an integer
+        if isa(value[2], Integer)
+            # Convert the integer to a Vector{Any}
+            FC_Final[key] = (value[1], Any[value[2]])
+        end
+    end
+
+    println("FC_Final")
+    for key in sort(collect(keys(FC_Final)))
+        println("$key ---> $(FC_Final[key])")
+    end
+
     # Populate FC_representatives and FC_cluster_members arrays:
     for key in sort(collect(keys(FC_Final)))
         append!(FC_cluster_members, FC_Final[key][2])
         append!(FC_representatives, FC_Final[key][1])
-        if index_c == FC_Final[key][2]
-            global index_newC = FC_Final[key][1]
+        if index_c in FC_Final[key][2]
+            println("index_newC:")
+            index_c = FC_Final[key][1]
+            Biomass = Reactions[index_c]
         end
     end
+
+    println(Reactions)
+    println("index_c = $index_c")
+    println("Biomass = $Biomass")
 
     # Create FC_Clusters dictionary:
     FC_Clusters = Dict()
@@ -242,6 +291,11 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
     for key in sort(collect(keys(FC_Final)))
         FC_Clusters[c] = FC_Final[key]
         c += 1
+    end
+
+    println("FC_Clusters")
+    for key in sort(collect(keys(FC_Clusters)))
+        println("$key ---> $(FC_Clusters[key])")
     end
 
     ## DC
@@ -254,7 +308,7 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
         # Iterate over the columns:
         for j in range(1, col)
             # Check if the value at position (i, j) in fctable is equal to 4.0:
-            if 4.0 ∈ fctable[i, :] && 2.0 ∉ fctable[i, :]
+            if 4.0 ∈ fctable[i, :]
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
                 append!(remove_list_DC, Reaction_Ids_noBlocked[i])
                 # Exit the inner loop as the reaction has been found and added to remove_list_DC:
@@ -277,7 +331,7 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
     Eliminations = union(blocked_index, remove_list_DC, FC_cluster_members)
 
     # Sort Eliminations:
-    Eliminations = sort(Eliminations)
+    #Eliminations = sort(Eliminations)
 
     # Update 'A_cols_reduced' by removing elements in 'Eliminations' from the range 1 to 'n' in 'A_cols_reduced':
     A_cols_reduced = A_cols_reduced[setdiff(range(1, n), Eliminations)]
@@ -371,6 +425,12 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
             if λ_vec[i] > Tolerance
                 index = findfirst(x -> x == i, A_cols_reduced)
                 A[row, index] = λ_vec[i]
+                println("index_newC:")
+                index_c = i
+                Biomass = Reactions[index_c]
+                println(Reactions)
+                println("index_c = $index_c")
+                println("Biomass = $Biomass")
             end
         end
 
@@ -413,32 +473,251 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
 
     ## Matrix S̃
 
+    println("Information:")
+
+    println("Metabolites:")
+    println(Metabolites)
+    println("Reactions:")
+    println(Reactions)
+    println("S:")
+    display(S)
+    println("A:")
+    display(A)
     row_S, col_S = size(S)
     S̃ = S * A
-    S̃, Metabolites_reduced = remove_zeroRows(S̃, Metabolites)
-    row_S̃, col_S̃ = size(S̃)
-
-    ## R̃
+    S̃, Metabolites_reduced, Metabolites_elimination = remove_zeroRows(S̃, Metabolites)
+    S̃_row, S̃_col = size(S̃)
 
     # Copying A_cols_reduced and assigning it to R̃:
-    R̃ = copy(A_cols_reduced)
+    Reactions_elimination = Reactions[setdiff(range(1, n), A_cols_reduced)]
+    R̃ = Reactions[A_cols_reduced]
 
-    ## M̃
 
     # Copying Metabolites_reduced and assigning it to M̃:
     M̃ = copy(Metabolites_reduced)
 
-    ## Modify Model
+    println("Metabolites_reduced:")
+    println(M̃)
+    println("Reactions_Reduced:")
+    println(R̃)
+    println("S̃:")
+    display(S̃)
 
-    model.S = copy(S̃)
-    Reactions_Reduced = Reactions[setdiff(range(1, n), Eliminations)]
-    model.rxns = Reactions_Reduced
-    model.mets = Metabolites_reduced
-    model.xl = model.xl[R̃]
-    model.xu = model.xu[R̃]
 
-    if index_c in A_cols_reduced
-        index_newC = findfirst(x -> x == Biomass, model.rxns)
+
+    ## R̃
+
+    println(typeof(model))
+    printstyled("#----- --------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Reaction(Original):")
+
+    for i in model.reactions
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("lower_bound = $(i.second.lower_bound)")
+        println("upper_bound = $(i.second.upper_bound)")
+        println("stoichiometry = $(i.second.stoichiometry)")
+        println("objective_coefficient = $(i.second.objective_coefficient)")
+        println("gene_association_dnf = $(i.second.gene_association_dnf)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Metabolite:")
+
+    ## M̃
+
+    for i in model.metabolites
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("balance = $(i.second.balance)")
+        println("formula = $(i.second.formula)")
+        println("charge = $(i.second.charge)")
+        println("compartment = $(i.second.compartment)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+
+    println("M̃: $(length(M̃))")
+    println(M̃)
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Gene:")
+
+    for i in model.genes
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Coupling:")
+
+    for i in model.couplings
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("lower_bound = $(i.second.lower_bound)")
+        println("upper_bound = $(i.second.upper_bound)")
+        println("reaction_weights = $(i.second.reaction_weights)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+    # Stoichiometry:
+
+    println("S:")
+    display(S)
+
+    println("Stoichiometry of S:")
+
+    for i in model.reactions
+        println("Stoichiometry of $(i.first)")
+        println("stoichiometry = $(i.second.stoichiometry)")
+    end
+
+    # Objective coefficients:
+    println("Objective coefficients:")
+
+    for i in model.reactions
+        println("$(i.first) : c = $(i.second.objective_coefficient))")
+    end
+
+
+    println("R̃")
+    println(R̃)
+    println("M̃")
+    println(M̃)
+
+    println("S̃:")
+    display(S̃)
+
+    # Reaction:
+
+    filter!(pair -> !(pair.first in Reactions_elimination), model.reactions)
+
+    # Metabolite:
+    println("Metabolites:")
+    println(Metabolites)
+    println("Metabolites_elimination:")
+    println(Metabolites_elimination)
+    println("Metabolites_reduced:")
+    println(Metabolites_reduced)
+
+    filter!(pair -> !(pair.first in Metabolites_elimination), model.metabolites)
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Modify Stoichiometry...")
+
+    for i in model.reactions
+        println("Remove Stoichiometry of $(i.first)")
+        for key in collect(keys(i.second.stoichiometry))
+            delete!(i.second.stoichiometry, key)
+        end
+    end
+
+    for i in model.reactions
+        println("Modify Stoichiometry of $(i.first)")
+        index_col = findfirst(x -> x == i.first, R̃)
+        stoichiometry_vector = S̃[:,index_col]
+        println("stoichiometry_vector = $(stoichiometry_vector)")
+        met = 1
+        for c = 1:length(stoichiometry_vector)
+            println("met = $(met)")
+            push!(i.second.stoichiometry, "$(M̃[met])" => stoichiometry_vector[c])
+            met += 1
+        end
+    end
+
+    println("S̃:")
+    display(S̃)
+
+    println("Stoichiometry of S̃:")
+
+    for i in model.reactions
+        println("Final Stoichiometry of $(i.first)")
+        println("stoichiometry = $(i.second.stoichiometry)")
+    end
+
+    for i in model.reactions
+        if i.first == Biomass
+            i.second.objective_coefficient = 1.0
+        end
+    end
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Reaction(Reduced):")
+
+    for i in model.reactions
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("lower_bound = $(i.second.lower_bound)")
+        println("upper_bound = $(i.second.upper_bound)")
+        println("stoichiometry = $(i.second.stoichiometry)")
+        println("objective_coefficient = $(i.second.objective_coefficient)")
+        println("gene_association_dnf = $(i.second.gene_association_dnf)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Metabolite:")
+
+    ## M̃
+
+    for i in model.metabolites
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("balance = $(i.second.balance)")
+        println("formula = $(i.second.formula)")
+        println("charge = $(i.second.charge)")
+        println("compartment = $(i.second.compartment)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Gene:")
+
+    for i in model.genes
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+    end
+
+    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
+    println("Coupling:")
+
+    for i in model.couplings
+        println("Elements of $(i.first)")
+        println("Name = $(i.second.name)")
+        println("lower_bound = $(i.second.lower_bound)")
+        println("upper_bound = $(i.second.upper_bound)")
+        println("reaction_weights = $(i.second.reaction_weights)")
+        println("annotations = $(i.second.annotations)")
+        println("notes = $(i.second.notes)")
+        printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
     end
 
     ## Reduction Map
@@ -455,75 +734,20 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
         col = sparsevec(col)
         # Finding the non-zero indices and values in the sparse vector:
         nonzero_indices, nonzero_values = findnz(col)
+        index = findfirst(x -> x == R̃[c], Reactions)
         # Assigning the tuple (R̃[c], nonzero_indices) to the key c in reduction_map:
-        reduction_map[c] = R̃[c], nonzero_indices
-        if index_c in nonzero_indices
-            index = findfirst(x -> x == R̃[c], A_cols_reduced)
-            index_newC = index
-        end
+        reduction_map[c] = index, nonzero_indices
         # Incrementing the counter c by 1:
         c += 1
     end
 
-    #println(A_cols_reduced[104])
-    # Assuming model is your CoreModel object and new_c is your new objective coefficient vector:
-    model.c = zeros(length(R̃))
-    model.c[index_newC] = 1.0
-    model.b = zeros(length(Metabolites_reduced))
+    display(A)
 
-    gene_dict = Dict()
-    c = 1
-    i = 1
-    for genes in model.grrs
-        if genes == nothing
-            gene_dict[i] = nothing
-        else
-            for gene in genes
-                gene_dict[i] = gene
-            end
-        end
-        i += 1
-    end
+    println(reduction_map)
 
-    # Create a new dictionary gene_dict_reduced:
-    gene_dict_reduced = Dict{Int, Vector{String}}()
-
-    ## Iterate over the keys of reduction_map
-
-    # Assuming you want to create a dictionary with R̃ rows:
-    for key in 1:length(R̃)
-        # Get the list of values to merge:
-        value_to_merge = reduction_map[key][2]
-        # Initialize an empty list to store the merged values:
-        merged_values = String[]
-        # Iterate over the values in value_to_merge and merge them from gene_dict:
-        for value in value_to_merge
-            if value in keys(gene_dict)
-                if gene_dict[value] != nothing
-                    append!(merged_values, gene_dict[value])
-                else
-                    continue
-                end
-            end
-        end
-        # Add the merged values to gene_dict_reduced:
-        gene_dict_reduced[key] = merged_values
-    end
-
-    # Create a new grrs vector with a dimension of R̃:
-    grrs_reduced = Vector{Union{Nothing, Vector{Vector{String}}}}(nothing, length(R̃))
-
-    # Populate the new grrs vector based on the dictionary:
-    for i in 1:length(R̃)
-        if haskey(gene_dict_reduced, i)
-            grrs_reduced[i] = [gene_dict_reduced[i]]
-        else
-            grrs_reduced[i] = nothing
-        end
-    end
-
-    model.grrs = grrs_reduced
-    Genes_reduced = genes(model)
+    println(Reactions)
+    println("index_c = $index_c")
+    println("Biomass = $Biomass")
 
     ## Print out results if requested
 
@@ -536,14 +760,14 @@ function quantomeReducer(model::SBMLFBCModels.SBMLFBCModel, removing::Bool=false
         println("Metabolites : $(m)")
         println("Reactions   : $(n)")
         println("Reduced Network:")
-        println("S           : $(row_S̃) x $(col_S̃)")
-        println("Genes       : $(length(Genes_reduced))")
+        println("S           : $(S̃_row) x $(S̃_col)")
+        #println("Genes       : $(length(Genes_reduced))")
         println("Metabolites : $(length(Metabolites_reduced))")
         println("Reactions   : $(length(R̃))")
         println("A matrix    : $(row_A) x $(col_A)")
     end
 
-    return model, A, reduction_map
+    return model
 end
 
 end

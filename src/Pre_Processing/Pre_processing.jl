@@ -51,12 +51,18 @@ See also: `COBREXA.load_model()`
 
 """
 
-function dataOfModel(model::SBMLFBCModels.SBMLFBCModel, printLevel::Int=1)
+function dataOfModel(model, printLevel::Int=1)
+
+    println("typeof(model) : $(typeof(model))")
 
     ## Extracting Data
 
     S = A.stoichiometry(model) # Stoichiometric matrix
     Metabolites = A.metabolites(model) # Array of metabolite IDs
+    println("A.reactions(model)")
+    println(A.reactions(model))
+    println("model.reactions")
+    println(model.reactions)
     Reactions = A.reactions(model) # Array of reaction IDs
     Genes = A.genes(model)
     m = A.n_metabolites(model) # Number of metabolites
@@ -73,16 +79,16 @@ function dataOfModel(model::SBMLFBCModels.SBMLFBCModel, printLevel::Int=1)
         println("$c = $i")
         c += 1
     end
-    println(c_vector)
+    #println(c_vector)
 
     ## Sorting Reactions
-
+#=
     p = sortperm(Reactions) # Sort the reaction IDs in alphabetical order
     Reactions = Reactions[p] # Reorder the reaction IDs according to the sorted indices
     lb = lb[p] # Reorder the lower bounds according to the sorted indices
     ub = ub[p] # Reorder the upper bounds according to the sorted indices
     S = S[:,p] # Reorder the columns of the stoichiometric matrix according to the sorted indices
-
+=#
     ## Print out results if requested
 
     if printLevel > 0
@@ -446,10 +452,12 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
     m = length(Metabolites)
 
     # Remove the corresponding metabolites from the Metabolites array:
+    Metabolites_elimination = Metabolites[zero_row]
     Metabolites = Metabolites[setdiff(range(1, m), zero_row)]
 
+
     # Return the updated S matrix and Metabolites array:
-    return S, Metabolites
+    return S, Metabolites, Metabolites_elimination
 end
 
 #-------------------------------------------------------------------------------------------
