@@ -16,7 +16,7 @@ include("TestData.jl")
 # Import required Julia modules:
 using COBREXA, JuMP, Test, Distributed
 using .TestData, .sparseQFCA
-#=
+
 ### sparseQFCA:
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
@@ -197,10 +197,10 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
-model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
+model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-=#
+
 ## ToyModel
 
 using COBREXA
@@ -326,11 +326,22 @@ m.reactions["EX_2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
+
+println("Original FBA:")
+solution = flux_balance_analysis(m, optimizer = HiGHS.Optimizer)
+println(solution.objective)
+println(collect(solution.fluxes))
+
 ## QuantomeRedNet
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("ToyModel :\n"; color=:yellow)
 model = @time sparseQFCA.quantomeReducer(m)
 
-println("Finish...")
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+println("Reduced FBA:")
+println(typeof(model))
+solution = flux_balance_analysis(model, optimizer = HiGHS.Optimizer)
+println(solution.objective)
+println(collect(solution.fluxes))
+
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)

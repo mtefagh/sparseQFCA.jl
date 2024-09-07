@@ -23,7 +23,7 @@ The function extracts various data from a given metabolic network model, represe
 
 # INPUTS
 
-- `model`:          A CoreModel that has been built using COBREXA's `load_model` function.
+- `model`:          A CanonicalModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -53,16 +53,10 @@ See also: `COBREXA.load_model()`
 
 function dataOfModel(model, printLevel::Int=1)
 
-    println("typeof(model) : $(typeof(model))")
-
     ## Extracting Data
 
     S = A.stoichiometry(model) # Stoichiometric matrix
     Metabolites = A.metabolites(model) # Array of metabolite IDs
-    println("A.reactions(model)")
-    println(A.reactions(model))
-    println("model.reactions")
-    println(model.reactions)
     Reactions = A.reactions(model) # Array of reaction IDs
     Genes = A.genes(model)
     m = A.n_metabolites(model) # Number of metabolites
@@ -76,7 +70,7 @@ function dataOfModel(model, printLevel::Int=1)
     println(typeof(c_vector))
     c = 1
     for i in c_vector
-        println("$c = $i")
+        #println("$c = $i")
         c += 1
     end
     #println(c_vector)
