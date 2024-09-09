@@ -3,7 +3,7 @@
 using Distributed
 
 # Add worker processes to the Julia distributed computing environment:
-#addprocs(7)
+addprocs(7)
 println("Number of Proccess : $(nprocs())")
 println("Number of Workers  : $(nworkers())")
 
@@ -16,6 +16,8 @@ include("TestData.jl")
 # Import required Julia modules:
 using COBREXA, JuMP, Test, Distributed
 using .TestData, .sparseQFCA
+
+import HiGHS
 
 ### sparseQFCA:
 
@@ -199,6 +201,27 @@ printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
 
+println("Reduced FBA e_coli_core:")
+println(typeof(model))
+solution = flux_balance_analysis(model, optimizer = HiGHS.Optimizer)
+println(solution.objective)
+println(collect(solution.fluxes))
+
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+
+
+## QuantomeRedNet
+
+printstyled("QuantomeRedNet :\n"; color=:yellow)
+printstyled("iAB_RBC_283 :\n"; color=:yellow)
+model = @time sparseQFCA.quantomeReducer(myModel_iAB_RBC_283)
+
+println("Reduced FBA iAB_RBC_283:")
+println(typeof(model))
+solution = flux_balance_analysis(model, optimizer = HiGHS.Optimizer)
+println(solution.objective)
+println(collect(solution.fluxes))
+
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 ## ToyModel
@@ -207,10 +230,8 @@ using COBREXA
 
 import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
-
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 import JSONFBCModels: JSONFBCModel
-
 import HiGHS
 
 m = Model()
@@ -326,7 +347,6 @@ m.reactions["EX_2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
-
 println("Original FBA:")
 solution = flux_balance_analysis(m, optimizer = HiGHS.Optimizer)
 println(solution.objective)
@@ -337,6 +357,9 @@ println(collect(solution.fluxes))
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("ToyModel :\n"; color=:yellow)
 model = @time sparseQFCA.quantomeReducer(m)
+
+# Check Final number of processes
+println("FInal number of processes: ", nprocs())
 
 println("Reduced FBA:")
 println(typeof(model))

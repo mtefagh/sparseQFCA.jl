@@ -392,10 +392,6 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
             if λ_vec[i] > Tolerance
                 index = findfirst(x -> x == i, A_cols_reduced)
                 A[row, index] = λ_vec[i]
-                if index_c == row
-                    index_c = i
-                    Biomass = Reactions[index_c]
-                end
             end
         end
 
@@ -433,6 +429,10 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     end
 
     A = convert(Matrix{Float64}, A)
+
+    # Remove all worker processes
+    #rmprocs(workers())
+
     row_A, col_A = size(A)
 
     ## Matrix S̃
@@ -532,6 +532,15 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
         end
     end
 
+    println("index_c : $index_c")
+    println("Biomass : $Biomass")
+
+    for (key, value) in sort(reduction_map)
+        if index_c in reduction_map[key][2]
+            index_c = reduction_map[key][1]
+            Biomass = Reactions[index_c]
+        end
+    end
 
     for i in model.reactions
         if i.first == Biomass
@@ -550,8 +559,10 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     Genes_final = collect(Iterators.flatten(Genes_final))
     Genes_removal = setdiff(Genes, Genes_final)
 
-
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
+
+    println("index_c : $index_c")
+    println("Biomass : $Biomass")
 
     ## Print out results if requested
 

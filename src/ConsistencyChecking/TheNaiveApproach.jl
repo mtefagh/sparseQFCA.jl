@@ -56,8 +56,6 @@ See also: `dataOfModel()`, `reversibility()`
 
 function find_blocked_reactions(model, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
-    println("typeof(model) : $(typeof(model))")
-
     ## Export data from model
 
     S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub = dataOfModel(model)
