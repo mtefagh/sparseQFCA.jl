@@ -136,17 +136,36 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `Model_QFCA`, 
 function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int64}, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
 
-    ## Extract relevant information from the input model object
+    ## Extract relevant information from the ModelObject_QFCA
 
+    # Extracting the stoichiometric matrix (S) from the ModelObject_QFCA:
     S = ModelObject_QFCA.S
+
+    # Extracting the array of metabolite IDs from the ModelObject_QFCA:
     Metabolites = ModelObject_QFCA.Metabolites
+
+    # Extracting the array of reaction IDs from the ModelObject_QFCA:
     Reactions = ModelObject_QFCA.Reactions
+
+    # Extracting the array of gene IDs from the ModelObject_QFCA:
     Genes = ModelObject_QFCA.Genes
+
+    # Extracting the number of metabolites (m) from the ModelObject_QFCA:
     m = ModelObject_QFCA.m
+
+    # Extracting the number of reactions (n) from the ModelObject_QFCA:
     n = ModelObject_QFCA.n
+
+    # Extracting the lower bounds for reactions from the ModelObject_QFCA:
     lb = ModelObject_QFCA.lb
+
+    # Extracting the upper bounds for reactions from the ModelObject_QFCA:
     ub = ModelObject_QFCA.ub
+
+    # Extracting the IDs of irreversible reactions from the ModelObject_QFCA:
     irreversible_reactions_id = ModelObject_QFCA.irreversible_reactions_id
+
+    # Extracting the IDs of reversible reactions from the ModelObject_QFCA:
     reversible_reactions_id = ModelObject_QFCA.reversible_reactions_id
 
     ## Count the number of reactions in each set
@@ -158,34 +177,50 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     Reaction_Ids = collect(1:n)
     Reaction_Ids_noBlocked = setdiff(Reaction_Ids, blocked_index)
 
+    # Calculate the number of blocked reactions:
     n_blocked = length(blocked_index)
-    Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
-    lb_noBlocked = lb[setdiff(1:end, blocked_index)]
-    ub_noBlocked = ub[setdiff(1:end, blocked_index)]
-    S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
-    irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
-    reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
 
+    # Create a new array of reaction IDs that excludes the blocked reactions:
+    Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
+
+    # Create a new array of lower bounds for the non-blocked reactions:
+    lb_noBlocked = lb[setdiff(1:end, blocked_index)]
+
+    # Create a new array of upper bounds for the non-blocked reactions:
+    ub_noBlocked = ub[setdiff(1:end, blocked_index)]
+
+    # Create a submatrix of the stoichiometric matrix 'S' with only non-blocked reactions:
+    S_noBlocked = S[:, setdiff(1:end, blocked_index)]
+
+    # Update the array of irreversible reaction IDs by removing the blocked reactions:
+    irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
+
+    # Update the array of reversible reaction IDs by removing the blocked reactions:
+    reversible_reactions_id = setdiff(reversible_reactions_id, blocked_index)
+
+    # Calculate the new number of irreversible reactions after excluding blocked ones:
     n_irr = length(irreversible_reactions_id)
+
+    # Calculate the new number of reversible reactions after excluding blocked ones:
     n_rev = length(reversible_reactions_id)
 
-    # Convert to Vector{Int64}
+    # Convert to Vector{Int64}:
     irreversible_reactions_id = convert(Vector{Int64}, irreversible_reactions_id)
-    # Convert to Vector{Int64}
+    # Convert to Vector{Int64}:
     reversible_reactions_id = convert(Vector{Int64}, reversible_reactions_id)
 
+    # Get the number of rows(metabolites) and columns(reactions) in the S_noBlocked matrix:
     row_noBlocked, col_noBlocked = size(S_noBlocked)
 
+    # Create a new array of lower bounds for the non-blocked reactions:
     lb_noBlocked = lb[setdiff(1:end, blocked_index)]
 
+    # Create a new array of upper bounds for the non-blocked reactions:
     ub_noBlocked = ub[setdiff(1:end, blocked_index)]
 
     ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
 
     S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked,Metabolites)
-
-    irreversible_reactions_id = sort(irreversible_reactions_id)
-    reversible_reactions_id = sort(reversible_reactions_id)
 
     ## Create a new instance of the input model with homogenous bounds
 
@@ -289,19 +324,19 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
     for i in range(1, col_noBlocked)
         for j in range(i+1, col_noBlocked)
-            # If i has an arrow pointing to j, but j doesn't have an arrow pointing to i, add an arrow from j to i
+            # If i has an arrow pointing to j, but j doesn't have an arrow pointing to i, add an arrow from j to i:
             if fctable[i,j] == 3.0 && fctable[j,i] == 0.0
                 fctable[j,i] = 4.0
 
-            # If j has an arrow pointing to i, but i doesn't have an arrow pointing to j, add an arrow from i to j
+            # If j has an arrow pointing to i, but i doesn't have an arrow pointing to j, add an arrow from i to j:
             elseif fctable[i,j] == 0.0 && fctable[j,i] == 3.0
                 fctable[i,j] = 4.0
 
-            # If i and j have arrows pointing in both directions, set the arrows to be bidirectional
+            # If i and j have arrows pointing in both directions, set the arrows to be bidirectional:
             elseif fctable[i,j] == 3.0 && fctable[j,i] == 3.0
                 fctable[i,j] = fctable[j,i] = 2.0
 
-            # If there are no arrows between i and j, or both arrows are already bidirectional, do nothing and continue to the next pair of reactions
+            # If there are no arrows between i and j, or both arrows are already bidirectional, do nothing and continue to the next pair of reactions:
             else
                 continue
             end
@@ -483,8 +518,13 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
         println("Number of 4's (DC j-->i)  : $d_4")
     end
 
+    # Convert fctable to a matrix of integers:
     fctable = convert(Matrix{Int}, fctable)
+
+    # Convert Fc_Coefficients to a matrix of Float64:
     Fc_Coefficients = convert(Matrix{Float64}, Fc_Coefficients)
+
+    # Convert Dc_Coefficients to a matrix of Float64:
     Dc_Coefficients = convert(Matrix{Float64}, Dc_Coefficients)
 
     return fctable, Fc_Coefficients, Dc_Coefficients
