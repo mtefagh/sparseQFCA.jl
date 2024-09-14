@@ -10,16 +10,16 @@ module Pre_processing
 
 export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
-using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
+using CPLEX, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
 
-import CDDLib, SBMLFBCModels
+import CDDLib
 
 import AbstractFBCModels as A
 
 """
     dataOfModel(model)
 
-The function extracts various data from a given metabolic network model, represented by a StandardModel object, and returns it as a tuple.
+The function extracts various data from a given metabolic network model, represented by a CanonicalModel object, and returns it as a tuple.
 
 # INPUTS
 
@@ -37,17 +37,19 @@ The function extracts various data from a given metabolic network model, represe
 - `Genes`:          A list of all genes associated with reactions in the metabolic network.
 - `m`:              The number of rows in the stoichiometric matrix.
 - `n`:              The number of columns in the stoichiometric matrix.
+- `n_genes`:        The number of columns in the stoichiometric matrix.
 - `lb`:             A `n` x `1` vector representing the lower bounds of each reaction.
 - `ub`:             A `n` x `1` vector representing the upper bounds of each reaction.
+- `c_vector`:       A `n` x `1` vector representing the Objective coefficients vector.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
+julia> S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model)
 ```
 
-See also: `COBREXA.load_model()`
+See also: `COBREXA.load_model(JSONFBCModel, "", A.CanonicalModel.Model)`
 
 """
 
@@ -55,45 +57,59 @@ function dataOfModel(model, printLevel::Int=1)
 
     ## Extracting Data
 
-    S = A.stoichiometry(model) # Stoichiometric matrix
-    Metabolites = A.metabolites(model) # Array of metabolite IDs
-    Reactions = A.reactions(model) # Array of reaction IDs
+    # Stoichiometric matrix:
+    S = A.stoichiometry(model)
+
+    # Array of metabolite IDs:
+    Metabolites = A.metabolites(model)
+
+    # Array of reaction IDs:
+    Reactions = A.reactions(model)
+
+    # Array of gene IDs:
     Genes = A.genes(model)
-    m = A.n_metabolites(model) # Number of metabolites
-    n = A.n_reactions(model) # Number of reactions
-    n_genes = A.n_genes(model) # Number of genes
-    # Array of lower bounds and upper bounds for each reaction
+
+    # Number of metabolites in the model:
+    m = A.n_metabolites(model)
+
+    # Number of reactions in the model:
+    n = A.n_reactions(model)
+
+    # Number of genes in the model:
+    n_genes = A.n_genes(model)
+
+    # Array of lower and upper bounds for each reaction (constraints on flux through each reaction):
     lb, ub = A.bounds(model)
-    # Objective coefficients
+
+    # Objective coefficients vector:
     c_vector = A.objective(model)
 
-    println(typeof(c_vector))
-    c = 1
-    for i in c_vector
-        #println("$c = $i")
-        c += 1
-    end
-    #println(c_vector)
+    ## Sorting Reactions (Commented out)
 
-    ## Sorting Reactions
-#=
-    p = sortperm(Reactions) # Sort the reaction IDs in alphabetical order
-    Reactions = Reactions[p] # Reorder the reaction IDs according to the sorted indices
-    lb = lb[p] # Reorder the lower bounds according to the sorted indices
-    ub = ub[p] # Reorder the upper bounds according to the sorted indices
-    S = S[:,p] # Reorder the columns of the stoichiometric matrix according to the sorted indices
-=#
+    #=
+    # Sort reaction IDs in alphabetical order and reorder the reactions and associated data accordingly
+    p = sortperm(Reactions)  # Get the sorted indices of the reactions
+    Reactions = Reactions[p]  # Reorder reactions by sorted indices
+    lb = lb[p]  # Reorder lower bounds accordingly
+    ub = ub[p]  # Reorder upper bounds accordingly
+    S = S[:,p]  # Reorder columns of the stoichiometric matrix accordingly
+    =#
+
     ## Print out results if requested
-
     if printLevel > 0
+        # Print a header for the output in cyan color
         printstyled("Metabolic Network:\n"; color=:cyan)
+
+        # Print the number of metabolites, reactions, and genes in the model
         println("Number of Metabolites : $m")
         println("Number of Reactions   : $n")
         println("Number of Genes       : $n_genes")
+
+        # Print the dimensions of the stoichiometric matrix (rows = metabolites, columns = reactions)
         println("Stoichiometric matrix : $m x $n")
     end
 
-    # Return the extracted data as a tuple:
+    # Return the extracted data as a tuple
     return S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector
 end
 
@@ -380,7 +396,7 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = 1000000.0
+    M = getM()
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
@@ -421,7 +437,7 @@ This results in a more compact representation of the metabolic network, with onl
 
 - Full input/output example
 ```julia
-julia> S, Metabolites = remove_zeroRows(S, Metabolites)
+julia> S, Metabolites, Metabolites_elimination = remove_zeroRows(S, Metabolites)
 ```
 
 See also: `dataOfModel()`
@@ -450,7 +466,7 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
     Metabolites = Metabolites[setdiff(range(1, m), zero_row)]
 
 
-    # Return the updated S matrix and Metabolites array:
+    # Return the updated S matrix, Metabolites array and Metabolites_elimination array:
     return S, Metabolites, Metabolites_elimination
 end
 
@@ -588,23 +604,24 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     # The initial value of false indicates that no reactions are blocked at the beginning:
     Correction = SharedArray{Int,2}((n, n), init = false)
 
+    # Create a local model object for each worker process:
+    if OctuplePrecision
+        local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+        settings = Clarabel.Settings()
+        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+    else
+        local_model = Model(CPLEX.Optimizer)
+        set_attribute(local_model, "CPX_PARAM_EPINT", 1e-8)
+    end
+
+    # Define variables V:
+    @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+
+    # Add the stoichiometric constraints to the model:
+    @constraint(local_model, S * V .== 0)
+
     # Iterate over all reversible reactions in the model:
     @sync @distributed for i in reversible_reactions_id
-
-        # Create a local model object for each worker process:
-        if OctuplePrecision
-            local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-            settings = Clarabel.Settings()
-            settings = Clarabel.Settings(verbose = false, time_limit = 5)
-        else
-            local_model = Model(GLPK.Optimizer)
-        end
-
-        # Define variables V:
-        @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
-
-        # Add the stoichiometric constraints to the model:
-        @constraint(local_model, S * V .== 0)
 
         # Set the objective function to maximize the flux through reaction i in the forward direction:
         @objective(local_model, Max, V[i])
@@ -651,7 +668,6 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         else
             continue
         end
-
     end
 
     for i = 1 : n

@@ -10,13 +10,13 @@ module QuantomeReducer
 
 export quantomeReducer
 
-using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, Clarabel
+using COBREXA, SparseArrays, CPLEX, JuMP, LinearAlgebra, Distributed, SharedArrays, Clarabel
 
 import CDDLib
 
-import JSONFBCModels: JSONFBCModel
-
 import AbstractFBCModels as A
+import AbstractFBCModels.CanonicalModel: Model
+import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
@@ -350,6 +350,9 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
     settings = Clarabel.Settings(verbose = false, time_limit = 5)
 
+    #model_local = JuMP.Model(CPLEX.Optimizer)
+    #set_attribute(model_local, "CPX_PARAM_EPINT", 1e-8)
+
     # Define variables λ, ν, and t:
     @variable(model_local, λ[1:n])
     @variable(model_local, ν[1:m])
@@ -429,9 +432,6 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     end
 
     A = convert(Matrix{Float64}, A)
-
-    # Remove all worker processes
-    #rmprocs(workers())
 
     row_A, col_A = size(A)
 
@@ -532,9 +532,6 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
         end
     end
 
-    println("index_c : $index_c")
-    println("Biomass : $Biomass")
-
     for (key, value) in sort(reduction_map)
         if index_c in reduction_map[key][2]
             index_c = reduction_map[key][1]
@@ -561,9 +558,6 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
 
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
 
-    println("index_c : $index_c")
-    println("Biomass : $Biomass")
-
     ## Print out results if requested
 
     if printLevel > 0
@@ -576,12 +570,11 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
         println("Reactions   : $(n)")
         println("Reduced Network:")
         println("S           : $(S̃_row) x $(S̃_col)")
-        #println("Genes       : $(length(Genes_reduced))")
+        println("Genes       : $(length(Genes_final))")
         println("Metabolites : $(length(Metabolites_reduced))")
         println("Reactions   : $(length(R̃))")
         println("A matrix    : $(row_A) x $(col_A)")
     end
-
     return model
 end
 

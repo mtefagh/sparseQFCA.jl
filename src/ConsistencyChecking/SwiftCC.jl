@@ -10,7 +10,7 @@ module SwiftCC
 
 export Model_CC, model_CC_Constructor, swiftCC
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
+using CPLEX, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
 
 import CDDLib
 
@@ -146,7 +146,8 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
         settings = Clarabel.Settings()
         settings = Clarabel.Settings(verbose = false, time_limit = 5)
     else
-        model = Model(GLPK.Optimizer)
+        model = Model(CPLEX.Optimizer)
+        set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
     end
 
     # Define variables V and u with their lower and upper bounds:
