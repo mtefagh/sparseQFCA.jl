@@ -38,7 +38,7 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 
 # INPUTS
 
-- `model`:                     A model that has been built using COBREXA's `load_model` function.
+- `model`:                     A CanonicalModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -69,9 +69,10 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
 
     S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model, printLevel)
 
-    ## Find Biomass
-
+    # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
     index_c = findfirst(x -> x == 1.0, c_vector)
+
+    # Use the found index to retrieve the corresponding element from the Reactions array:
     Biomass = Reactions[index_c]
 
     row_S, col_S = size(S)
@@ -97,25 +98,38 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
 
     ## Correct Reversibility
 
+    # Create an empty dictionary to store reaction bounds:
     Dict_bounds = Dict()
 
+    # Iterate through each reaction to populate the dictionary with lower and upper bounds:
     for i = 1:n
         Dict_bounds[Reactions[i]] = lb[i], ub[i]
     end
 
+    # Create a new Model_Correction object with the current data:
     ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
+    # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, OctuplePrecision, printLevel)
+
+    # Get the dimensions of the updated stoichiometric matrix:
+    row, col = size(S)
+
+    ## Count the number of reactions in each set
+
+    n_irr = length(irreversible_reactions_id)
+    n_rev = length(reversible_reactions_id)
+
+    # Update the dictionary with the new lower and upper bounds after correction:
     for i = 1:n
         Dict_bounds[Reactions[i]] = lb[i], ub[i]
     end
 
-    row, col = size(S)
+    # Reconstruct the corrected model with updated parameters:
     model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
 
-    row, col = size(S)
     ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     # Convert to Vector{Int64}:
@@ -125,28 +139,8 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     # Get the dimensions of fctable:
     row, col = size(fctable)
 
-    ## Count the number of reactions in each set
-
-    n_irr = length(irreversible_reactions_id)
-    n_rev = length(reversible_reactions_id)
-
     # Remove blocked reactions from Reaction_Ids:
     Reaction_Ids_noBlocked = setdiff(Reaction_Ids, blocked_index)
-
-    ## Remove any reactions that cannot carry flux and is blocked
-
-    Reactions_noBlocked = Reactions[setdiff(range(1, n), blocked_index)]
-    lb_noBlocked = lb[setdiff(1:end, blocked_index)]
-    ub_noBlocked = ub[setdiff(1:end, blocked_index)]
-    S_noBlocked  = S[:, setdiff(1:end, blocked_index)]
-    irreversible_reactions_id = setdiff(irreversible_reactions_id, blocked_index)
-    reversible_reactions_id   = setdiff(reversible_reactions_id, blocked_index)
-
-    ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
-
-    # Sort irreversible_reactions_id and reversible_reactions_id:
-    irreversible_reactions_id = sort(irreversible_reactions_id)
-    reversible_reactions_id = sort(reversible_reactions_id)
 
     # Initialize arrays:
     A_rows_original = Array{Int64}([])
@@ -346,107 +340,117 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     DCE = Dict()
     counter = 1
 
-    # Create a new optimization model:
+    # Create a new optimization model with BigFloat precision and Clarabel optimizer:
     model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+
+    # Set up optimization settings: no verbosity and a 5-second time limit:
     settings = Clarabel.Settings(verbose = false, time_limit = 5)
 
-    #model_local = JuMP.Model(CPLEX.Optimizer)
-    #set_attribute(model_local, "CPX_PARAM_EPINT", 1e-8)
-
-    # Define variables λ, ν, and t:
+    # Define the decision variables λ (for reactions), ν (for metabolites), and t (a scalar variable):
     @variable(model_local, λ[1:n])
     @variable(model_local, ν[1:m])
     @variable(model_local, t)
 
-    # Set the objective function to minimize t:
+    # Set the objective function to minimize t (scalar variable):
     @objective(model_local, Min, t)
 
-    @constraint(model_local, [j in reversible_reactions_id], λ[j] == 0.0)
+    # Constraint 1: λ and t must satisfy the NormOneCone (a type of norm constraint):
+    con1 = @constraint(model_local, [t; λ] in MOI.NormOneCone(1 + length(λ)))
 
-    # Perform distributed optimization for each reaction in remove_list_DC:
+    # Constraint 2: The dual variable λ must be equal to the transposed stoichiometric matrix (S') times ν:
+    con2 = @constraint(model_local, λ == S' * ν)
+
+    # Constraint 3: Ensure that λ is 0 for reversible reactions (the reaction flux is zero for reversible reactions):
+    con3 = @constraint(model_local, [j in reversible_reactions_id], λ[j] == 0.0)
+
+    # Perform distributed optimization for each reaction in the remove_list_DC list:
     @sync @distributed for i in remove_list_DC
 
-        # save i as row number:
+        # Save i as the row number to process the current reaction:
         row = i
 
-        # Compute the linear combination for DCE:
+        # Compute the linear combination for DCE by excluding the current reaction (i):
         DCE_LinearCombination = setdiff(1:n, i)
 
-        # Define constraints for the optimization problem:
-        con1 = @constraint(model_local, [t; λ] in MOI.NormOneCone(1 + length(λ)))
-        con2 = @constraint(model_local, λ == S' * ν)
-        con3 = @constraint(model_local, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
-        con4 = @constraint(model_local, [j in DCE_LinearCombination], λ[j] >= 0.0)
-        @constraint(model_local, con5, λ[i] == -1.0)
+        ## Define additional constraints for the optimization problem:
 
-        # Solve the optimization problem:
+        # Constraint 4: Set λ to zero for specific reactions in the Eliminations ∩ DCE_LinearCombination set:
+        con4 = @constraint(model_local, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
+
+        # Constraint 5: Set λ to be non-negative for the remaining reactions in DCE_LinearCombination:
+        con5 = @constraint(model_local, [j in DCE_LinearCombination], λ[j] >= 0.0)
+
+        # Constraint 6: Force λ for the current reaction (i) to be -1:
+        con6 = @constraint(model_local, λ[i] == -1.0)
+
+        # Solve the optimization problem for the current setup:
         optimize!(model_local)
 
-        # Incrementing the counter by 1:
+        # Increment the counter to keep track of the number of optimizations performed:
         counter += 1
 
-        # Get the values of λ:
+        # Get the values of the λ variables after solving the optimization problem:
         λ_vec = value.(λ)
 
-        # Create an empty array for storing column indices:
+        # Create an empty array to store the indices of the non-zero λ values:
         cols = Array{Int64}([])
 
+        # Loop through the λ vector and check for values above the defined tolerance:
         for i = 1:length(λ_vec)
             if λ_vec[i] > Tolerance
+                # Find the column index of the corresponding reaction in A_cols_reduced:
                 index = findfirst(x -> x == i, A_cols_reduced)
+
+                # Update the corresponding value in matrix A for the current row:
                 A[row, index] = λ_vec[i]
             end
         end
 
-        ## Condition 1
-
-        delete(model_local, con1) # Remove the current constraint from the model
-        unregister(model_local, :con1) # Unregister the current constraint from the model
-
-        ## Condition 2
-
-        delete(model_local, con2) # Remove the current constraint from the model
-        unregister(model_local, :con2) # Unregister the current constraint from the model
-
-        ## Condition 3
-
-        constraint_refs_con3 = [con3[i] for i in eachindex(con3)]
-        for i in constraint_refs_con3
-            delete(model_local, i)
-            unregister(model_local, :i)
-        end
-
-        ## Condition 4
-
+        ## Condition 4: Remove all constraints in con4 from the model once used:
         constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
         for i in constraint_refs_con4
-            delete(model_local, i)
-            unregister(model_local, :i)
+            delete(model_local, i)  # Remove the constraint from the model:
+            unregister(model_local, :i)  # Unregister the constraint for clean-up:
         end
 
-        ## Condition 5
+        ## Condition 5: Remove all constraints in con5 from the model once used:
+        constraint_refs_con5 = [con5[i] for i in eachindex(con5)]
+        for i in constraint_refs_con5
+            delete(model_local, i)  # Remove the constraint from the model:
+            unregister(model_local, :i)  # Unregister the constraint for clean-up:
+        end
 
-        delete(model_local, con5) # Remove the current constraint from the model
-        unregister(model_local, :con5) # Unregister the current constraint from the model
+        ## Condition 6: Remove the current λ constraint (con6) from the model:
+        delete(model_local, con6)  # Remove the specific λ[i] == -1 constraint:
+        unregister(model_local, :con6)  # Unregister this constraint for clean-up:
 
     end
 
+    # Convert matrix A to a matrix of Float64 data type for numerical stability:
     A = convert(Matrix{Float64}, A)
 
+    # Get the number of rows and columns in matrix A:
     row_A, col_A = size(A)
 
-    ## Matrix S̃
-
+    # Get the number of rows and columns in the stoichiometric matrix S:
     row_S, col_S = size(S)
+
+    # Compute the modified stoichiometric matrix S̃ by multiplying S with A:
     S̃ = S * A
+
+    # Remove any zero rows from the matrix S̃ and get the reduced metabolite list:
     S̃, Metabolites_reduced, Metabolites_elimination = remove_zeroRows(S̃, Metabolites)
+
+    # Get the dimensions of the reduced stoichiometric matrix S̃:
     S̃_row, S̃_col = size(S̃)
 
-    # Copying A_cols_reduced and assigning it to R̃:
+    # Identify the reactions that have been eliminated (not part of A_cols_reduced):
     Reactions_elimination = Reactions[setdiff(range(1, n), A_cols_reduced)]
+
+    # Get the reduced list of reactions corresponding to the columns in A_cols_reduced:
     R̃ = Reactions[A_cols_reduced]
 
-    # Copying Metabolites_reduced and assigning it to M̃:
+    # Make a copy of the reduced metabolites to M̃:
     M̃ = copy(Metabolites_reduced)
 
     ## Reduction Map
@@ -470,13 +474,19 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
         c += 1
     end
 
-    ### Genes Modify
+    ## Genes
 
+    # Iterate through each reaction in the model:
     for i in model.reactions
+        # Iterate through the sorted reduction_map (which maps reactions to a list of associated reactions):
         for (key, value) in sort(reduction_map)
+            # Check if the current reaction matches the first element in the reduction_map's value list:
             if i.first == Reactions[value[1]]
+                # Loop through the second element of the value list, which contains a set of reactions:
                 for j in value[2]
+                    # Check if the gene association for the current reaction and the related reaction is not empty:
                     if !isnothing(i.second.gene_association_dnf) && !isnothing(model.reactions[Reactions[j]].gene_association_dnf)
+                        # Concatenate the gene associations of the current reaction with those of the related reaction:
                         i.second.gene_association_dnf = vcat(i.second.gene_association_dnf, model.reactions[Reactions[j]].gene_association_dnf)
                     end
                 end
@@ -484,78 +494,121 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
         end
     end
 
+    # Iterate through each reaction in the model:
     for i in model.reactions
-        # Check if gene_association_dnf exists and is not nothing
+        # Check if the gene association exists and is not nothing:
         if !isnothing(i.second.gene_association_dnf)
+            # Flatten the non-empty elements of the gene_association_dnf list into a single iterable:
             flattened = filter(!isempty, i.second.gene_association_dnf) |> Iterators.flatten
-
+            # Create a set to keep track of unique genes:
             seen = Set{String}()
+            # Create an empty vector to store unique gene associations:
             result = Vector{Vector{String}}()
-
+            # Iterate through the flattened list of genes:
             for gene in flattened
+                # Check if the gene has not been seen before:
                 if !(gene in seen)
+                    # Add the gene to the set of seen genes:
                     push!(seen, gene)
+                    # Add the gene as a new vector to the result list:
                     push!(result, [gene])
                 end
             end
-
+            # Update the gene_association_dnf with the unique gene associations:
             i.second.gene_association_dnf = result
         end
-
     end
 
-    # lb & ub
+    ## Update lb & Up
+
+    # Iterate through each reaction in the model to update the lower and upper bounds:
     for i in model.reactions
+        # Set the lower bound for the reaction using the pre-calculated Dict_bounds:
         i.second.lower_bound = Dict_bounds[i.first][1]
+        # Set the upper bound for the reaction using the pre-calculated Dict_bounds:
         i.second.upper_bound = Dict_bounds[i.first][2]
     end
 
-    # Reaction:
-
+    # Filter out reactions that are in the list of eliminated reactions:
     filter!(pair -> !(pair.first in Reactions_elimination), model.reactions)
 
+    # Filter out metabolites that are in the list of eliminated metabolites:
     filter!(pair -> !(pair.first in Metabolites_elimination), model.metabolites)
 
+    ## Update Stoichiometry Matrix
+
+    # Iterate through each reaction in the model to clear the stoichiometry:
     for i in model.reactions
+        # Collect the keys from the stoichiometry map of the current reaction:
         for key in collect(keys(i.second.stoichiometry))
+            # Remove the stoichiometry entry for the current key:
             delete!(i.second.stoichiometry, key)
         end
     end
 
+    # Iterate through each reaction to update the stoichiometry based on the modified matrix:
     for i in model.reactions
+        # Find the index of the current reaction in the reduced reaction list R̃:
         index_col = findfirst(x -> x == i.first, R̃)
+
+        # Get the corresponding column in the modified stoichiometric matrix S̃:
         stoichiometry_vector = S̃[:,index_col]
+
+        # Initialize a counter for metabolites:
         met = 1
+
+        # Loop through the stoichiometry vector to update the stoichiometry for each metabolite:
         for c = 1:length(stoichiometry_vector)
+            # Push the metabolite and its corresponding stoichiometry value to the reaction:
             push!(i.second.stoichiometry, "$(M̃[met])" => stoichiometry_vector[c])
             met += 1
         end
     end
 
+    ## Update Biomass
+
+    # Iterate through the reduction map to check and update the Biomass reaction:
     for (key, value) in sort(reduction_map)
+        # If the biomass reaction (index_c) is in the reduction map, update its index:
         if index_c in reduction_map[key][2]
             index_c = reduction_map[key][1]
             Biomass = Reactions[index_c]
         end
     end
 
+    ## Update Objective coefficient
+
+    # Iterate through the reactions to set the objective coefficient for the biomass reaction:
     for i in model.reactions
+        # If the current reaction matches the biomass reaction, set its objective coefficient to 1.0:
         if i.first == Biomass
             i.second.objective_coefficient = 1.0
         end
     end
 
+    ## Update Genes
+
+    # Initialize an empty list to store final gene associations:
     Genes_final = []
+
+    # Iterate through each reaction to collect gene associations:
     for i in model.reactions
+        # If the reaction has a non-empty gene association, append it to Genes_final:
         if !isnothing(i.second.gene_association_dnf)
             append!(Genes_final, i.second.gene_association_dnf)
         end
     end
 
+    # Remove duplicate genes from Genes_final:
     Genes_final = unique(Genes_final)
+
+    # Flatten the nested gene lists in Genes_final into a single list:
     Genes_final = collect(Iterators.flatten(Genes_final))
+
+    # Determine the genes that need to be removed by finding the difference:
     Genes_removal = setdiff(Genes, Genes_final)
 
+    # Filter out genes in the model that are present in Genes_removal:
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
 
     ## Print out results if requested
