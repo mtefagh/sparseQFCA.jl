@@ -12,6 +12,10 @@ export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions
 
 using CPLEX, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
 
+include("Solve.jl")
+
+using .Solve
+
 import CDDLib
 
 import AbstractFBCModels as A
@@ -465,7 +469,6 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
     Metabolites_elimination = Metabolites[zero_row]
     Metabolites = Metabolites[setdiff(range(1, m), zero_row)]
 
-
     # Return the updated S matrix, Metabolites array and Metabolites_elimination array:
     return S, Metabolites, Metabolites_elimination
 end
@@ -559,6 +562,8 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # OPTIONAL INPUTS
 
+- `solvername`:                             Name of the solver(default: GLPK).
+- `OctuplePrecision`:                       A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:                             Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -580,7 +585,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance(
 
 """
 
-function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, OctuplePrecision::Bool=false, printLevel::Int=1)
+function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, solvername::String="GLPK", OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extract relevant information from the input model object
 
@@ -607,11 +612,9 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     # Create a local model object for each worker process:
     if OctuplePrecision
         local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
         settings = Clarabel.Settings(verbose = false, time_limit = 5)
     else
-        local_model = Model(CPLEX.Optimizer)
-        set_attribute(local_model, "CPX_PARAM_EPINT", 1e-8)
+        local_model, solver = changeSparseQFCASolver(solvername)
     end
 
     # Define variables V:

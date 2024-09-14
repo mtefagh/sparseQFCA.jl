@@ -11,13 +11,14 @@ module sparseQFCA
     using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
     include("Pre_Processing/Pre_processing.jl")
+    include("Pre_Processing/Solve.jl")
     include("ConsistencyChecking/TheNaiveApproach.jl")
     include("ConsistencyChecking/SwiftCC.jl")
     include("QFCA/distributedQFCA.jl")
     include("QFCA/SQFCA.jl")
     include("QuantomeRedNet/QuantomeReducer.jl")
 
-    using .Pre_processing, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, .SQFCA, .QuantomeReducer
+    using .Pre_processing, .Solve, .TheNaiveApproach, .SwiftCC, .DistributedQFCA, .SQFCA, .QuantomeReducer
 
 end
 

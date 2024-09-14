@@ -14,6 +14,10 @@ using CPLEX, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
 
 import CDDLib
 
+include("../Pre_Processing/Solve.jl")
+
+using .Solve
+
 include("../Pre_Processing/Pre_processing.jl")
 
 using .Pre_processing
@@ -94,7 +98,9 @@ and uses Gaussian elimination to identify blocked reversible reactions.
 
 # OPTIONAL INPUTS
 
+- `solvername`:            Name of the solver(default: GLPK).
 - `Tolerance`:             A small number that represents the level of error tolerance.
+- `OctuplePrecision`:      A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:            Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -113,7 +119,7 @@ See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 """
 
-function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extract relevant information from the input model object
 
@@ -146,8 +152,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
         settings = Clarabel.Settings()
         settings = Clarabel.Settings(verbose = false, time_limit = 5)
     else
-        model = Model(CPLEX.Optimizer)
-        set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
+        model, solver = changeSparseQFCASolver(solvername)
     end
 
     # Define variables V and u with their lower and upper bounds:

@@ -30,7 +30,7 @@ end
 #-------------------------------------------------------------------------------------------
 
 """
-    changeSparseQFCASolver(name, params, printLevel)
+    changeSparseQFCASolver(name, printLevel)
 
 Function used to change the solver and include the respective solver interfaces
 
@@ -44,7 +44,7 @@ Function used to change the solver and include the respective solver interfaces
 
 # OUTPUT
 
-- `model`:          Solver object with a `handle` field
+- `model`:          A JuMP model for solving LPs.
 - `solver`:         Solver object with a `handle` field
 
 # EXAMPLES
@@ -76,6 +76,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the CPLEX solver:
             set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if CPLEX cannot be set:
             error("The solver `CPLEX` cannot be set using `changeSparseQFCASolver()`.")
@@ -91,6 +93,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the HiGHS solver:
             set_attribute(model, "presolve", "on")
             set_attribute(model, "time_limit", 60.0)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if HiGHS cannot be set:
             error("The solver `HiGHS` cannot be set using `changeSparseQFCASolver()`.")
@@ -106,6 +110,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Gurobi solver:
             set_attribute(model, "TimeLimit", 100)
             set_attribute(model, "Presolve", 0)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if Gurobi cannot be set:
             error("The solver `Gurobi` cannot be set using `changeSparseQFCASolver()`.")
@@ -121,6 +127,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Clp solver:
             set_attribute(model, "LogLevel", 1)
             set_attribute(model, "Algorithm", 4)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if Clp cannot be set:
             error("The solver `Clp` cannot be set using `changeSparseQFCASolver()`.")
@@ -135,6 +143,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the Cbc solver:
             set_attribute(model, "logLevel", 1)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if Cbc cannot be set:
             error("The solver `Cbc` cannot be set using `changeSparseQFCASolver()`.")
@@ -150,6 +160,9 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the GLPK solver:
             set_attribute(model, "tm_lim", 60 * 1_000)
             set_attribute(model, "msg_lev", GLPK.GLP_MSG_OFF)
+            # Return the created model and solver configuration:
+            return model, solver
+
         catch
             # Handle the error if GLPK cannot be set:
             error("The solver `GLPK` cannot be set using `changeSparseQFCASolver()`.")
@@ -164,6 +177,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the ECOS solver:
             set_attribute(model, "maxit", 100)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if ECOS cannot be set:
             error("The solver `ECOS` cannot be set using `changeSparseQFCASolver()`.")
@@ -176,6 +191,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             solver.handle = SCS.Optimizer
             # Create a model using the SCS solver:
             model = Model(solver.handle)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if SCS cannot be set:
             error("The solver `SCS` cannot be set using `changeSparseQFCASolver()`.")
@@ -191,6 +208,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Mosek solver:
             set_attribute(model, "QUIET", true)
             set_attribute(model, "INTPNT_CO_TOL_DFEAS", 1e-7)
+            # Return the created model and solver configuration:
+            return model, solver
         catch
             # Handle the error if Mosek cannot be set:
             error("The solver `Mosek` cannot be set using `changeSparseQFCASolver()`.")
@@ -203,8 +222,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
         error("The solver is not supported. Please set the solver name to one the supported solvers.")
     end
 
-    # Return the created model and solver configuration:
-    return model, solver
+end
+
 end
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------

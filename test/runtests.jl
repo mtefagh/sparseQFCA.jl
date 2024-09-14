@@ -22,7 +22,7 @@ import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 import JSONFBCModels: JSONFBCModel
 
-
+#
 ### sparseQFCA:
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
@@ -200,7 +200,7 @@ fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iI
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 ## QuantomeRedNet
-
+#=
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
@@ -324,7 +324,7 @@ blockedList_swiftCC_iAB_RBC_283, dualVar_e_coli_core = @time sparseQFCA.swiftCC(
 println(blockedList_swiftCC_iAB_RBC_283)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
-
+=#
 ## ToyModel
 
 m = Model()

@@ -42,7 +42,8 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 
 # OPTIONAL INPUTS
 
-- `removing`:                  A boolean variable that indicates whether reactions should be removed from the network in the stages of determining coupling or not.
+- `solvername`:                Name of the solver(default: GLPK).
+- `removing`:                  A flag controlling whether reactions should be filtered out during the coupling determination phase of network analysis.
 - `Tolerance`:                 A small number that represents the level of error tolerance.
 - `printLevel`:                Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
@@ -61,7 +62,7 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
@@ -88,7 +89,7 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-    blocked_index, ν  = swiftCC(ModelObject_CC, Tolerance, OctuplePrecision, printLevel)
+    blocked_index, ν  = swiftCC(ModelObject_CC, solvername, Tolerance, OctuplePrecision, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
 
     # Convert to Vector{Int64}:
@@ -108,7 +109,7 @@ function quantomeReducer(model, removing::Bool=false, Tolerance::Float64=1e-6, O
     ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
-    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, OctuplePrecision, printLevel)
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev)
 
     # Get the dimensions of the updated stoichiometric matrix:
     row, col = size(S)
