@@ -49,14 +49,12 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 # OUTPUTS
 
 - `reducedModel`               A reduced metabolic network.
-- `A`                          A `n` x `ñ` matrix representing the coefficients betwee reactions of original networks and reactions of reduced network.
-- `reduct-map`                 A dictionary to save the representatives of eliminations.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> reducedModel, A, reduct_map = quantomeReducer(model)
+julia> reducedModel = quantomeReducer(model)
 ```
 
 See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributedReversibility_Correction()`, `distributedQFCA()`
