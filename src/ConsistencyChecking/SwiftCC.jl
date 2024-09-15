@@ -243,18 +243,29 @@ function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance:
     # Determine the dimensions of the Sol matrix:
     row_sol, col_sol = size(Sol)
 
-    # Find columns in Sol that correspond to blocked reversible reactions:
+    # Initialize counter variable:
     c = 0
+
+    # Create an empty array to store indices of blocked reactions:
     rev_blocked_reactions_col = []
+
+    # Iterate over each column of matrix Sol:
     for col in eachcol(Sol)
+        # Increment counter for each column:
         c += 1
+        # Check if the norm of the current column is approximately zero within tolerance:
         if isapprox(norm(col), 0, atol = Tolerance)
+            # If true, append the current column index to rev_blocked_reactions_col:
             append!(rev_blocked_reactions_col, c)
         end
     end
 
+    # Create an empty array to store blocked reversible reactions:
     rev_blocked_reactions = []
+
+    # Iterate over indices stored in rev_blocked_reactions_col:
     for i in rev_blocked_reactions_col
+        # Append corresponding reaction ID from reversible_reactions_id to rev_blocked_reactions:
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end
 

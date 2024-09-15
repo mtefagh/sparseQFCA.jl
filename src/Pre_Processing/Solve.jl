@@ -114,7 +114,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Gurobi solver:
             set_attribute(model, "TimeLimit", 100)
             set_attribute(model, "Presolve", 0)
-            # Set verbose attribute to false (disable verbose output)
+            # Set verbose attribute to false (disable verbose output):
             set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver

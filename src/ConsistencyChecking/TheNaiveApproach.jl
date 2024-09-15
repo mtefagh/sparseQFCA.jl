@@ -10,7 +10,7 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA, Distributed, Clarabel
+using JuMP, COBREXA, Distributed, Clarabel
 
 include("../Pre_Processing/Solve.jl")
 

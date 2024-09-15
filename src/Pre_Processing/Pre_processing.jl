@@ -332,7 +332,7 @@ The function takes an array of strings, representing reaction IDs, and checks if
 
 - Full input/output example
 ```julia
-julia> check_duplicate = check_duplicate_reactions(Reactions)
+julia> check_duplicate_reactions(Reactions)
 ```
 
 See also: `dataOfModel()`
