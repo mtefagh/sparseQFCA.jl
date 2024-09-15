@@ -7,9 +7,10 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 module DistributedQFCA
+
 export Model_QFCA, model_QFCA_Constructor, distributedQFCA
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
+using JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, SharedArrays
 
 include("../Pre_Processing/Pre_processing.jl")
 

@@ -22,7 +22,6 @@ import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 import JSONFBCModels: JSONFBCModel
 
-#
 ### sparseQFCA:
 
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
@@ -200,7 +199,7 @@ fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iI
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
 ## QuantomeRedNet
-#=
+
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
@@ -324,39 +323,38 @@ blockedList_swiftCC_iAB_RBC_283, dualVar_e_coli_core = @time sparseQFCA.swiftCC(
 println(blockedList_swiftCC_iAB_RBC_283)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
-=#
+
 ## ToyModel
 
-m = Model()
-println("typeof(m) = $(typeof(m))")
+ToyModel = Model()
 
 # Genes:
-m.genes["g1"] = Gene()
-m.genes["g2"] = Gene()
-m.genes["g3"] = Gene()
-m.genes["g4"] = Gene()
-m.genes["g5"] = Gene()
-m.genes["g6"] = Gene()
+ToyModel.genes["g1"] = Gene()
+ToyModel.genes["g2"] = Gene()
+ToyModel.genes["g3"] = Gene()
+ToyModel.genes["g4"] = Gene()
+ToyModel.genes["g5"] = Gene()
+ToyModel.genes["g6"] = Gene()
 
 ## Metabolites
 
 # IntraCellular:
 
 #m1c
-m.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
+ToyModel.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
 #m2c
-m.metabolites["m2"] = Metabolite(name = "M2_c", compartment = "inside")
+ToyModel.metabolites["m2"] = Metabolite(name = "M2_c", compartment = "inside")
 #m3c
-m.metabolites["m3"] = Metabolite(name = "M3_c", compartment = "inside")
+ToyModel.metabolites["m3"] = Metabolite(name = "M3_c", compartment = "inside")
 #m4c
-m.metabolites["m4"] = Metabolite(name = "M4_c", compartment = "inside")
+ToyModel.metabolites["m4"] = Metabolite(name = "M4_c", compartment = "inside")
 
 # ExtraCellular:
 
 #m1e
-m.metabolites["m5"] = Metabolite(name = "M1_e", compartment = "outside")
+ToyModel.metabolites["m5"] = Metabolite(name = "M1_e", compartment = "outside")
 #m3e
-m.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
+ToyModel.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
 
 
 ## Reactions
@@ -365,7 +363,7 @@ M = 1000000.0
 
 # Forward:
 
-m.reactions["M1t"] = Reaction(
+ToyModel.reactions["M1t"] = Reaction(
     name = "transport m1",
     lower_bound = 0.0,
     upper_bound = M,
@@ -374,7 +372,7 @@ m.reactions["M1t"] = Reaction(
     objective_coefficient = 0.0,
 )
 
-m.reactions["rxn1"] = Reaction(
+ToyModel.reactions["rxn1"] = Reaction(
     name = "rxn1",
     lower_bound = 0.0,
     upper_bound = M,
@@ -383,7 +381,7 @@ m.reactions["rxn1"] = Reaction(
     objective_coefficient = 0.0,
 )
 
-m.reactions["rxn2"] = Reaction(
+ToyModel.reactions["rxn2"] = Reaction(
     name = "rxn2",
     lower_bound = 0.0,
     upper_bound = M,
@@ -392,7 +390,7 @@ m.reactions["rxn2"] = Reaction(
     objective_coefficient = 0.0,
 )
 
-m.reactions["M2t"] = Reaction(
+ToyModel.reactions["M2t"] = Reaction(
     name = "transport m2",
     lower_bound = 0.0,
     upper_bound = M,
@@ -403,7 +401,7 @@ m.reactions["M2t"] = Reaction(
 
 # Foward and Backward:
 
-m.reactions["rxn3"] = Reaction(
+ToyModel.reactions["rxn3"] = Reaction(
     name = "rxn3",
     lower_bound = -M,
     upper_bound = M,
@@ -412,7 +410,7 @@ m.reactions["rxn3"] = Reaction(
     objective_coefficient = 0.0,
 )
 
-m.reactions["M3t"] = Reaction(
+ToyModel.reactions["M3t"] = Reaction(
     name = "transport m3",
     lower_bound = -M,
     upper_bound = M,
@@ -423,7 +421,7 @@ m.reactions["M3t"] = Reaction(
 
 # Exchange:
 
-m.reactions["EX_1"] = Reaction(
+ToyModel.reactions["EX_1"] = Reaction(
     name = "exchange m5",
     lower_bound = -M,
     upper_bound = M,
@@ -432,7 +430,7 @@ m.reactions["EX_1"] = Reaction(
     objective_coefficient = 0.0,
 )
 
-m.reactions["EX_2"] = Reaction(
+ToyModel.reactions["EX_2"] = Reaction(
     name = "exchange m6",
     lower_bound = -M,
     upper_bound = M,
@@ -442,21 +440,19 @@ m.reactions["EX_2"] = Reaction(
 )
 
 println("Original FBA:")
-solution = flux_balance_analysis(m, optimizer = CPLEX.Optimizer)
+solution = flux_balance_analysis(ToyModel, optimizer = CPLEX.Optimizer)
 println(solution.objective)
 println(collect(solution.fluxes))
-
-println("typeof(m) = $(typeof(m))")
 
 ## QuantomeRedNet
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("ToyModel :\n"; color=:yellow)
-model = @time sparseQFCA.quantomeReducer(m)
+ToyModel_reduced = @time sparseQFCA.quantomeReducer(ToyModel)
 
 println("Reduced FBA:")
-println(typeof(model))
-solution = flux_balance_analysis(model, optimizer = CPLEX.Optimizer)
+println(typeof(ToyModel_reduced))
+solution = flux_balance_analysis(ToyModel_reduced, optimizer = CPLEX.Optimizer)
 println(solution.objective)
 println(collect(solution.fluxes))
 

@@ -76,6 +76,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the CPLEX solver:
             set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
+            # Set verbose attribute to false (disable verbose output)
+            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -93,6 +95,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the HiGHS solver:
             set_attribute(model, "presolve", "on")
             set_attribute(model, "time_limit", 60.0)
+            # Set verbose attribute to false (disable verbose output)
+            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -110,6 +114,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Gurobi solver:
             set_attribute(model, "TimeLimit", 100)
             set_attribute(model, "Presolve", 0)
+            # Set verbose attribute to false (disable verbose output)
+            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -127,6 +133,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Clp solver:
             set_attribute(model, "LogLevel", 1)
             set_attribute(model, "Algorithm", 4)
+            # Set verbose attribute to false (disable verbose output)
+            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -143,6 +151,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the Cbc solver:
             set_attribute(model, "logLevel", 1)
+            # Set verbose attribute to false (disable verbose output)
+            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch

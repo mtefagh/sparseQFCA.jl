@@ -10,9 +10,10 @@ module QuantomeReducer
 
 export quantomeReducer
 
-using COBREXA, SparseArrays, CPLEX, JuMP, LinearAlgebra, Distributed, SharedArrays, Clarabel
+using COBREXA, SparseArrays, JuMP, LinearAlgebra, Distributed, SharedArrays
 
 import CDDLib
+import Clarabel
 
 import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
@@ -339,11 +340,14 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     DCE = Dict()
     counter = 1
 
-    # Create a new optimization model with BigFloat precision and Clarabel optimizer:
+    # Define a local model using GenericModel from Clarabel.jl:
     model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-
-    # Set up optimization settings: no verbosity and a 5-second time limit:
-    settings = Clarabel.Settings(verbose = false, time_limit = 5)
+    # Set verbose attribute to false (disable verbose output):
+    set_attribute(model_local, "verbose", false)
+    # Set absolute tolerance for gap convergence to 1e-32:
+    set_attribute(model_local, "tol_gap_abs", 1e-32)
+    # Set relative tolerance for gap convergence to 1e-32:
+    set_attribute(model_local, "tol_gap_rel", 1e-32)
 
     # Define the decision variables λ (for reactions), ν (for metabolites), and t (a scalar variable):
     @variable(model_local, λ[1:n])

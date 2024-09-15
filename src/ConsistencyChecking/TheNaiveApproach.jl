@@ -16,7 +16,7 @@ include("../Pre_Processing/Solve.jl")
 
 using .Solve
 
-import CDDLib, SBMLFBCModels
+import CDDLib
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -111,9 +111,14 @@ function find_blocked_reactions(model, solvername::String="GLPK", Tolerance::Flo
     # Create a new optimization model using the GLPK optimizer:
 
     if OctuplePrecision
+        # Define a model_irr using GenericModel from Clarabel.jl:
         model_irr = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model_irr, "verbose", false)
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model_irr, "tol_gap_abs", 1e-32)
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model_irr, "tol_gap_rel", 1e-32)
     else
         model_irr, solver = changeSparseQFCASolver(solvername)
     end

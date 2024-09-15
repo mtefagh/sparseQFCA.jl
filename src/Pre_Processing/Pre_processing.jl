@@ -10,7 +10,7 @@ module Pre_processing
 
 export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
-using CPLEX, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
+using JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
 
 include("Solve.jl")
 
@@ -587,12 +587,36 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance(
 
 function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, solvername::String="GLPK", OctuplePrecision::Bool=false, printLevel::Int=1)
 
-    ## Extract relevant information from the input model object
+    ## Extract relevant information from the ModelObject_Correction
 
+    # Extracting the stoichiometric matrix (S) from the ModelObject_Correction:
     S = ModelObject_Correction.S
+
+    # Extracting the array of metabolite IDs from the ModelObject_Correction:
+    Metabolites = ModelObject_Correction.Metabolites
+
+    # Extracting the array of reaction IDs from the ModelObject_Correction:
+    Reactions = ModelObject_Correction.Reactions
+
+    # Extracting the array of gene IDs from the ModelObject_Correction:
+    Genes = ModelObject_Correction.Genes
+
+    # Extracting the number of metabolites (m) from the ModelObject_Correction:
+    m = ModelObject_Correction.m
+
+    # Extracting the number of reactions (n) from the ModelObject_Correction:
+    n = ModelObject_Correction.n
+
+    # Extracting the lower bounds for reactions from the ModelObject_Correction:
     lb = ModelObject_Correction.lb
+
+    # Extracting the upper bounds for reactions from the ModelObject_Correction:
     ub = ModelObject_Correction.ub
+
+    # Extracting the IDs of irreversible reactions from the ModelObject_QFCA:
     irreversible_reactions_id = ModelObject_Correction.irreversible_reactions_id
+
+    # Extracting the IDs of reversible reactions from the ModelObject_QFCA:
     reversible_reactions_id = ModelObject_Correction.reversible_reactions_id
 
     # Define the number of variables in the model:
@@ -611,8 +635,14 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
 
     # Create a local model object for each worker process:
     if OctuplePrecision
+        # Define a local model using GenericModel from Clarabel.jl:
         local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(local_model, "verbose", false)
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(local_model, "tol_gap_abs", 1e-32)
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(local_model, "tol_gap_rel", 1e-32)
     else
         local_model, solver = changeSparseQFCASolver(solvername)
     end

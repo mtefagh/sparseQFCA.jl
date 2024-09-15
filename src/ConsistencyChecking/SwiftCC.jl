@@ -10,7 +10,7 @@ module SwiftCC
 
 export Model_CC, model_CC_Constructor, swiftCC
 
-using CPLEX, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
+using JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
 
 import CDDLib
 
@@ -88,8 +88,8 @@ end
 """
     swiftCC(ModelObject_CC)
 
-The function first exports data from ModelObject_CC and performs some calculations to determine the reversibility of reactions
-and the number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
+The function first exports data from ModelObject_CC and performs some calculations to determine the reversibility of reactions and the
+number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
 and uses Gaussian elimination to identify blocked reversible reactions.
 
 # INPUTS
@@ -121,14 +121,30 @@ See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
-    ## Extract relevant information from the input model object
+    ## Extract relevant information from the ModelObject_CC
 
+    # Extracting the stoichiometric matrix (S) from the ModelObject_CC:
     S = ModelObject_CC.S
+
+    # Extracting the array of metabolite IDs from the ModelObject_CC:
     Metabolites = ModelObject_CC.Metabolites
+
+    # Extracting the array of reaction IDs from the ModelObject_CC:
     Reactions = ModelObject_CC.Reactions
+
+    # Extracting the array of gene IDs from the ModelObject_CC:
+    Genes = ModelObject_CC.Genes
+
+    # Extracting the number of metabolites (m) from the ModelObject_CC:
     m = ModelObject_CC.m
+
+    # Extracting the number of reactions (n) from the ModelObject_CC:
     n = ModelObject_CC.n
+
+    # Extracting the lower bounds for reactions from the ModelObject_CC:
     lb = ModelObject_CC.lb
+
+    # Extracting the upper bounds for reactions from the ModelObject_CC:
     ub = ModelObject_CC.ub
 
     ## Identify which reactions are irreversible and which are reversible
@@ -148,9 +164,14 @@ function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance:
 
     # Create a new optimization model using the GLPK optimizer:
     if OctuplePrecision
+        # Define a model using GenericModel from Clarabel.jl:
         model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model, "verbose", false)
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model, "tol_gap_abs", 1e-32)
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model, "tol_gap_rel", 1e-32)
     else
         model, solver = changeSparseQFCASolver(solvername)
     end
