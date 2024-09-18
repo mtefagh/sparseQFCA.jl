@@ -2,7 +2,7 @@
 
 | **Tests** | **Coverage** |
 |:---:|:---:|
-| [![Build Status](https://app.travis-ci.com/mtefagh/sparseQFCA.jl.svg&branch=master) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl) 
+| [![Build Status](https://app.travis-ci.com/mtefagh/sparseQFCA.jl.svg&branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl.svg&branch=master) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl) 
 
 ## sparseQFCA architecture
 *sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package providing a sparse Quantitative flux coupling analysis(QFCA). It uses parallel processing and is designed for finding flux coupling table and metabolic network reductions, specifically for QuantomeRedNet. Moreover, a Julia implementation of Swift Consistency Checking is also available as a preprocessing subroutine.
