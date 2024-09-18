@@ -202,12 +202,6 @@ printstyled("#------------------------------------------------------------------
 
 ## QuantomeRedNet
 
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-printstyled("e_coli_core :\n"; color=:yellow)
-model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core, "HiGHS", true)
-
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
-
 ## ToyModel
 
 ToyModel = Model()
