@@ -19,6 +19,9 @@ import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 
+include("../Pre_Processing/Solve.jl")
+using .Solve
+
 include("../Pre_Processing/Pre_processing.jl")
 using .Pre_processing
 
@@ -43,7 +46,8 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 
 # OPTIONAL INPUTS
 
-- `solvername`:                Name of the solver(default: GLPK).
+- `SolverName`:                Name of the solver(default: HiGHS).
+- `OctuplePrecision`:          A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `removing`:                  A flag controlling whether reactions should be filtered out during the coupling determination phase of network analysis.
 - `Tolerance`:                 A small number that represents the level of error tolerance.
 - `printLevel`:                Verbose level (default: 1). Mute all output with `printLevel = 0`.
@@ -63,7 +67,7 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
@@ -90,7 +94,7 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-    blocked_index, ν  = swiftCC(ModelObject_CC, solvername, Tolerance, OctuplePrecision, printLevel)
+    blocked_index, ν  = swiftCC(ModelObject_CC, SolverName, false, Tolerance, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
 
     # Convert to Vector{Int64}:
@@ -110,7 +114,7 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
-    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev)
+    S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, SolverName, false)
 
     # Get the dimensions of the updated stoichiometric matrix:
     row, col = size(S)
@@ -134,7 +138,7 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
 
     # Convert to Vector{Int64}:
     blocked_index = convert(Vector{Int64}, blocked_index)
-    fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index)
+    fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index, SolverName, false)
 
     # Get the dimensions of fctable:
     row, col = size(fctable)
@@ -243,23 +247,41 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
         end
     end
 
-    # Populate FC_representatives and FC_cluster_members arrays:
+    ## Iterate over sorted keys of FC_Final dictionary
+
     for key in sort(collect(keys(FC_Final)))
+        # Append cluster members to FC_cluster_members array:
         append!(FC_cluster_members, FC_Final[key][2])
+
+        # Append representative reaction to FC_representatives array:
         append!(FC_representatives, FC_Final[key][1])
+
+        # Check if index_c is among the cluster members:
         if index_c in FC_Final[key][2]
+            # If true, update index_c to the representative reaction:
             index_c = FC_Final[key][1]
+
+            # Update Biomass variable with the reaction corresponding to index_c:
             Biomass = Reactions[index_c]
         end
     end
 
-    # Create FC_Clusters dictionary:
+    ## Create a new dictionary FC_Clusters
+
     FC_Clusters = Dict()
+
+    # Initialize counter variable:
     c = 1
+
+    # Iterate over sorted keys of FC_Final dictionary:
     for key in sort(collect(keys(FC_Final)))
+        # Assign each cluster from FC_Final to FC_Clusters with a numeric key:
         FC_Clusters[c] = FC_Final[key]
+
+        # Increment counter for each cluster:
         c += 1
     end
+
 
     ## DC
 
@@ -284,6 +306,8 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     blocked_index = sort(blocked_index)
     FC_cluster_members = sort(FC_cluster_members)
     remove_list_DC = sort(remove_list_DC)
+
+    # Sort the 'Reaction_Ids_noBlocked', 'irreversible_reactions_id', and 'reversible_reactions_id' arrays:
     Reaction_Ids_noBlocked = sort(Reaction_Ids_noBlocked)
     irreversible_reactions_id = sort(irreversible_reactions_id)
     reversible_reactions_id = sort(reversible_reactions_id)
@@ -340,14 +364,23 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     DCE = Dict()
     counter = 1
 
-    # Define a local model using GenericModel from Clarabel.jl:
-    model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-    # Set verbose attribute to false (disable verbose output):
-    set_attribute(model_local, "verbose", false)
-    # Set absolute tolerance for gap convergence to 1e-32:
-    set_attribute(model_local, "tol_gap_abs", 1e-32)
-    # Set relative tolerance for gap convergence to 1e-32:
-    set_attribute(model_local, "tol_gap_rel", 1e-32)
+    # Check if we're using octuple precision (very high precision floating-point numbers):
+    if OctuplePrecision
+        # Define a model_irr using GenericModel from Clarabel.jl:
+        model_local = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model_local, "verbose", false)
+
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model_local, "tol_gap_abs", 1e-32)
+
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model_local, "tol_gap_rel", 1e-32)
+    else
+        # If not using octuple precision, change the solver based on the solvername:
+        model_local, solver = changeSparseQFCASolver(SolverName)
+    end
 
     # Define the decision variables λ (for reactions), ν (for metabolites), and t (a scalar variable):
     @variable(model_local, λ[1:n])
@@ -366,7 +399,8 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
     # Constraint 3: Ensure that λ is 0 for reversible reactions (the reaction flux is zero for reversible reactions):
     con3 = @constraint(model_local, [j in reversible_reactions_id], λ[j] == 0.0)
 
-    # Perform distributed optimization for each reaction in the remove_list_DC list:
+    ## Perform distributed optimization for each reaction in the remove_list_DC list
+
     @sync @distributed for i in remove_list_DC
 
         # Save i as the row number to process the current reaction:
@@ -375,7 +409,7 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
         # Compute the linear combination for DCE by excluding the current reaction (i):
         DCE_LinearCombination = setdiff(1:n, i)
 
-        ## Define additional constraints for the optimization problem:
+        ## Define additional constraints for the optimization problem
 
         # Constraint 4: Set λ to zero for specific reactions in the Eliminations ∩ DCE_LinearCombination set:
         con4 = @constraint(model_local, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
@@ -409,23 +443,26 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
             end
         end
 
-        ## Condition 4: Remove all constraints in con4 from the model once used:
+        ## Condition 4: Remove all constraints in con4 from the model once used
+
         constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
         for i in constraint_refs_con4
-            delete(model_local, i)  # Remove the constraint from the model:
-            unregister(model_local, :i)  # Unregister the constraint for clean-up:
+            delete(model_local, i)  # Remove the constraint from the model
+            unregister(model_local, :i)  # Unregister the constraint for clean-up
         end
 
-        ## Condition 5: Remove all constraints in con5 from the model once used:
+        ## Condition 5: Remove all constraints in con5 from the model once used
+
         constraint_refs_con5 = [con5[i] for i in eachindex(con5)]
         for i in constraint_refs_con5
-            delete(model_local, i)  # Remove the constraint from the model:
-            unregister(model_local, :i)  # Unregister the constraint for clean-up:
+            delete(model_local, i)  # Remove the constraint from the model
+            unregister(model_local, :i)  # Unregister the constraint for clean-up
         end
 
-        ## Condition 6: Remove the current λ constraint (con6) from the model:
-        delete(model_local, con6)  # Remove the specific λ[i] == -1 constraint:
-        unregister(model_local, :con6)  # Unregister this constraint for clean-up:
+        ## Condition 6: Remove the current λ constraint (con6) from the model
+
+        delete(model_local, con6)  # Remove the specific λ[i] == -1 constraint
+        unregister(model_local, :con6)  # Unregister this constraint for clean-up
 
     end
 
@@ -618,6 +655,11 @@ function quantomeReducer(model, solvername::String="GLPK", removing::Bool=false,
 
     if printLevel > 0
         printstyled("Metabolic Network Reductions:\n"; color=:cyan)
+        if OctuplePrecision
+            printstyled("The name of the solver = Clarabel \n"; color=:green)
+        else
+            printstyled("The name of the solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Original Network:")
         println("S           : $(row_S) x $(col_S)")

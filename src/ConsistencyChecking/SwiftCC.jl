@@ -88,9 +88,13 @@ end
 """
     swiftCC(ModelObject_CC)
 
-The function first exports data from ModelObject_CC and performs some calculations to determine the reversibility of reactions and the
-number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
-and uses Gaussian elimination to identify blocked reversible reactions.
+The function, named swiftCC, performs consistency checking on a metabolic network model using the Swift Consistency Checking algorithm.
+It takes several inputs, including a model object (ModelObject_CC), solver name, octuple precision flag, tolerance, and print level. The
+function extracts relevant information from the input model, identifies irreversible and reversible reactions, and then solves optimization
+problems to find blocked reactions. It uses either high-precision calculations with Clarabel.jl or a sparse QFCA solver depending on the input
+parameters. The function returns a list of blocked reaction IDs and the dual variables for the stoichiometric constraint. It also provides
+optional printing of results, including the number of blocked reactions and solver details. Overall, this function implements a sophisticated
+algorithm for analyzing metabolic networks and identifying inconsistencies or blocked reactions in the system.
 
 # INPUTS
 
@@ -98,9 +102,9 @@ and uses Gaussian elimination to identify blocked reversible reactions.
 
 # OPTIONAL INPUTS
 
-- `solvername`:            Name of the solver(default: GLPK).
-- `Tolerance`:             A small number that represents the level of error tolerance.
+- `SolverName`:            Name of the solver(default: HiGHS).
 - `OctuplePrecision`:      A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
+- `Tolerance`:             A small number that represents the level of error tolerance.
 - `printLevel`:            Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -119,7 +123,7 @@ See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 """
 
-function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePrecision::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extract relevant information from the ModelObject_CC
 
@@ -162,18 +166,22 @@ function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance:
     lb_u = zeros(n_irr)
     ub_u = ones(n_irr)
 
-    # Create a new optimization model using the GLPK optimizer:
+    # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
-        # Define a model using GenericModel from Clarabel.jl:
+        # Define a model_irr using GenericModel from Clarabel.jl:
         model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+
         # Set verbose attribute to false (disable verbose output):
         set_attribute(model, "verbose", false)
+
         # Set absolute tolerance for gap convergence to 1e-32:
         set_attribute(model, "tol_gap_abs", 1e-32)
+
         # Set relative tolerance for gap convergence to 1e-32:
         set_attribute(model, "tol_gap_rel", 1e-32)
     else
-        model, solver = changeSparseQFCASolver(solvername)
+        # If not using octuple precision, change the solver based on the solvername:
+        model, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define variables V and u with their lower and upper bounds:
@@ -284,6 +292,11 @@ function swiftCC(ModelObject_CC::Model_CC, solvername::String="GLPK", Tolerance:
         printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("The name of the solver = Clarabel \n"; color=:green)
+        else
+            printstyled("The name of the solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
         println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")

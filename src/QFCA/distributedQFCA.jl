@@ -107,6 +107,8 @@ the calculations across multiple processors. The output is a matrix that shows t
 
 # OPTIONAL INPUTS
 
+- `SolverName`:                Name of the solver(default: HiGHS).
+- `OctuplePrecision`:          A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `removing`:                  A boolean variable that indicates whether reactions should be removed from the network in the stages of determining coupling or not.
 - `Tolerance`:                 A small number that represents the level of error tolerance.
 - `printLevel`:                Verbose level (default: 1). Mute all output with `printLevel = 0`.
@@ -134,7 +136,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, `Model_QFCA`, 
 
 """
 
-function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int64}, solvername::String="GLPK", removing::Bool=false, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int64}, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extract relevant information from the ModelObject_QFCA
 
@@ -252,7 +254,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Calculate the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, ν = swiftCC(ModelObject_CC, solvername, Tolerance, OctuplePrecision, 0)
+            blocked, ν, status = swiftCC(ModelObject_CC, SolverName, false, Tolerance, 0)
 
             # Update indices of blocked reactions after removing ith reaction:
             for j = 1:length(blocked)
@@ -283,7 +285,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
             # Find the set of blocked reactions and dual variables for the modified network:
             model_CC_Constructor(ModelObject_CC ,S_noBlocked, Metabolites, Reactions_noBlocked, Genes, row_noBlocked, col_noBlocked, lb_noBlocked, ub_noBlocked)
-            blocked, ν = swiftCC(ModelObject_CC, solvername, Tolerance, OctuplePrecision, 0)
+            blocked, ν = swiftCC(ModelObject_CC, SolverName, false, Tolerance, 0)
 
             # Update DC_Matrix based on the blocked reactions:
             DC_Matrix[i,blocked] .= 1.0
@@ -509,6 +511,11 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
         printstyled("Distributed Quantitative Flux Coupling Analysis(distributedQFCA):\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("The name of the solver = Clarabel \n"; color=:green)
+        else
+            printstyled("The name of the solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Final fctable : ")
         println("Number of 0's (unCoupled) : $d_0")

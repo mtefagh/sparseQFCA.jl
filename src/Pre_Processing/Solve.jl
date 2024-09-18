@@ -10,7 +10,7 @@ module Solve
 
 export SolverConfig, changeSparseQFCASolver
 
-using JuMP, MosekTools, CPLEX, HiGHS, Gurobi, Clp, Cbc, GLPK, ECOS, SCS
+using JuMP, MosekTools, CPLEX, HiGHS, Clp, Cbc, GLPK, ECOS, SCS
 
 """
     SolverConfig(name, handle)
@@ -50,8 +50,8 @@ Function used to change the solver and include the respective solver interfaces
 # EXAMPLES
 
 ```julia
-julia> solverName = :GLPK
-julia> model, solver = changeCobraSolver(solverName)
+julia> SolverName = :GLPK
+julia> model, solver = changeCobraSolver(SolverName)
 ```
 
 """
@@ -76,8 +76,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the CPLEX solver:
             set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
-            # Set verbose attribute to false (disable verbose output)
-            set_attribute(model, "verbose", false)
+            # Set verbose attribute to false (disable verbose output):
+            set_optimizer_attribute(model, "CPX_PARAM_SCRIND", 0)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -95,32 +95,13 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the HiGHS solver:
             set_attribute(model, "presolve", "on")
             set_attribute(model, "time_limit", 60.0)
-            # Set verbose attribute to false (disable verbose output)
-            set_attribute(model, "verbose", false)
+            # Set verbose attribute to false (disable verbose output):
+            set_optimizer_attribute(model, "output_flag", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
             # Handle the error if HiGHS cannot be set:
             error("The solver `HiGHS` cannot be set using `changeSparseQFCASolver()`.")
-        end
-
-    # If the solver is "Gurobi":
-    elseif name == "Gurobi"
-        try
-            # Set the solver handle to Gurobi.Optimizer:
-            solver.handle = Gurobi.Optimizer
-            # Create a model using the Gurobi solver:
-            model = Model(solver.handle)
-            # Set specific attributes for the Gurobi solver:
-            set_attribute(model, "TimeLimit", 100)
-            set_attribute(model, "Presolve", 0)
-            # Set verbose attribute to false (disable verbose output):
-            set_attribute(model, "verbose", false)
-            # Return the created model and solver configuration:
-            return model, solver
-        catch
-            # Handle the error if Gurobi cannot be set:
-            error("The solver `Gurobi` cannot be set using `changeSparseQFCASolver()`.")
         end
 
     # If the solver is "Clp":
@@ -133,8 +114,6 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set specific attributes for the Clp solver:
             set_attribute(model, "LogLevel", 1)
             set_attribute(model, "Algorithm", 4)
-            # Set verbose attribute to false (disable verbose output)
-            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch
@@ -151,8 +130,6 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             model = Model(solver.handle)
             # Set specific attributes for the Cbc solver:
             set_attribute(model, "logLevel", 1)
-            # Set verbose attribute to false (disable verbose output)
-            set_attribute(model, "verbose", false)
             # Return the created model and solver configuration:
             return model, solver
         catch

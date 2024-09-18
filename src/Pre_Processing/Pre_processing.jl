@@ -123,9 +123,9 @@ end
     getM()
 
 The function reads the first line of a configuration file named "ConfigFile.txt" located in a subdirectory called "config".
-The value on that line is parsed as a floating-point number and returned as the output of the function,
-which is typically used to set the upper bound of a variable representing an infinite boundary in a metabolic network model.
-If the file cannot be opened or the value on the first line is not a valid floating-point number, the function returns nothing.
+The value on that line is parsed as a floating-point number and returned as the output of the function, which is typically
+used to set the upper bound of a variable representing an infinite boundary in a metabolic network model. If the file cannot
+be opened or the value on the first line is not a valid floating-point number, the function returns nothing.
 
 # INPUTS
 
@@ -182,9 +182,9 @@ end
 """
     getTolerance()
 
-The function reads a value from a configuration file and returns it as a floating-point number to set
-the error tolerance level for subsequent computations. If an error occurs while opening or reading the file,
-the function prints an error message and returns nothing.
+The function reads a value from a configuration file and returns it as a floating-point number to set the
+error tolerance level for subsequent computations. If an error occurs while opening or reading the file,the
+function prints an error message and returns nothing.
 
 # INPUTS
 
@@ -207,7 +207,7 @@ julia> Tolerance = getTolerance()
 
 """
 
-function getTolerance(printLevel::Int=1)
+function getTolerance(printLevel::Int=0)
 
     ## Attempt to open the file "ConfigFile.txt" for reading
 
@@ -420,8 +420,9 @@ end
 """
     remove_zeroRows(S, Metabolites)
 
-The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites, with all rows that contain only zeros removed.
-This results in a more compact representation of the metabolic network, with only the relevant reactions and metabolites included.
+The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites,
+with all rows that contain only zeros removed. This results in a more compact representation of the metabolic
+network, with only the relevant reactions and metabolites included.
 
 # INPUTS
 
@@ -562,7 +563,7 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # OPTIONAL INPUTS
 
-- `solvername`:                             Name of the solver(default: GLPK).
+- `SolverName`:                             Name of the solver(default: HiGHS).
 - `OctuplePrecision`:                       A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:                             Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
@@ -585,7 +586,7 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance(
 
 """
 
-function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, solvername::String="GLPK", OctuplePrecision::Bool=false, printLevel::Int=1)
+function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, SolverName::String="HiGHS", OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Extract relevant information from the ModelObject_Correction
 
@@ -644,7 +645,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         # Set relative tolerance for gap convergence to 1e-32:
         set_attribute(local_model, "tol_gap_rel", 1e-32)
     else
-        local_model, solver = changeSparseQFCASolver(solvername)
+        local_model, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define variables V:
@@ -768,6 +769,12 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         printstyled("Distributed Reversibility Correction:\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("The name of the solver = Clarabel \n"; color=:green)
+        else
+            printstyled("The name of the solver = $SolverName\n"; color=:green)
+        end
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
         println("Number of reversibe blocked in backward direction : $(length(rev_blocked_back))")
         println("Number of irreversible reactions after Correction : $(length(irreversible_reactions_id))")

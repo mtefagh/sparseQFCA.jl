@@ -3,7 +3,7 @@
 using Distributed
 
 # Add worker processes to the Julia distributed computing environment:
-#addprocs(7)
+addprocs(7)
 println("Number of Proccess : $(nprocs())")
 println("Number of Workers  : $(nworkers())")
 
@@ -14,7 +14,8 @@ include("TestData.jl")
 @everywhere include("../src/sparseQFCA.jl")
 
 # Import required Julia modules:
-using COBREXA, JuMP, Test, Distributed, CPLEX
+using COBREXA, JuMP, Test, Distributed
+using JuMP, HiGHS, Clarabel
 
 using .TestData, .sparseQFCA
 import AbstractFBCModels as A
@@ -77,6 +78,7 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("CC_SwiftCC :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
+
 # Get the necessary data from myModel_e_coli_core:
 
 S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core, c_vector = sparseQFCA.dataOfModel(myModel_e_coli_core)
@@ -202,125 +204,7 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
-model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
-
-S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core, c_vector = sparseQFCA.dataOfModel(model)
-
-# Define the model
-FBA_model = JuMP.Model(CPLEX.Optimizer)
-# Add decision variables
-n = length(Reactions_e_coli_core)
-@variable(FBA_model, lb_e_coli_core[i] <= x[i = 1:n_e_coli_core] <= ub_e_coli_core[i])
-# Set the objective function
-@objective(FBA_model, Min, (c_vector)'* x)
-@constraint(FBA_model, (S_e_coli_core) * x .== 0)
-# Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
-for i in 1:length(x)
-    append!(V, value(x[i]))
-end
-
-println("V:")
-println(V)
-
-index_c = findfirst(x -> x == 1.0, c_vector)
-
-println("Biomass: ")
-println(V[index_c])
-
-println("Reduced FBA e_coli_core:")
-println(typeof(model))
-solution = flux_balance_analysis(model, optimizer = CPLEX.Optimizer)
-println(solution.objective)
-println(collect(solution.fluxes))
-
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-## QuantomeRedNet
-
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-printstyled("iAB_RBC_283 :\n"; color=:yellow)
-
-model = @time sparseQFCA.quantomeReducer(myModel_iAB_RBC_283)
-
-model_reduced = Model()
-println("typeof(model_reduced) = $(typeof(model_reduced))")
-
-# Genes:
-for i in model.genes
-    model_reduced.genes["$(i.first)"] = Gene(name = "$(i.second.name)", annotations = i.second.annotations, notes = i.second.notes)
-end
-
-
-# Metabolites:
-for i in model.metabolites
-    model_reduced.metabolites["$(i.first)"] = Metabolite(name = "$(i.second.name)",compartment = "$(i.second.compartment)",formula = i.second.formula,
-                            charge = i.second.charge, balance = i.second.balance, annotations = i.second.annotations, notes = i.second.notes)
-end
-
-# Reactions:
-for i in model.reactions
-    model_reduced.reactions["$(i.first)"] = Reaction(
-        name = "$(i.second.name)",
-        lower_bound = i.second.lower_bound,
-        upper_bound = i.second.upper_bound,
-        stoichiometry = i.second.stoichiometry,
-        objective_coefficient = i.second.objective_coefficient,
-        gene_association_dnf = i.second.gene_association_dnf,
-        annotations = i.second.annotations,
-        notes = i.second.notes,
-        )
-end
-
-# Couplings:
-for i in model.couplings
-    model_reduced.couplings["$(i.first)"] = Reaction(
-        name = "$(i.second.name)",
-        reaction_weights = i.second.reaction_weights,
-        lower_bound = i.second.lower_bound,
-        upper_bound = i.second.upper_bound,
-        annotations = i.second.annotations,
-        notes = i.second.notes,
-        )
-end
-
-println("Reduced FBA:")
-println(typeof(model))
-solution = flux_balance_analysis(model, optimizer = CPLEX.Optimizer)
-println(solution.objective)
-println(collect(solution.fluxes))
-
-println("typeof(model_reduced) = $(typeof(model_reduced))")
-
-println("Reduced FBA iMan:")
-
-S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = sparseQFCA.dataOfModel(model)
-
-# Define the model
-FBA_model = JuMP.Model(CPLEX.Optimizer)
-# Add decision variables
-n = length(Reactions)
-@variable(FBA_model, lb[i] <= x[i = 1:n] <= ub[i])
-# Set the objective function
-@objective(FBA_model, Min, (c_vector)'* x)
-@constraint(FBA_model, (S) * x .== 0)
-# Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
-for i in 1:length(x)
-    append!(V, value(x[i]))
-end
-
-index_c = findfirst(x -> x == 1.0, c_vector)
-
-println("Biomass = $(Reactions[index_c]) = $(V[index_c])")
-
-ModelObject_iAB_RBC_283 = sparseQFCA.Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
-# Find blocked reactions in the e_coli_core model using the swiftCC method and time the operation:
-blockedList_swiftCC_iAB_RBC_283, dualVar_e_coli_core = @time sparseQFCA.swiftCC(ModelObject_iAB_RBC_283)
-
-println(blockedList_swiftCC_iAB_RBC_283)
+model = @time sparseQFCA.quantomeReducer(myModel_e_coli_core, "HiGHS", true)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
@@ -439,21 +323,28 @@ ToyModel.reactions["EX_2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
-println("Original FBA:")
-solution = flux_balance_analysis(ToyModel, optimizer = CPLEX.Optimizer)
-println(solution.objective)
-println(collect(solution.fluxes))
-
-## QuantomeRedNet
-
-printstyled("QuantomeRedNet :\n"; color=:yellow)
 printstyled("ToyModel :\n"; color=:yellow)
-ToyModel_reduced = @time sparseQFCA.quantomeReducer(ToyModel)
 
-println("Reduced FBA:")
-println(typeof(ToyModel_reduced))
-solution = flux_balance_analysis(ToyModel_reduced, optimizer = CPLEX.Optimizer)
-println(solution.objective)
-println(collect(solution.fluxes))
+ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
 
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector = sparseQFCA.dataOfModel(ToyModel_reduced)
+
+# Define the model
+FBA_model = JuMP.Model(HiGHS.Optimizer)
+# Add decision variables
+n = length(Reactions_ToyModel)
+@variable(FBA_model, lb_ToyModel[i] <= x[i = 1:n_ToyModel] <= ub_ToyModel[i])
+# Set the objective function
+@objective(FBA_model, Max, (c_vector)'* x)
+@constraint(FBA_model, (S_ToyModel) * x .== 0)
+# Solve the model
+optimize!(FBA_model)
+V = Array{Float64}([])
+for i in 1:length(x)
+    append!(V, value(x[i]))
+end
+
+index_c = findfirst(x -> x == 1.0, c_vector)
+println("Biomass = $(Reactions_ToyModel[index_c]) , Flux = $(V[index_c])")
+
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
