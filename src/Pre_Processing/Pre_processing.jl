@@ -111,13 +111,13 @@ function dataOfModel(model, printLevel::Int=1)
         printstyled("Metabolic Network:\n"; color=:cyan)
 
         # Print the number of metabolites, reactions, and genes in the model
-        println("Number of Metabolites : $m")
-        println("Number of Reactions   : $n")
-        println("Biomass(index=$index) : $Biomass")
-        println("Number of Genes       : $n_genes")
+        println("Number of Metabolites      : $m")
+        println("Number of Reactions        : $n")
+        println("Biomass(index=$index_c)           : $Biomass")
+        println("Number of Genes            : $n_genes")
 
         # Print the dimensions of the stoichiometric matrix (rows = metabolites, columns = reactions)
-        println("Stoichiometric matrix : $m x $n")
+        println("Stoichiometric matrix      : $m x $n")
     end
 
     # Return the extracted data as a tuple
@@ -289,7 +289,7 @@ function reversibility(lb::Array{Float64,1}, Reaction_Ids::Vector{Int64}, printL
 
     ## Loop through each reaction in the "lb" array
 
-    for i in 1:n
+    for i = 1:n
         # If the lower bound of the reaction is greater than or equal to zero, add the reaction ID to the irreversible reactions array:
         if lb[i] >= 0
             append!(irreversible_reactions_id, Reaction_Ids[i])
@@ -460,7 +460,7 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
 
     zero_row = [] # create an empty array to store indices of zero rows
     c = 1 # initialize a counter variable to keep track of row indices
-    for row in eachrow(S) # iterate over each row of the matrix S
+    for row ∈ eachrow(S) # iterate over each row of the matrix S
         if row == zeros(length(row)) # check if the current row is all zeros
             append!(zero_row, c) # if so, append the current row index to zero_row array
         end
@@ -662,52 +662,53 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     @constraint(local_model, S * V .== 0)
 
     # Iterate over all reversible reactions in the model:
-    @sync @distributed for i in reversible_reactions_id
+    @sync @distributed for i ∈ reversible_reactions_id
 
-        # Set the objective function to maximize the flux through reaction i in the forward direction:
-        @objective(local_model, Max, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
-        @constraint(local_model, c_irr, V[i] <= 1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_fwd = objective_value(local_model)
-
-        # Remove the current constraint from the model:
-        delete(local_model, c_irr)
-
-        # Unregister the current constraint from the model:
-        unregister(local_model, :c_irr)
-
-        # Set the objective function to minimize the flux through reaction i in the backward direction:
-        @objective(local_model, Min, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
-        @constraint(local_model, c_rev, V[i] >= -1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_back = objective_value(local_model)
-
-        # Remove the current constraint from the model:
-        delete(local_model, c_rev)
-
-        # Unregister the current constraint from the model:
-        unregister(local_model, :c_rev)
-
-        # The reaction is considered to be blocked:
-        if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
+        if i ∈ blocked_index_rev
+            # The reaction is considered to be blocked:
             Correction[i,i] = +2.0
-            continue
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
-        elseif isapprox(opt_fwd, 0, atol=Tolerance)
-            Correction[i,i] = +1.0
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
-        elseif isapprox(opt_back, 0, atol=Tolerance)
-            Correction[i,i] = -1.0
         else
-            continue
+            # Set the objective function to maximize the flux through reaction i in the forward direction:
+            @objective(local_model, Max, V[i])
+
+            # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
+            @constraint(local_model, c_irr, V[i] <= 1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_fwd = objective_value(local_model)
+
+            # Remove the current constraint from the model:
+            delete(local_model, c_irr)
+
+            # Unregister the current constraint from the model:
+            unregister(local_model, :c_irr)
+
+            # Set the objective function to minimize the flux through reaction i in the backward direction:
+            @objective(local_model, Min, V[i])
+
+            # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
+            @constraint(local_model, c_rev, V[i] >= -1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_back = objective_value(local_model)
+
+            # Remove the current constraint from the model:
+            delete(local_model, c_rev)
+
+            # Unregister the current constraint from the model:
+            unregister(local_model, :c_rev)
+
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
+            if isapprox(opt_fwd, 0, atol=Tolerance)
+                Correction[i,i] = +1.0
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
+            elseif isapprox(opt_back, 0, atol=Tolerance)
+                Correction[i,i] = -1.0
+            else
+                continue
+            end
         end
     end
 
@@ -728,12 +729,15 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         end
     end
 
+    println("Correction:")
+    display(Correction)
+
     # Initialize an empty array to store the IDs of corrected reversible reactions:
     corrected_reversible_reactions_id = Array{Int64}([])
 
     ## Forward
 
-    for i in rev_blocked_fwd
+    for i ∈ rev_blocked_fwd
         # Modify lower and upper bounds:
         ub[i] = lb[i] * -1
         lb[i] = 0.0
@@ -745,7 +749,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
 
     ## Backward
 
-    for i in rev_blocked_back
+    for i ∈ rev_blocked_back
         # Modify lower bounds:
         lb[i] = 0.0
         # Add to irreversible reactions list:
@@ -766,7 +770,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     ## Add remaining reversible reactions to the corrected reversible reactions list
 
     # Convert the remaining reversible reactions set back to a list:
-    for i in set_reversible_reactions_id
+    for i ∈ set_reversible_reactions_id
         append!(corrected_reversible_reactions_id, i)
     end
 

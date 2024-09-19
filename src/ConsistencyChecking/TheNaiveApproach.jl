@@ -40,7 +40,7 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 
 # OPTIONAL INPUTS
 
-- `solvername`:         Name of the solver(default: HiGHS).
+- `SolverName`:         Name of the solver(default: HiGHS).
 - `Tolerance`:          A small number that represents the level of error tolerance.
 - `OctuplePrecision`:   A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
@@ -60,7 +60,7 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(model, solvername::String="HiGHS", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function find_blocked_reactions(model, SolverName::String="HiGHS", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Export data from model
 
@@ -122,8 +122,8 @@ function find_blocked_reactions(model, solvername::String="HiGHS", Tolerance::Fl
         # Set relative tolerance for gap convergence to 1e-32:
         set_attribute(model_irr, "tol_gap_rel", 1e-32)
     else
-        # If not using octuple precision, change the solver based on the solvername:
-        model_irr, solver = changeSparseQFCASolver(solvername)
+        # If not using octuple precision, change the solver based on the SolverName:
+        model_irr, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
@@ -179,8 +179,8 @@ function find_blocked_reactions(model, solvername::String="HiGHS", Tolerance::Fl
         # Set relative tolerance for gap convergence to 1e-32:
         set_attribute(model_rev, "tol_gap_rel", 1e-32)
     else
-        # If not using octuple precision, change the solver based on the solvername:
-        model_rev, solver = changeSparseQFCASolver(solvername)
+        # If not using octuple precision, change the solver based on the SolverName:
+        model_rev, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
@@ -232,6 +232,11 @@ function find_blocked_reactions(model, solvername::String="HiGHS", Tolerance::Fl
         printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("Solver = Clarabel \n"; color=:green)
+        else
+            printstyled("Solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
         println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")

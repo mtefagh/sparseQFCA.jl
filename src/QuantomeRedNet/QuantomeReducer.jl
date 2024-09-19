@@ -117,7 +117,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, SolverName, false)
 
     # Get the dimensions of the updated stoichiometric matrix:
-    row, col = size(S)
+    row_S, col_S = size(S)
 
     ## Count the number of reactions in each set
 
@@ -130,11 +130,11 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     end
 
     # Reconstruct the corrected model with updated parameters:
-    model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
 
-    ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row, col, lb, ub, irreversible_reactions_id, reversible_reactions_id)
+    ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
 
     # Convert to Vector{Int64}:
     blocked_index = convert(Vector{Int64}, blocked_index)
