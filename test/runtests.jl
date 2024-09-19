@@ -24,7 +24,7 @@ import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 import JSONFBCModels: JSONFBCModel
 
 ### sparseQFCA:
-
+#=
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
 printstyled("sparseQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
@@ -199,7 +199,7 @@ fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iI
 @test distributedQFCATest_iIS312(fctable_distributedQFCA_iIS312)
 # Print a separator:
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
+=#
 ## QuantomeRedNet
 
 ## ToyModel

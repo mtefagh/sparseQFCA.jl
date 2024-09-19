@@ -83,7 +83,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     ## Ensure that the bounds of all reactions are homogenous
 
-    lb, ub = homogenization(lb, ub, 0)
+    lb, ub = homogenization(lb, ub)
 
     ## Separate reactions into reversible and irreversible sets
 
@@ -656,9 +656,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     if printLevel > 0
         printstyled("Metabolic Network Reductions:\n"; color=:cyan)
         if OctuplePrecision
-            printstyled("The name of the solver = Clarabel \n"; color=:green)
+            printstyled("Solver = Clarabel \n"; color=:green)
         else
-            printstyled("The name of the solver = $SolverName\n"; color=:green)
+            printstyled("Solver = $SolverName\n"; color=:green)
         end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Original Network:")

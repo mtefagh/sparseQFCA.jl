@@ -88,6 +88,12 @@ function dataOfModel(model, printLevel::Int=1)
     # Objective coefficients vector:
     c_vector = A.objective(model)
 
+    # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
+    index_c = findfirst(x -> x == 1.0, c_vector)
+
+    # Use the found index to retrieve the corresponding element from the Reactions array:
+    Biomass = Reactions[index_c]
+
     ## Sorting Reactions (Commented out)
 
     #=
@@ -107,6 +113,7 @@ function dataOfModel(model, printLevel::Int=1)
         # Print the number of metabolites, reactions, and genes in the model
         println("Number of Metabolites : $m")
         println("Number of Reactions   : $n")
+        println("Biomass(index=$index) : $Biomass")
         println("Number of Genes       : $n_genes")
 
         # Print the dimensions of the stoichiometric matrix (rows = metabolites, columns = reactions)
@@ -770,9 +777,9 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
         if OctuplePrecision
-            printstyled("The name of the solver = Clarabel \n"; color=:green)
+            printstyled("Solver = Clarabel \n"; color=:green)
         else
-            printstyled("The name of the solver = $SolverName\n"; color=:green)
+            printstyled("Solver = $SolverName\n"; color=:green)
         end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
