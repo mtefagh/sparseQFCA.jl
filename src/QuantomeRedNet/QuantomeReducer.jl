@@ -141,7 +141,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index, SolverName, false)
 
     # Get the dimensions of fctable:
-    row, col = size(fctable)
+    row_fctable, col_fctable = size(fctable)
 
     # Remove blocked reactions from Reaction_Ids:
     Reaction_Ids_noBlocked = setdiff(Reaction_Ids, blocked_index)
@@ -166,9 +166,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Iterate over fctable to identify and store FC coefficients
 
     # Iterating over a range starting from 1 and ending at col:
-    for i in range(1, col)
+    for i in range(1, col_fctable)
         # Nested loop iterating over a range starting from i+1 and ending at col:
-        for j in range(i+1, col)
+        for j in range(i+1, col_fctable)
             # Checking conditions for equality and i not equal to j:
             if (fctable[i,j] == fctable[j,i] == 1.0) && (i != j)
                 # Assigning tuple to FC_Coef[c]:
@@ -282,16 +282,15 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         c += 1
     end
 
-
     ## DC
 
     # Initialize an empty array to store the IDs of reactions to be removed:
     remove_list_DC = Array{Int64}([])
 
     # Iterate over the rows:
-    for i in range(1, row)
+    for i in range(1, row_fctable)
         # Iterate over the columns:
-        for j in range(1, col)
+        for j in range(1, col_fctable)
             # Check if the value at position (i, j) in fctable is equal to 4.0:
             if 4.0 ∈ fctable[i, :]
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
@@ -355,7 +354,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
             # Find the index in 'A_cols_reduced' where the first element of 'FC_Coef[key]' is present:
             index = findfirst(x -> x == FC_Coef[key][1], A_cols_reduced)
             # Set the corresponding element in 'A' to the third element of 'FC_Coef[key]':
-            A[FC_Coef[key][2], index] = FC_Coef[key][3]
+            A[FC_Coef[key][2], index] = 1 / FC_Coef[key][3]
         end
     end
 
@@ -482,7 +481,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     S̃, Metabolites_reduced, Metabolites_elimination = remove_zeroRows(S̃, Metabolites)
 
     # Get the dimensions of the reduced stoichiometric matrix S̃:
-    S̃_row, S̃_col = size(S̃)
+    row_S̃, col_S̃ = size(S̃)
 
     # Identify the reactions that have been eliminated (not part of A_cols_reduced):
     Reactions_elimination = Reactions[setdiff(range(1, n), A_cols_reduced)]
@@ -667,7 +666,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         println("Metabolites : $(m)")
         println("Reactions   : $(n)")
         println("Reduced Network:")
-        println("S           : $(S̃_row) x $(S̃_col)")
+        println("S           : $(row_S̃) x $(col_S̃)")
         println("Genes       : $(length(Genes_final))")
         println("Metabolites : $(length(Metabolites_reduced))")
         println("Reactions   : $(length(R̃))")

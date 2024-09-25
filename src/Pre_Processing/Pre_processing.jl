@@ -729,9 +729,6 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         end
     end
 
-    println("Correction:")
-    display(Correction)
-
     # Initialize an empty array to store the IDs of corrected reversible reactions:
     corrected_reversible_reactions_id = Array{Int64}([])
 
