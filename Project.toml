@@ -20,7 +20,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 CDDLib = "0.9"
-COBREXA = "1.5.1"
+COBREXA = "1.5.1, 2.3"
 Clarabel = "0.7.1, 0.9"
 Colors = "0.12.10"
 GLPK = "1.1.3"
