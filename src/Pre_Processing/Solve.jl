@@ -66,7 +66,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
     solver = SolverConfig(name, 0)
 
     ## Define the solver handle based on the solver name provided
-
+#=
     # If the solver is "CPLEX":
     if name == "CPLEX"
         try
@@ -84,7 +84,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Handle the error if CPLEX cannot be set:
             error("The solver `CPLEX` cannot be set using `changeSparseQFCASolver()`.")
         end
-
+=#
     # If the solver is "HiGHS":
     elseif name == "HiGHS"
         try
