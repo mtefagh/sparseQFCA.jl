@@ -239,7 +239,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     ## Calculate directional couplings and coefficients for each pair of reactions
 
     # This is a parallel loop that distributes iterations across multiple processors:
-    @sync @distributed for i in range(1, col_noBlocked)
+    @sync @distributed for i = 1:col_noBlocked
         if(removing)
             # Store current values of bounds and stoichiometric matrix before removing the ith reaction from the metabolic network:
             lb_noBlocked_temp = copy(lb_noBlocked)
@@ -309,8 +309,8 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     ## Update the functional coupling table based on the directional coupling matrix
 
     # For each reaction i and reaction j in the range of blocked reactions:
-    for i in range(1, col_noBlocked)
-        for j in range(1, col_noBlocked)
+    for i = 1:col_noBlocked
+        for j = 1:col_noBlocked
             # If there is directional coupling from reaction j to reaction i:
             if DC_Matrix[i, j] == 1.0
                 fctable[j,i] = 3.0
@@ -324,8 +324,8 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
     ## Distinguish between (DC, FC or PC) kinds of coupling
 
-    for i in range(1, col_noBlocked)
-        for j in range(i+1, col_noBlocked)
+    for i = 1:col_noBlocked
+        for j = i+1:col_noBlocked
             # If i has an arrow pointing to j, but j doesn't have an arrow pointing to i, add an arrow from j to i:
             if fctable[i,j] == 3.0 && fctable[j,i] == 0.0
                 fctable[j,i] = 4.0
@@ -356,8 +356,8 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
     ## Iterate over all pairs of nodes in the coupling table
 
-    for i in range(1, col_noBlocked)
-        for j in range(1, col_noBlocked)
+    for i = 1:col_noBlocked
+        for j = 1:col_noBlocked
             # If the nodes are partially coupled in both directions:
             if fctable[i,j] == fctable[j,i] == 2.0
 
@@ -390,7 +390,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
     ## Loop through each row in S matrix
 
-    for row in eachrow(S_noBlocked)
+    for row ∈ eachrow(S_noBlocked)
         non_zero_indices = []
         row = sparsevec(row)
 
@@ -414,14 +414,14 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     ## Convert FC_OneMet : Vector{any} ---> Tuple{Int64, Int64}
 
     # Loop through each key in FC_OneMet dictionary and convert the values from vector to tuple:
-    for key in sort(collect(keys(FC_OneMet)))
+    for key ∈ sort(collect(keys(FC_OneMet)))
         FC_OneMet[key] = (FC_OneMet[key][1], FC_OneMet[key][2])
         FC_OneMet[key] = convert(Tuple{Int64, Int64}, FC_OneMet[key])
     end
 
     ## Loop through each key in FC_OneMet dictionary
 
-    for key in sort(collect(keys(FC_OneMet)))
+    for key ∈ sort(collect(keys(FC_OneMet)))
         # Check if the row index and column index of the key in PC matches the tuple value in FC_OneMet:
         if (PC[key][1] == FC_OneMet[key][1]) && (PC[key][2] == FC_OneMet[key][2])
 
@@ -439,7 +439,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     ## Solve an LU decomposition for each pair of partially coupled nodes to determine fully coupling
 
     # Start a distributed loop over keys in PC, sorted in ascending order:
-    @sync @distributed for key in sort(collect(keys(PC)))
+    @sync @distributed for key ∈ sort(collect(keys(PC)))
 
         ## Check if the value of fctable at the location given by the key in PC is not equal to 1.0
 
