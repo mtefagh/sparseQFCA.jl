@@ -210,7 +210,7 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
     irr_blocked_reactions = []
 
     # Iterate over the irreversible reactions and check if the corresponding u variable is close to 0, If it is, the reaction is considered blocked and its ID is added to the list:
-    for i in range(1,n_irr; step=1)
+    for i = 1:n_irr
         if isapprox(value(u[i]), 0.0, atol = Tolerance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
         end
@@ -232,7 +232,7 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
 
     # Populate the I_reversible Matrix with 1 in the rows corresponding to reversible reactions:
     rev_id = 1
-    for col in eachcol(I_reversible)
+    for col ∈ eachcol(I_reversible)
         col[reversible_reactions_id[rev_id]] = 1.0
         rev_id += 1
     end
@@ -258,7 +258,7 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
     rev_blocked_reactions_col = []
 
     # Iterate over each column of matrix Sol:
-    for col in eachcol(Sol)
+    for col ∈ eachcol(Sol)
         # Increment counter for each column:
         c += 1
         # Check if the norm of the current column is approximately zero within tolerance:
@@ -272,7 +272,7 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
     rev_blocked_reactions = []
 
     # Iterate over indices stored in rev_blocked_reactions_col:
-    for i in rev_blocked_reactions_col
+    for i ∈ rev_blocked_reactions_col
         # Append corresponding reaction ID from reversible_reactions_id to rev_blocked_reactions:
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end

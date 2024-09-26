@@ -10,7 +10,7 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using JuMP, COBREXA, Distributed, Clarabel
+using JuMP, Distributed, Clarabel
 
 include("../Pre_Processing/Solve.jl")
 
@@ -83,7 +83,7 @@ function find_blocked_reactions(model, SolverName::String="HiGHS", Tolerance::Fl
 
     ## Loop through each value in the array "lb" and "ub"
 
-    for i in 1:n
+    for i = 1:n
         # If the lower bound is greater than zero, set it to zero:
         if lb[i] > 0
             lb[i] = 0
@@ -134,7 +134,7 @@ function find_blocked_reactions(model, SolverName::String="HiGHS", Tolerance::Fl
 
     ## Loop through each irreversible reaction in the irreversible reactions array
 
-    for j in irreversible_reactions_id
+    for j ∈ irreversible_reactions_id
         # Set the objective to maximize the flux of the current reaction:
         @objective(model_irr, Max, V[j])
 
@@ -190,7 +190,7 @@ function find_blocked_reactions(model, SolverName::String="HiGHS", Tolerance::Fl
     @constraint(model_rev, S * V .== 0)
 
     # Loop through each reversible reaction in the reversible reactions array:
-    for j in reversible_reactions_id
+    for j ∈ reversible_reactions_id
 
         ## Forward direction
 
