@@ -78,6 +78,9 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             set_attribute(model, "time_limit", 60.0)
             # Set verbose attribute to false (disable verbose output):
             set_optimizer_attribute(model, "output_flag", false)
+            # Set tolerances for increased accuracy
+            set_optimizer_attribute(model, "primal_feasibility_tolerance", 1e-9)
+            set_optimizer_attribute(model, "dual_feasibility_tolerance", 1e-9)
             # Return the created model and solver configuration:
             return model, solver
         catch
