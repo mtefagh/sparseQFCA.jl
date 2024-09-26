@@ -166,9 +166,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Iterate over fctable to identify and store FC coefficients
 
     # Iterating over a range starting from 1 and ending at col:
-    for i in range(1, col_fctable)
+    for i = 1:col_fctable
         # Nested loop iterating over a range starting from i+1 and ending at col:
-        for j in range(i+1, col_fctable)
+        for j = i+1:col_fctable
             # Checking conditions for equality and i not equal to j:
             if (fctable[i,j] == fctable[j,i] == 1.0) && (i != j)
                 # Assigning tuple to FC_Coef[c]:
@@ -185,7 +185,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     s = 1
     # Iterating over keys of FC after sorting them:
-    for key in sort(collect(keys(FC)))
+    for key ∈ sort(collect(keys(FC)))
         # Checking conditions for key comparison:
         if (key >= 2) && (FC[key][1] == FC[key-1][1])
             # Initializing an empty list called temp_list:
@@ -211,7 +211,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
             # Incrementing the counter s by 1:
             s = s + 1
             # Looping over delete_list:
-            for i in delete_list
+            for i ∈ delete_list
                 # Deleting element i from FC_Final:
                 delete!(FC_Final, i)
             end
@@ -228,8 +228,8 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     remove_list_FC = sort(remove_list_FC)
 
     # Remove FC clusters that contain reactions in remove_list_FC from FC_Final dictionary:
-    for key in sort(collect(keys(FC_Final)))
-        if FC_Final[key][1] in remove_list_FC
+    for key ∈ sort(collect(keys(FC_Final)))
+        if FC_Final[key][1] ∈ remove_list_FC
             delete!(FC_Final, key)
         end
     end
@@ -239,7 +239,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     FC_cluster_members = Array{Int64}([])
 
     # Iterate through the items in the dictionary
-    for (key, value) in FC_Final
+    for (key, value) ∈ FC_Final
         # Check if the second element of the tuple is an integer
         if isa(value[2], Integer)
             # Convert the integer to a Vector{Any}
@@ -249,7 +249,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     ## Iterate over sorted keys of FC_Final dictionary
 
-    for key in sort(collect(keys(FC_Final)))
+    for key ∈ sort(collect(keys(FC_Final)))
         # Append cluster members to FC_cluster_members array:
         append!(FC_cluster_members, FC_Final[key][2])
 
@@ -274,7 +274,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     c = 1
 
     # Iterate over sorted keys of FC_Final dictionary:
-    for key in sort(collect(keys(FC_Final)))
+    for key ∈ sort(collect(keys(FC_Final)))
         # Assign each cluster from FC_Final to FC_Clusters with a numeric key:
         FC_Clusters[c] = FC_Final[key]
 
@@ -288,9 +288,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     remove_list_DC = Array{Int64}([])
 
     # Iterate over the rows:
-    for i in range(1, row_fctable)
+    for i = 1:row_fctable
         # Iterate over the columns:
-        for j in range(1, col_fctable)
+        for j = 1:col_fctable
             # Check if the value at position (i, j) in fctable is equal to 4.0:
             if 4.0 ∈ fctable[i, :]
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
@@ -332,7 +332,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     # Iterate over indices from 1 to n:
     for i = 1:n
-        if i in blocked_index
+        if i ∈ blocked_index
             # Set the entire row to 0.0 in 'A' for the indices present in 'blocked_index':
             A[i, :] .= 0.0
         end
@@ -349,8 +349,8 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## FC
 
     # Iterate over keys in 'FC_Coef' sorted in ascending order:
-    for key in sort(collect(keys(FC_Coef)))
-        if FC_Coef[key][1] in A_cols_reduced
+    for key ∈ sort(collect(keys(FC_Coef)))
+        if FC_Coef[key][1] ∈ A_cols_reduced
             # Find the index in 'A_cols_reduced' where the first element of 'FC_Coef[key]' is present:
             index = findfirst(x -> x == FC_Coef[key][1], A_cols_reduced)
             # Set the corresponding element in 'A' to the third element of 'FC_Coef[key]':
@@ -400,7 +400,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     ## Perform distributed optimization for each reaction in the remove_list_DC list
 
-    @sync @distributed for i in remove_list_DC
+    @sync @distributed for i ∈ remove_list_DC
 
         # Save i as the row number to process the current reaction:
         row = i
@@ -445,7 +445,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         ## Condition 4: Remove all constraints in con4 from the model once used
 
         constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
-        for i in constraint_refs_con4
+        for i ∈ constraint_refs_con4
             delete(model_local, i)  # Remove the constraint from the model
             unregister(model_local, :i)  # Unregister the constraint for clean-up
         end
@@ -453,7 +453,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         ## Condition 5: Remove all constraints in con5 from the model once used
 
         constraint_refs_con5 = [con5[i] for i in eachindex(con5)]
-        for i in constraint_refs_con5
+        for i ∈ constraint_refs_con5
             delete(model_local, i)  # Remove the constraint from the model
             unregister(model_local, :i)  # Unregister the constraint for clean-up
         end
@@ -501,7 +501,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     c = 1
 
     # Iterating over each column of matrix A:
-    for col in eachcol(A)
+    for col ∈ eachcol(A)
         # Converting the current column to a sparse vector:
         col = sparsevec(col)
         # Finding the non-zero indices and values in the sparse vector:
@@ -516,13 +516,13 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Genes
 
     # Iterate through each reaction in the model:
-    for i in model.reactions
+    for i ∈ model.reactions
         # Iterate through the sorted reduction_map (which maps reactions to a list of associated reactions):
-        for (key, value) in sort(reduction_map)
+        for (key, value) ∈ sort(reduction_map)
             # Check if the current reaction matches the first element in the reduction_map's value list:
             if i.first == Reactions[value[1]]
                 # Loop through the second element of the value list, which contains a set of reactions:
-                for j in value[2]
+                for j ∈ value[2]
                     # Check if the gene association for the current reaction and the related reaction is not empty:
                     if !isnothing(i.second.gene_association_dnf) && !isnothing(model.reactions[Reactions[j]].gene_association_dnf)
                         # Concatenate the gene associations of the current reaction with those of the related reaction:
@@ -534,7 +534,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     end
 
     # Iterate through each reaction in the model:
-    for i in model.reactions
+    for i ∈ model.reactions
         # Check if the gene association exists and is not nothing:
         if !isnothing(i.second.gene_association_dnf)
             # Flatten the non-empty elements of the gene_association_dnf list into a single iterable:
@@ -544,7 +544,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
             # Create an empty vector to store unique gene associations:
             result = Vector{Vector{String}}()
             # Iterate through the flattened list of genes:
-            for gene in flattened
+            for gene ∈ flattened
                 # Check if the gene has not been seen before:
                 if !(gene in seen)
                     # Add the gene to the set of seen genes:
@@ -561,7 +561,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Update lb & Up
 
     # Iterate through each reaction in the model to update the lower and upper bounds:
-    for i in model.reactions
+    for i ∈ model.reactions
         # Set the lower bound for the reaction using the pre-calculated Dict_bounds:
         i.second.lower_bound = Dict_bounds[i.first][1]
         # Set the upper bound for the reaction using the pre-calculated Dict_bounds:
@@ -577,16 +577,16 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Update Stoichiometry Matrix
 
     # Iterate through each reaction in the model to clear the stoichiometry:
-    for i in model.reactions
+    for i ∈ model.reactions
         # Collect the keys from the stoichiometry map of the current reaction:
-        for key in collect(keys(i.second.stoichiometry))
+        for key ∈ collect(keys(i.second.stoichiometry))
             # Remove the stoichiometry entry for the current key:
             delete!(i.second.stoichiometry, key)
         end
     end
 
     # Iterate through each reaction to update the stoichiometry based on the modified matrix:
-    for i in model.reactions
+    for i ∈ model.reactions
         # Find the index of the current reaction in the reduced reaction list R̃:
         index_col = findfirst(x -> x == i.first, R̃)
 
@@ -607,9 +607,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Update Biomass
 
     # Iterate through the reduction map to check and update the Biomass reaction:
-    for (key, value) in sort(reduction_map)
+    for (key, value) ∈ sort(reduction_map)
         # If the biomass reaction (index_c) is in the reduction map, update its index:
-        if index_c in reduction_map[key][2]
+        if index_c ∈ reduction_map[key][2]
             index_c = reduction_map[key][1]
             Biomass = Reactions[index_c]
         end
@@ -618,7 +618,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     ## Update Objective coefficient
 
     # Iterate through the reactions to set the objective coefficient for the biomass reaction:
-    for i in model.reactions
+    for i ∈ model.reactions
         # If the current reaction matches the biomass reaction, set its objective coefficient to 1.0:
         if i.first == Biomass
             i.second.objective_coefficient = 1.0
@@ -631,7 +631,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     Genes_final = []
 
     # Iterate through each reaction to collect gene associations:
-    for i in model.reactions
+    for i ∈ model.reactions
         # If the reaction has a non-empty gene association, append it to Genes_final:
         if !isnothing(i.second.gene_association_dnf)
             append!(Genes_final, i.second.gene_association_dnf)
