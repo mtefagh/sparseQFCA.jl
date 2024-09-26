@@ -237,7 +237,7 @@ ToyModel.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
 
 ## Reactions
 
-M = 1000000.0
+M = sparseQFCA.getM(0)
 
 # Forward:
 
@@ -319,12 +319,16 @@ ToyModel.reactions["EX_2"] = Reaction(
 
 printstyled("ToyModel :\n"; color=:yellow)
 
+printstyled("QuantomeRedNet :\n"; color=:yellow)
+
 ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
+
+println("ToyModel - Reduced FBA:")
 
 S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector = sparseQFCA.dataOfModel(ToyModel_reduced)
 
 # Define the model
-FBA_model = JuMP.Model(HiGHS.Optimizer)
+FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
 # Add decision variables
 n = length(Reactions_ToyModel)
 @variable(FBA_model, lb_ToyModel[i] <= x[i = 1:n_ToyModel] <= ub_ToyModel[i])
@@ -343,7 +347,9 @@ println("Biomass = $(Reactions_ToyModel[index_c]) , Flux = $(V[index_c])")
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
-## ToyModel
+## ToyModel2
+
+printstyled("ToyModel2 :\n"; color=:yellow)
 
 ToyModel2 = Model()
 
@@ -359,7 +365,7 @@ ToyModel2.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
 
 ## Reactions
 
-M = 1000000.0
+M = sparseQFCA.getM(0)
 
 ToyModel2.reactions["rxn1"] = Reaction(
     name = "rxn1",
@@ -379,40 +385,16 @@ ToyModel2.reactions["rxn2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
-println("Initial FBA:")
-
-S_ToyModel2, Metabolites_ToyModel2, Reactions_ToyModel2, Genes_ToyModel2, m_ToyModel2, n_ToyModel2, n_genes_ToyModel2, lb_ToyModel2, ub_ToyModel2, c_vector_ToyModel2 = sparseQFCA.dataOfModel(ToyModel2)
-
-# Define the model
-FBA_model = JuMP.Model(HiGHS.Optimizer)
-# Add decision variables
-n = length(Reactions_ToyModel2)
-@variable(FBA_model, lb_ToyModel2[i] <= x[i = 1:n_ToyModel2] <= ub_ToyModel2[i])
-# Set the objective function
-@objective(FBA_model, Max, (c_vector_ToyModel2)'* x)
-@constraint(FBA_model, (S_ToyModel2) * x .== 0)
-# Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
-for i in 1:length(x)
-    append!(V, value(x[i]))
-end
-
-index_c_ToyModel2 = findfirst(x -> x == 1.0, c_vector_ToyModel2)
-println("Biomass = $(Reactions_ToyModel2[index_c_ToyModel2]) , Flux = $(V[index_c_ToyModel2])")
-
 printstyled("QuantomeRedNet :\n"; color=:yellow)
-
-printstyled("ToyModel2 :\n"; color=:yellow)
 
 ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel2, "HiGHS", true)
 
-println("Reduced FBA:")
+println("ToyModel2 - Reduced FBA:")
 
 S_ToyModel2, Metabolites_ToyModel2, Reactions_ToyModel2, Genes_ToyModel2, m_ToyModel2, n_ToyModel2, n_genes_ToyModel2, lb_ToyModel2, ub_ToyModel2, c_vector_ToyModel2 = sparseQFCA.dataOfModel(ToyModel_reduced)
 
 # Define the model
-FBA_model = JuMP.Model(HiGHS.Optimizer)
+FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
 # Add decision variables
 n = length(Reactions_ToyModel2)
 @variable(FBA_model, lb_ToyModel2[i] <= x[i = 1:n_ToyModel2] <= ub_ToyModel2[i])
@@ -428,55 +410,3 @@ end
 
 index_c_ToyModel2 = findfirst(x -> x == 1.0, c_vector_ToyModel2)
 println("Biomass = $(Reactions_ToyModel2[index_c_ToyModel2]) , Flux = $(V[index_c_ToyModel2])")
-
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-println("Initial FBA iAB_RBC_283:")
-
-S_iAB_RBC_283, Metabolites_iAB_RBC_283, Reactions_iAB_RBC_283, Genes_iAB_RBC_283, m_iAB_RBC_283, n_iAB_RBC_283, n_genes_iAB_RBC_283, lb_iAB_RBC_283, ub_iAB_RBC_283, c_vector_iAB_RBC_283 = sparseQFCA.dataOfModel(myModel_iAB_RBC_283)
-
-# Define the model
-FBA_model = JuMP.Model(HiGHS.Optimizer)
-# Add decision variables
-n = length(Reactions_iAB_RBC_283)
-@variable(FBA_model, lb_iAB_RBC_283[i] <= x[i = 1:n_iAB_RBC_283] <= ub_iAB_RBC_283[i])
-# Set the objective function
-@objective(FBA_model, Max, (c_vector_iAB_RBC_283)'* x)
-@constraint(FBA_model, (S_iAB_RBC_283) * x .== 0)
-# Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
-for i in 1:length(x)
-    append!(V, value(x[i]))
-end
-
-index_c_iAB_RBC_283 = findfirst(x -> x == 1.0, c_vector_iAB_RBC_283)
-println("Biomass = $(Reactions_iAB_RBC_283[index_c_iAB_RBC_283]) , Flux = $(V[index_c_iAB_RBC_283])")
-
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-
-printstyled("iAB_RBC_283 :\n"; color=:yellow)
-
-iAB_RBC_283_reduced = sparseQFCA.quantomeReducer(myModel_iAB_RBC_283, "HiGHS", true)
-
-println("Reduced FBA:")
-
-S_iAB_RBC_283, Metabolites_iAB_RBC_283, Reactions_iAB_RBC_283, Genes_iAB_RBC_283, m_iAB_RBC_283, n_iAB_RBC_283, n_genes_iAB_RBC_283, lb_iAB_RBC_283, ub_iAB_RBC_283, c_vector_iAB_RBC_283 = sparseQFCA.dataOfModel(iAB_RBC_283_reduced)
-
-# Define the model
-FBA_model = JuMP.Model(HiGHS.Optimizer)
-# Add decision variables
-n = length(Reactions_iAB_RBC_283)
-@variable(FBA_model, lb_iAB_RBC_283[i] <= x[i = 1:n_iAB_RBC_283] <= ub_iAB_RBC_283[i])
-# Set the objective function
-@objective(FBA_model, Max, (c_vector_iAB_RBC_283)'* x)
-@constraint(FBA_model, (S_iAB_RBC_283) * x .== 0)
-# Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
-for i in 1:length(x)
-    append!(V, value(x[i]))
-end
-
-index_c_iAB_RBC_283 = findfirst(x -> x == 1.0, c_vector_iAB_RBC_283)
-println("Biomass = $(Reactions_iAB_RBC_283[index_c_iAB_RBC_283]) , Flux = $(V[index_c_iAB_RBC_283])")

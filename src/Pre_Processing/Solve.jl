@@ -66,27 +66,8 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
     solver = SolverConfig(name, 0)
 
     ## Define the solver handle based on the solver name provided
-#=
-    # If the solver is "CPLEX":
-    if name == "CPLEX"
-        try
-            # Set the solver handle to CPLEX.Optimizer:
-            solver.handle = CPLEX.Optimizer
-            # Create a model using the CPLEX solver:
-            model = Model(solver.handle)
-            # Set specific attributes for the CPLEX solver:
-            set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
-            # Set verbose attribute to false (disable verbose output):
-            set_optimizer_attribute(model, "CPX_PARAM_SCRIND", 0)
-            # Return the created model and solver configuration:
-            return model, solver
-        catch
-            # Handle the error if CPLEX cannot be set:
-            error("The solver `CPLEX` cannot be set using `changeSparseQFCASolver()`.")
-        end
-=#
     # If the solver is "HiGHS":
-    elseif name == "HiGHS"
+    if name == "HiGHS"
         try
             # Set the solver handle to HiGHS.Optimizer:
             solver.handle = HiGHS.Optimizer
@@ -103,7 +84,25 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Handle the error if HiGHS cannot be set:
             error("The solver `HiGHS` cannot be set using `changeSparseQFCASolver()`.")
         end
-
+#=
+    # If the solver is "CPLEX":
+    elseif name == "CPLEX"
+        try
+            # Set the solver handle to CPLEX.Optimizer:
+            solver.handle = CPLEX.Optimizer
+            # Create a model using the CPLEX solver:
+            model = Model(solver.handle)
+            # Set specific attributes for the CPLEX solver:
+            set_attribute(model, "CPX_PARAM_EPINT", 1e-8)
+            # Set verbose attribute to false (disable verbose output):
+            set_optimizer_attribute(model, "CPX_PARAM_SCRIND", 0)
+            # Return the created model and solver configuration:
+            return model, solver
+        catch
+            # Handle the error if CPLEX cannot be set:
+            error("The solver `CPLEX` cannot be set using `changeSparseQFCASolver()`.")
+        end
+=#
     # If the solver is "Clp":
     elseif name == "Clp"
         try
@@ -184,7 +183,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Handle the error if SCS cannot be set:
             error("The solver `SCS` cannot be set using `changeSparseQFCASolver()`.")
         end
-
+#=
     # If the solver is "Mosek":
     elseif name == "Mosek"
         try
@@ -201,7 +200,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Handle the error if Mosek cannot be set:
             error("The solver `Mosek` cannot be set using `changeSparseQFCASolver()`.")
         end
-
+=#
     # If the solver is not recognized or supported:
     else
         solver.handle = -1

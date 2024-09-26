@@ -113,7 +113,6 @@ function dataOfModel(model, printLevel::Int=1)
         # Print the number of metabolites, reactions, and genes in the model
         println("Number of Metabolites      : $m")
         println("Number of Reactions        : $n")
-        println("Biomass(index=$index_c)           : $Biomass")
         println("Number of Genes            : $n_genes")
 
         # Print the dimensions of the stoichiometric matrix (rows = metabolites, columns = reactions)
