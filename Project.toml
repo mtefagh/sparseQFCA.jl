@@ -27,7 +27,7 @@ JSONFBCModels = "475c1105-d6ed-49c1-9b32-c11adca6d3e8"
 
 [compat]
 CDDLib = "0.9"
-COBREXA = "2.0"
+COBREXA = "1.5, 2.0"
 Clarabel = "0.7, 0.9"
 Colors = "0.12"
 GLPK = "1.1"

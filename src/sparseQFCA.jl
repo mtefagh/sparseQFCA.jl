@@ -8,7 +8,7 @@
 
 module sparseQFCA
 
-    using COBREXA, SparseArrays, GLPK, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
+    using COBREXA, SparseArrays, HiGHS, JuMP, LinearAlgebra, Distributed, SharedArrays, SparseArrays
 
     include("Pre_Processing/Pre_processing.jl")
     include("Pre_Processing/Solve.jl")
