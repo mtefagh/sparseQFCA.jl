@@ -10,7 +10,7 @@ module Solve
 
 export SolverConfig, changeSparseQFCASolver
 
-using JuMP, MosekTools, CPLEX, HiGHS, Clp, Cbc, GLPK, ECOS, SCS
+using JuMP, HiGHS, Clp, Cbc, GLPK, ECOS, SCS
 
 """
     SolverConfig(name, handle)
