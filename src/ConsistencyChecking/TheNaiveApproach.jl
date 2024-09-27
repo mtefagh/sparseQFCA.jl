@@ -10,7 +10,11 @@ module TheNaiveApproach
 
 export find_blocked_reactions
 
-using GLPK, JuMP, COBREXA, Distributed, Clarabel
+using JuMP, Distributed, Clarabel
+
+include("../Pre_Processing/Solve.jl")
+
+using .Solve
 
 import CDDLib
 
@@ -32,11 +36,13 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 
 # INPUTS
 
-- `model`:              A CoreModel that has been built using COBREXA's `load_model` function.
+- `model`:              A CanonicalModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
+- `SolverName`:         Name of the solver(default: HiGHS).
 - `Tolerance`:          A small number that represents the level of error tolerance.
+- `OctuplePrecision`:   A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:         Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -54,11 +60,11 @@ See also: `dataOfModel()`, `reversibility()`
 
 """
 
-function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function find_blocked_reactions(model, SolverName::String="HiGHS", Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
 
     ## Export data from model
 
-    S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
+    S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model)
 
     ## Determine the reversibility of a reaction
 
@@ -77,7 +83,7 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
 
     ## Loop through each value in the array "lb" and "ub"
 
-    for i in 1:n
+    for i = 1:n
         # If the lower bound is greater than zero, set it to zero:
         if lb[i] > 0
             lb[i] = 0
@@ -102,14 +108,22 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
     irreversible_blocked_reactions_id = []
     irreversible_unblocked_reactions_id = []
 
-    # Create a new optimization model using the GLPK optimizer:
-
+    # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
+        # Define a model_irr using GenericModel from Clarabel.jl:
         model_irr = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model_irr, "verbose", false)
+
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model_irr, "tol_gap_abs", 1e-32)
+
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model_irr, "tol_gap_rel", 1e-32)
     else
-        model_irr = Model(GLPK.Optimizer)
+        # If not using octuple precision, change the solver based on the SolverName:
+        model_irr, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
@@ -120,7 +134,7 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
 
     ## Loop through each irreversible reaction in the irreversible reactions array
 
-    for j in irreversible_reactions_id
+    for j ∈ irreversible_reactions_id
         # Set the objective to maximize the flux of the current reaction:
         @objective(model_irr, Max, V[j])
 
@@ -151,14 +165,22 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
     reversible_unblocked_reactions_id = []
     reversible_blocked_reactions_id = []
 
-    # Create a new optimization model using the GLPK optimizer:
-
+    # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
+        # Define a model_irr using GenericModel from Clarabel.jl:
         model_rev = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model_rev, "verbose", false)
+
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model_rev, "tol_gap_abs", 1e-32)
+
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model_rev, "tol_gap_rel", 1e-32)
     else
-        model_rev = Model(GLPK.Optimizer)
+        # If not using octuple precision, change the solver based on the SolverName:
+        model_rev, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define the variable V for each reaction, with its lower and upper bounds:
@@ -168,7 +190,7 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
     @constraint(model_rev, S * V .== 0)
 
     # Loop through each reversible reaction in the reversible reactions array:
-    for j in reversible_reactions_id
+    for j ∈ reversible_reactions_id
 
         ## Forward direction
 
@@ -210,6 +232,11 @@ function find_blocked_reactions(model::CoreModel, Tolerance::Float64=1e-6, Octup
         printstyled("Consistency_Checking(TheNaiveApproch):\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("Solver = Clarabel \n"; color=:green)
+        else
+            printstyled("Solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irreversible_blocked_reactions_id))")
         println("Number of reversible   blocked reactions : $(length(reversible_blocked_reactions_id))")

@@ -15,7 +15,13 @@ include("TestData.jl")
 
 # Import required Julia modules:
 using COBREXA, JuMP, Test, Distributed
+using JuMP, HiGHS, Clarabel
+
 using .TestData, .sparseQFCA
+import AbstractFBCModels as A
+import AbstractFBCModels.CanonicalModel: Model
+import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
+import JSONFBCModels: JSONFBCModel
 
 ### sparseQFCA:
 
@@ -25,7 +31,7 @@ printstyled("iIS312 :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
 
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312, c_vector = sparseQFCA.dataOfModel(myModel_iIS312)
 # Ensure that the bounds of all reactions are homogenous:
 lb_iIS312, ub_iIS312 = sparseQFCA.homogenization(lb_iIS312, ub_iIS312)
 # Separate reactions into reversible and irreversible sets:
@@ -72,9 +78,10 @@ printstyled("#------------------------------------------------------------------
 
 printstyled("CC_SwiftCC :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
+
 # Get the necessary data from myModel_e_coli_core:
 
-S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, Genes_Reactions_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
+S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core, c_vector = sparseQFCA.dataOfModel(myModel_e_coli_core)
 # Check for duplicate reactions in Reactions_e_coli_core:
 check_duplicate = sparseQFCA.check_duplicate_reactions(Reactions_e_coli_core)
 # Homogenize the lower and upper bounds of the reactions in myModel_e_coli_core:
@@ -105,7 +112,7 @@ printstyled("CC_SwiftCC :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 
 # Get data from the iIS312 model:
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312, c_vector = sparseQFCA.dataOfModel(myModel_iIS312)
 # Check for duplicate reactions in the iIS312 model:
 check_duplicate = sparseQFCA.check_duplicate_reactions(Reactions_iIS312)
 # Homogenize the lower and upper bounds for reactions in the iIS312 model:
@@ -127,7 +134,7 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("e_coli_core :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
-S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, Genes_Reactions_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core = sparseQFCA.dataOfModel(myModel_e_coli_core)
+S_e_coli_core, Metabolites_e_coli_core, Reactions_e_coli_core, Genes_e_coli_core, m_e_coli_core, n_e_coli_core, n_genes_e_coli_core, lb_e_coli_core, ub_e_coli_core, c_vector = sparseQFCA.dataOfModel(myModel_e_coli_core)
 # Ensure that the bounds of all reactions are homogenous
 lb_e_coli_core, ub_e_coli_core = sparseQFCA.homogenization(lb_e_coli_core, ub_e_coli_core)
 # Separate reactions into reversible and irreversible sets:
@@ -163,7 +170,7 @@ printstyled("distributedQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
 
 # Extracte relevant data from input model:
-S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, Genes_Reactions_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312 = sparseQFCA.dataOfModel(myModel_iIS312)
+S_iIS312, Metabolites_iIS312, Reactions_iIS312, Genes_iIS312, m_iIS312, n_iIS312, n_genes_iIS312, lb_iIS312, ub_iIS312, c_vector = sparseQFCA.dataOfModel(myModel_iIS312)
 # Ensure that the bounds of all reactions are homogenous
 lb_iIS312, ub_iIS312 = sparseQFCA.homogenization(lb_iIS312, ub_iIS312)
 # Separate reactions into reversible and irreversible sets:
@@ -195,8 +202,211 @@ printstyled("#------------------------------------------------------------------
 
 ## QuantomeRedNet
 
+## ToyModel
+
+ToyModel = Model()
+
+# Genes:
+ToyModel.genes["g1"] = Gene()
+ToyModel.genes["g2"] = Gene()
+ToyModel.genes["g3"] = Gene()
+ToyModel.genes["g4"] = Gene()
+ToyModel.genes["g5"] = Gene()
+ToyModel.genes["g6"] = Gene()
+
+## Metabolites
+
+# IntraCellular:
+
+#m1c
+ToyModel.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
+#m2c
+ToyModel.metabolites["m2"] = Metabolite(name = "M2_c", compartment = "inside")
+#m3c
+ToyModel.metabolites["m3"] = Metabolite(name = "M3_c", compartment = "inside")
+#m4c
+ToyModel.metabolites["m4"] = Metabolite(name = "M4_c", compartment = "inside")
+
+# ExtraCellular:
+
+#m1e
+ToyModel.metabolites["m5"] = Metabolite(name = "M1_e", compartment = "outside")
+#m3e
+ToyModel.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
+
+
+## Reactions
+
+M = sparseQFCA.getM(0)
+
+# Forward:
+
+ToyModel.reactions["M1t"] = Reaction(
+    name = "transport m1",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m5" => -1.0, "m1" => 1.0),
+    gene_association_dnf = [["g1"]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel.reactions["rxn1"] = Reaction(
+    name = "rxn1",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => -2.0, "m2" => 1.0, "m3" => 1.0),
+    gene_association_dnf = [["g2"]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel.reactions["rxn2"] = Reaction(
+    name = "rxn2",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m2" => -1.0, "m3" => 1.0),
+    gene_association_dnf = [["g3"]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel.reactions["M2t"] = Reaction(
+    name = "transport m2",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m2" => -1.0, "m5" => 1.0),
+    gene_association_dnf = [["g4"]],
+    objective_coefficient = 0.0,
+)
+
+# Foward and Backward:
+
+ToyModel.reactions["rxn3"] = Reaction(
+    name = "rxn3",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => -1.0, "m4" => 1.0),
+    gene_association_dnf = [["g5"]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel.reactions["M3t"] = Reaction(
+    name = "transport m3",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m3" => -1.0, "m6" => 1.0),
+    gene_association_dnf = [["g6"]],
+    objective_coefficient = 0.0,
+)
+
+# Exchange:
+
+ToyModel.reactions["EX_1"] = Reaction(
+    name = "exchange m5",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m5" => -1.0),
+    gene_association_dnf = [[]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel.reactions["EX_2"] = Reaction(
+    name = "exchange m6",
+    lower_bound = -M,
+    upper_bound = M,
+    stoichiometry = Dict("m6" => -1.0),
+    gene_association_dnf = [],
+    objective_coefficient = 1.0,
+)
+
+printstyled("ToyModel :\n"; color=:yellow)
+
 printstyled("QuantomeRedNet :\n"; color=:yellow)
-printstyled("e_coli_core :\n"; color=:yellow)
-model, A, reduct_map = @time sparseQFCA.quantomeReducer(myModel_e_coli_core)
+
+ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
+
+println("ToyModel - Reduced FBA:")
+
+S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector = sparseQFCA.dataOfModel(ToyModel_reduced)
+
+# Define the model
+FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
+# Add decision variables
+n = length(Reactions_ToyModel)
+@variable(FBA_model, lb_ToyModel[i] <= x[i = 1:n_ToyModel] <= ub_ToyModel[i])
+# Set the objective function
+@objective(FBA_model, Max, (c_vector)'* x)
+@constraint(FBA_model, (S_ToyModel) * x .== 0)
+# Solve the model
+optimize!(FBA_model)
+V = Array{Float64}([])
+for i in 1:length(x)
+    append!(V, value(x[i]))
+end
+
+index_c = findfirst(x -> x == 1.0, c_vector)
+println("Biomass = $(Reactions_ToyModel[index_c]) , Flux = $(V[index_c])")
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+
+## ToyModel2
+
+printstyled("ToyModel2 :\n"; color=:yellow)
+
+ToyModel2 = Model()
+
+# Genes:
+ToyModel2.genes["g1"] = Gene()
+
+## Metabolites
+
+# IntraCellular:
+
+#m1c
+ToyModel2.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
+
+## Reactions
+
+M = sparseQFCA.getM(0)
+
+ToyModel2.reactions["rxn1"] = Reaction(
+    name = "rxn1",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => 2.0),
+    gene_association_dnf = [["g1"]],
+    objective_coefficient = 0.0,
+)
+
+ToyModel2.reactions["rxn2"] = Reaction(
+    name = "rxn2",
+    lower_bound = 0.0,
+    upper_bound = M,
+    stoichiometry = Dict("m1" => -1.0),
+    gene_association_dnf = [],
+    objective_coefficient = 1.0,
+)
+
+printstyled("QuantomeRedNet :\n"; color=:yellow)
+
+ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel2, "HiGHS", true)
+
+println("ToyModel2 - Reduced FBA:")
+
+S_ToyModel2, Metabolites_ToyModel2, Reactions_ToyModel2, Genes_ToyModel2, m_ToyModel2, n_ToyModel2, n_genes_ToyModel2, lb_ToyModel2, ub_ToyModel2, c_vector_ToyModel2 = sparseQFCA.dataOfModel(ToyModel_reduced)
+
+# Define the model
+FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
+# Add decision variables
+n = length(Reactions_ToyModel2)
+@variable(FBA_model, lb_ToyModel2[i] <= x[i = 1:n_ToyModel2] <= ub_ToyModel2[i])
+# Set the objective function
+@objective(FBA_model, Max, (c_vector_ToyModel2)'* x)
+@constraint(FBA_model, (S_ToyModel2) * x .== 0)
+# Solve the model
+optimize!(FBA_model)
+V = Array{Float64}([])
+for i in 1:length(x)
+    append!(V, value(x[i]))
+end
+
+index_c_ToyModel2 = findfirst(x -> x == 1.0, c_vector_ToyModel2)
+println("Biomass = $(Reactions_ToyModel2[index_c_ToyModel2]) , Flux = $(V[index_c_ToyModel2])")

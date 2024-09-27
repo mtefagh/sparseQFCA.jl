@@ -9,7 +9,11 @@
 module SQFCA
 export QFCA
 
-using LinearAlgebra, SparseArrays, JuMP, GLPK, Distributed
+include("../Pre_Processing/Solve.jl")
+
+using .Solve
+
+using HiGHS, LinearAlgebra, SparseArrays, JuMP, Distributed
 
 """
     QFCA(S, rev)
@@ -24,6 +28,7 @@ specified by its stoichiometric matrix and irreversible reactions and also retur
 
 # OPTIONAL INPUTS
 
+- `SolverName`:               Name of the solver(default: HiGHS).
 - `Tolerance`:                A small number that represents the level of error tolerance.
 - `printLevel`:               Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
@@ -51,9 +56,9 @@ See also:
 
 """
 
-function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
+function QFCA(S, rev, SolverName::String="HiGHS", Tolerance::Float64=1e-6, printLevel::Int=1)
 
-    model = Model(GLPK.Optimizer)
+    model, solver = changeSparseQFCASolver(SolverName)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
@@ -100,7 +105,7 @@ function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
             end
         end
     end
-    fullModel = Model(GLPK.Optimizer)
+    fullModel, solver = changeSparseQFCASolver(SolverName)
     m, n = size(S)
     ub = [fill(Inf, m); fill(0.0, n)]
     lb = -copy(ub)
@@ -146,7 +151,7 @@ function QFCA(S, rev, Tolerance::Float64=1e-6, printLevel::Int=1)
                 optimize!(fullModel)
                 certificate = [value(x[j]) for j in 1:m]
             else
-                sparseModel = Model(GLPK.Optimizer)
+                sparseModel, solver = changeSparseQFCASolver(SolverName)
                 @variable(sparseModel, y[j=1:m])
                 for j in 1:n
                     if j == index

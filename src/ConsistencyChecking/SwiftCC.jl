@@ -10,9 +10,13 @@ module SwiftCC
 
 export Model_CC, model_CC_Constructor, swiftCC
 
-using GLPK, JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
+using JuMP, COBREXA, LinearAlgebra, SparseArrays, Distributed, Clarabel
 
 import CDDLib
+
+include("../Pre_Processing/Solve.jl")
+
+using .Solve
 
 include("../Pre_Processing/Pre_processing.jl")
 
@@ -84,9 +88,13 @@ end
 """
     swiftCC(ModelObject_CC)
 
-The function first exports data from ModelObject_CC and performs some calculations to determine the reversibility of reactions
-and the number of blocked reactions. It then creates an optimization model using the GLPK optimizer to identify irreversible blocked reactions,
-and uses Gaussian elimination to identify blocked reversible reactions.
+The function, named swiftCC, performs consistency checking on a metabolic network model using the Swift Consistency Checking algorithm.
+It takes several inputs, including a model object (ModelObject_CC), solver name, octuple precision flag, tolerance, and print level. The
+function extracts relevant information from the input model, identifies irreversible and reversible reactions, and then solves optimization
+problems to find blocked reactions. It uses either high-precision calculations with Clarabel.jl or a sparse QFCA solver depending on the input
+parameters. The function returns a list of blocked reaction IDs and the dual variables for the stoichiometric constraint. It also provides
+optional printing of results, including the number of blocked reactions and solver details. Overall, this function implements a sophisticated
+algorithm for analyzing metabolic networks and identifying inconsistencies or blocked reactions in the system.
 
 # INPUTS
 
@@ -94,6 +102,8 @@ and uses Gaussian elimination to identify blocked reversible reactions.
 
 # OPTIONAL INPUTS
 
+- `SolverName`:            Name of the solver(default: HiGHS).
+- `OctuplePrecision`:      A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `Tolerance`:             A small number that represents the level of error tolerance.
 - `printLevel`:            Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
@@ -113,16 +123,32 @@ See also: `Model_CC`, `model_CC_Constructor()`, `reversibility()`
 
 """
 
-function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePrecision::Bool=false, printLevel::Int=1)
+function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePrecision::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
-    ## Extract relevant information from the input model object
+    ## Extract relevant information from the ModelObject_CC
 
+    # Extracting the stoichiometric matrix (S) from the ModelObject_CC:
     S = ModelObject_CC.S
+
+    # Extracting the array of metabolite IDs from the ModelObject_CC:
     Metabolites = ModelObject_CC.Metabolites
+
+    # Extracting the array of reaction IDs from the ModelObject_CC:
     Reactions = ModelObject_CC.Reactions
+
+    # Extracting the array of gene IDs from the ModelObject_CC:
+    Genes = ModelObject_CC.Genes
+
+    # Extracting the number of metabolites (m) from the ModelObject_CC:
     m = ModelObject_CC.m
+
+    # Extracting the number of reactions (n) from the ModelObject_CC:
     n = ModelObject_CC.n
+
+    # Extracting the lower bounds for reactions from the ModelObject_CC:
     lb = ModelObject_CC.lb
+
+    # Extracting the upper bounds for reactions from the ModelObject_CC:
     ub = ModelObject_CC.ub
 
     ## Identify which reactions are irreversible and which are reversible
@@ -140,13 +166,22 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
     lb_u = zeros(n_irr)
     ub_u = ones(n_irr)
 
-    # Create a new optimization model using the GLPK optimizer:
+    # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
+        # Define a model_irr using GenericModel from Clarabel.jl:
         model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-        settings = Clarabel.Settings()
-        settings = Clarabel.Settings(verbose = false, time_limit = 5)
+
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(model, "verbose", false)
+
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(model, "tol_gap_abs", 1e-32)
+
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(model, "tol_gap_rel", 1e-32)
     else
-        model = Model(GLPK.Optimizer)
+        # If not using octuple precision, change the solver based on the solvername:
+        model, solver = changeSparseQFCASolver(SolverName)
     end
 
     # Define variables V and u with their lower and upper bounds:
@@ -175,7 +210,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
     irr_blocked_reactions = []
 
     # Iterate over the irreversible reactions and check if the corresponding u variable is close to 0, If it is, the reaction is considered blocked and its ID is added to the list:
-    for i in range(1,n_irr; step=1)
+    for i = 1:n_irr
         if isapprox(value(u[i]), 0.0, atol = Tolerance)
             append!(irr_blocked_reactions, irreversible_reactions_id[i])
         end
@@ -197,7 +232,7 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
 
     # Populate the I_reversible Matrix with 1 in the rows corresponding to reversible reactions:
     rev_id = 1
-    for col in eachcol(I_reversible)
+    for col ∈ eachcol(I_reversible)
         col[reversible_reactions_id[rev_id]] = 1.0
         rev_id += 1
     end
@@ -216,18 +251,29 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
     # Determine the dimensions of the Sol matrix:
     row_sol, col_sol = size(Sol)
 
-    # Find columns in Sol that correspond to blocked reversible reactions:
+    # Initialize counter variable:
     c = 0
+
+    # Create an empty array to store indices of blocked reactions:
     rev_blocked_reactions_col = []
-    for col in eachcol(Sol)
+
+    # Iterate over each column of matrix Sol:
+    for col ∈ eachcol(Sol)
+        # Increment counter for each column:
         c += 1
+        # Check if the norm of the current column is approximately zero within tolerance:
         if isapprox(norm(col), 0, atol = Tolerance)
+            # If true, append the current column index to rev_blocked_reactions_col:
             append!(rev_blocked_reactions_col, c)
         end
     end
 
+    # Create an empty array to store blocked reversible reactions:
     rev_blocked_reactions = []
-    for i in rev_blocked_reactions_col
+
+    # Iterate over indices stored in rev_blocked_reactions_col:
+    for i ∈ rev_blocked_reactions_col
+        # Append corresponding reaction ID from reversible_reactions_id to rev_blocked_reactions:
         append!(rev_blocked_reactions, reversible_reactions_id[i])
     end
 
@@ -246,6 +292,11 @@ function swiftCC(ModelObject_CC::Model_CC, Tolerance::Float64=1e-6, OctuplePreci
         printstyled("Consistency_Checking(SwiftCC):\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("Solver = Clarabel \n"; color=:green)
+        else
+            printstyled("Solver = $SolverName\n"; color=:green)
+        end
         printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of irreversible blocked reactions : $(length(irr_blocked_reactions))")
         println("Number of reversible   blocked reactions : $(length(rev_blocked_reactions))")
