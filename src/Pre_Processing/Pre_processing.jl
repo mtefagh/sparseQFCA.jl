@@ -10,18 +10,24 @@ module Pre_processing
 
 export dataOfModel, getM, getTolerance, reversibility, check_duplicate_reactions, homogenization, remove_zeroRows, Model_Correction, model_Correction_Constructor, distributedReversibility_Correction
 
-using GLPK, JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
+using JuMP, COBREXA, SparseArrays, Distributed, SharedArrays, Distributed, Clarabel
+
+include("Solve.jl")
+
+using .Solve
 
 import CDDLib
+
+import AbstractFBCModels as A
 
 """
     dataOfModel(model)
 
-The function extracts various data from a given metabolic network model, represented by a StandardModel object, and returns it as a tuple.
+The function extracts various data from a given metabolic network model, represented by a CanonicalModel object, and returns it as a tuple.
 
 # INPUTS
 
-- `model`:          A CoreModel that has been built using COBREXA's `load_model` function.
+- `model`:          A CanonicalModel that has been built using COBREXA's `load_model` function.
 
 # OPTIONAL INPUTS
 
@@ -35,55 +41,86 @@ The function extracts various data from a given metabolic network model, represe
 - `Genes`:          A list of all genes associated with reactions in the metabolic network.
 - `m`:              The number of rows in the stoichiometric matrix.
 - `n`:              The number of columns in the stoichiometric matrix.
+- `n_genes`:        The number of columns in the stoichiometric matrix.
 - `lb`:             A `n` x `1` vector representing the lower bounds of each reaction.
 - `ub`:             A `n` x `1` vector representing the upper bounds of each reaction.
+- `c_vector`:       A `n` x `1` vector representing the Objective coefficients vector.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub = dataOfModel(model)
+julia> S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model)
 ```
 
-See also: `COBREXA.load_model()`
+See also: `COBREXA.load_model(JSONFBCModel, "", A.CanonicalModel.Model)`
 
 """
 
-function dataOfModel(model::CoreModel, printLevel::Int=1)
+function dataOfModel(model, printLevel::Int=1)
 
     ## Extracting Data
 
-    S = model.S # Stoichiometric matrix
-    Metabolites = model.mets # Array of metabolite IDs
-    Reactions = model.rxns # Array of reaction IDs
-    Genes = genes(model)
-    Genes_Reactions = model.grrs # Array of gene IDs
-    m = length(model.mets) # Number of metabolites
-    n = length(model.rxns) # Number of reactions
-    n_genes = length(genes(model)) # Number of genes
-    lb = model.xl # Array of lower bounds for each reaction
-    ub = model.xu# Array of upper bounds for each reaction
+    # Stoichiometric matrix:
+    S = A.stoichiometry(model)
 
-    ## Sorting Reactions
+    # Array of metabolite IDs:
+    Metabolites = A.metabolites(model)
 
-    p = sortperm(Reactions) # Sort the reaction IDs in alphabetical order
-    Reactions = Reactions[p] # Reorder the reaction IDs according to the sorted indices
-    lb = lb[p] # Reorder the lower bounds according to the sorted indices
-    ub = ub[p] # Reorder the upper bounds according to the sorted indices
-    S = S[:,p] # Reorder the columns of the stoichiometric matrix according to the sorted indices
+    # Array of reaction IDs:
+    Reactions = A.reactions(model)
+
+    # Array of gene IDs:
+    Genes = A.genes(model)
+
+    # Number of metabolites in the model:
+    m = A.n_metabolites(model)
+
+    # Number of reactions in the model:
+    n = A.n_reactions(model)
+
+    # Number of genes in the model:
+    n_genes = A.n_genes(model)
+
+    # Array of lower and upper bounds for each reaction (constraints on flux through each reaction):
+    lb, ub = A.bounds(model)
+
+    # Objective coefficients vector:
+    c_vector = A.objective(model)
+
+    # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
+    index_c = findfirst(x -> x == 1.0, c_vector)
+
+    # Use the found index to retrieve the corresponding element from the Reactions array:
+    Biomass = Reactions[index_c]
+
+    ## Sorting Reactions (Commented out)
+
+    #=
+    # Sort reaction IDs in alphabetical order and reorder the reactions and associated data accordingly
+    p = sortperm(Reactions)  # Get the sorted indices of the reactions
+    Reactions = Reactions[p]  # Reorder reactions by sorted indices
+    lb = lb[p]  # Reorder lower bounds accordingly
+    ub = ub[p]  # Reorder upper bounds accordingly
+    S = S[:,p]  # Reorder columns of the stoichiometric matrix accordingly
+    =#
 
     ## Print out results if requested
-
     if printLevel > 0
+        # Print a header for the output in cyan color
         printstyled("Metabolic Network:\n"; color=:cyan)
-        println("Number of Metabolites : $m")
-        println("Number of Reactions   : $n")
-        println("Number of Genes       : $n_genes")
-        println("Stoichiometric matrix : $m x $n")
+
+        # Print the number of metabolites, reactions, and genes in the model
+        println("Number of Metabolites      : $m")
+        println("Number of Reactions        : $n")
+        println("Number of Genes            : $n_genes")
+
+        # Print the dimensions of the stoichiometric matrix (rows = metabolites, columns = reactions)
+        println("Stoichiometric matrix      : $m x $n")
     end
 
-    # Return the extracted data as a tuple:
-    return S, Metabolites, Reactions, Genes, Genes_Reactions, m, n, n_genes, lb, ub
+    # Return the extracted data as a tuple
+    return S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector
 end
 
 #-------------------------------------------------------------------------------------------
@@ -92,9 +129,9 @@ end
     getM()
 
 The function reads the first line of a configuration file named "ConfigFile.txt" located in a subdirectory called "config".
-The value on that line is parsed as a floating-point number and returned as the output of the function,
-which is typically used to set the upper bound of a variable representing an infinite boundary in a metabolic network model.
-If the file cannot be opened or the value on the first line is not a valid floating-point number, the function returns nothing.
+The value on that line is parsed as a floating-point number and returned as the output of the function, which is typically
+used to set the upper bound of a variable representing an infinite boundary in a metabolic network model. If the file cannot
+be opened or the value on the first line is not a valid floating-point number, the function returns nothing.
 
 # INPUTS
 
@@ -151,9 +188,9 @@ end
 """
     getTolerance()
 
-The function reads a value from a configuration file and returns it as a floating-point number to set
-the error tolerance level for subsequent computations. If an error occurs while opening or reading the file,
-the function prints an error message and returns nothing.
+The function reads a value from a configuration file and returns it as a floating-point number to set the
+error tolerance level for subsequent computations. If an error occurs while opening or reading the file,the
+function prints an error message and returns nothing.
 
 # INPUTS
 
@@ -176,7 +213,7 @@ julia> Tolerance = getTolerance()
 
 """
 
-function getTolerance(printLevel::Int=1)
+function getTolerance(printLevel::Int=0)
 
     ## Attempt to open the file "ConfigFile.txt" for reading
 
@@ -251,7 +288,7 @@ function reversibility(lb::Array{Float64,1}, Reaction_Ids::Vector{Int64}, printL
 
     ## Loop through each reaction in the "lb" array
 
-    for i in 1:n
+    for i = 1:n
         # If the lower bound of the reaction is greater than or equal to zero, add the reaction ID to the irreversible reactions array:
         if lb[i] >= 0
             append!(irreversible_reactions_id, Reaction_Ids[i])
@@ -301,7 +338,7 @@ The function takes an array of strings, representing reaction IDs, and checks if
 
 - Full input/output example
 ```julia
-julia> check_duplicate = check_duplicate_reactions(Reactions)
+julia> check_duplicate_reactions(Reactions)
 ```
 
 See also: `dataOfModel()`
@@ -369,7 +406,7 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = 1000000.0
+    M = getM()
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
@@ -389,8 +426,9 @@ end
 """
     remove_zeroRows(S, Metabolites)
 
-The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites, with all rows that contain only zeros removed.
-This results in a more compact representation of the metabolic network, with only the relevant reactions and metabolites included.
+The function returns a modified stoichiometric matrix S and corresponding array of metabolites Metabolites,
+with all rows that contain only zeros removed. This results in a more compact representation of the metabolic
+network, with only the relevant reactions and metabolites included.
 
 # INPUTS
 
@@ -410,7 +448,7 @@ This results in a more compact representation of the metabolic network, with onl
 
 - Full input/output example
 ```julia
-julia> S, Metabolites = remove_zeroRows(S, Metabolites)
+julia> S, Metabolites, Metabolites_elimination = remove_zeroRows(S, Metabolites)
 ```
 
 See also: `dataOfModel()`
@@ -421,7 +459,7 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
 
     zero_row = [] # create an empty array to store indices of zero rows
     c = 1 # initialize a counter variable to keep track of row indices
-    for row in eachrow(S) # iterate over each row of the matrix S
+    for row ∈ eachrow(S) # iterate over each row of the matrix S
         if row == zeros(length(row)) # check if the current row is all zeros
             append!(zero_row, c) # if so, append the current row index to zero_row array
         end
@@ -435,10 +473,11 @@ function remove_zeroRows(S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix
     m = length(Metabolites)
 
     # Remove the corresponding metabolites from the Metabolites array:
+    Metabolites_elimination = Metabolites[zero_row]
     Metabolites = Metabolites[setdiff(range(1, m), zero_row)]
 
-    # Return the updated S matrix and Metabolites array:
-    return S, Metabolites
+    # Return the updated S matrix, Metabolites array and Metabolites_elimination array:
+    return S, Metabolites, Metabolites_elimination
 end
 
 #-------------------------------------------------------------------------------------------
@@ -530,6 +569,8 @@ Finally, the function removes the blocked reactions from the list of reversible 
 
 # OPTIONAL INPUTS
 
+- `SolverName`:                             Name of the solver(default: HiGHS).
+- `OctuplePrecision`:                       A flag(default: false) indicating whether octuple precision should be used when solving linear programs.
 - `printLevel`:                             Verbose level (default: 1). Mute all output with `printLevel = 0`.
 
 # OUTPUTS
@@ -551,14 +592,38 @@ See also: `dataOfModel()`, `reversibility()`, `homogenization()`, 'getTolerance(
 
 """
 
-function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, OctuplePrecision::Bool=false, printLevel::Int=1)
+function distributedReversibility_Correction(ModelObject_Correction::Model_Correction, blocked_index_rev::Vector{Int64}, SolverName::String="HiGHS", OctuplePrecision::Bool=false, printLevel::Int=1)
 
-    ## Extract relevant information from the input model object
+    ## Extract relevant information from the ModelObject_Correction
 
+    # Extracting the stoichiometric matrix (S) from the ModelObject_Correction:
     S = ModelObject_Correction.S
+
+    # Extracting the array of metabolite IDs from the ModelObject_Correction:
+    Metabolites = ModelObject_Correction.Metabolites
+
+    # Extracting the array of reaction IDs from the ModelObject_Correction:
+    Reactions = ModelObject_Correction.Reactions
+
+    # Extracting the array of gene IDs from the ModelObject_Correction:
+    Genes = ModelObject_Correction.Genes
+
+    # Extracting the number of metabolites (m) from the ModelObject_Correction:
+    m = ModelObject_Correction.m
+
+    # Extracting the number of reactions (n) from the ModelObject_Correction:
+    n = ModelObject_Correction.n
+
+    # Extracting the lower bounds for reactions from the ModelObject_Correction:
     lb = ModelObject_Correction.lb
+
+    # Extracting the upper bounds for reactions from the ModelObject_Correction:
     ub = ModelObject_Correction.ub
+
+    # Extracting the IDs of irreversible reactions from the ModelObject_QFCA:
     irreversible_reactions_id = ModelObject_Correction.irreversible_reactions_id
+
+    # Extracting the IDs of reversible reactions from the ModelObject_QFCA:
     reversible_reactions_id = ModelObject_Correction.reversible_reactions_id
 
     # Define the number of variables in the model:
@@ -575,70 +640,75 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     # The initial value of false indicates that no reactions are blocked at the beginning:
     Correction = SharedArray{Int,2}((n, n), init = false)
 
+    # Create a local model object for each worker process:
+    if OctuplePrecision
+        # Define a local model using GenericModel from Clarabel.jl:
+        local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
+        # Set verbose attribute to false (disable verbose output):
+        set_attribute(local_model, "verbose", false)
+        # Set absolute tolerance for gap convergence to 1e-32:
+        set_attribute(local_model, "tol_gap_abs", 1e-32)
+        # Set relative tolerance for gap convergence to 1e-32:
+        set_attribute(local_model, "tol_gap_rel", 1e-32)
+    else
+        local_model, solver = changeSparseQFCASolver(SolverName)
+    end
+
+    # Define variables V:
+    @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+
+    # Add the stoichiometric constraints to the model:
+    @constraint(local_model, S * V .== 0)
+
     # Iterate over all reversible reactions in the model:
-    @sync @distributed for i in reversible_reactions_id
+    @sync @distributed for i ∈ reversible_reactions_id
 
-        # Create a local model object for each worker process:
-        if OctuplePrecision
-            local_model = GenericModel{BigFloat}(Clarabel.Optimizer{BigFloat})
-            settings = Clarabel.Settings()
-            settings = Clarabel.Settings(verbose = false, time_limit = 5)
-        else
-            local_model = Model(GLPK.Optimizer)
-        end
-
-        # Define variables V:
-        @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
-
-        # Add the stoichiometric constraints to the model:
-        @constraint(local_model, S * V .== 0)
-
-        # Set the objective function to maximize the flux through reaction i in the forward direction:
-        @objective(local_model, Max, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
-        @constraint(local_model, c_irr, V[i] <= 1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_fwd = objective_value(local_model)
-
-        # Remove the current constraint from the model:
-        delete(local_model, c_irr)
-
-        # Unregister the current constraint from the model:
-        unregister(local_model, :c_irr)
-
-        # Set the objective function to minimize the flux through reaction i in the backward direction:
-        @objective(local_model, Min, V[i])
-
-        # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
-        @constraint(local_model, c_rev, V[i] >= -1)
-
-        # Optimize the model and retrieve the objective value:
-        optimize!(local_model)
-        opt_back = objective_value(local_model)
-
-        # Remove the current constraint from the model:
-        delete(local_model, c_rev)
-
-        # Unregister the current constraint from the model:
-        unregister(local_model, :c_rev)
-
-        # The reaction is considered to be blocked:
-        if isapprox(opt_fwd, 0, atol=Tolerance) && isapprox(opt_back, 0, atol=Tolerance)
+        if i ∈ blocked_index_rev
+            # The reaction is considered to be blocked:
             Correction[i,i] = +2.0
-            continue
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
-        elseif isapprox(opt_fwd, 0, atol=Tolerance)
-            Correction[i,i] = +1.0
-        # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
-        elseif isapprox(opt_back, 0, atol=Tolerance)
-            Correction[i,i] = -1.0
         else
-            continue
-        end
+            # Set the objective function to maximize the flux through reaction i in the forward direction:
+            @objective(local_model, Max, V[i])
 
+            # Add a constraint that limits the flux through reaction i in the forward direction to be less than or equal to 1:
+            @constraint(local_model, c_irr, V[i] <= 1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_fwd = objective_value(local_model)
+
+            # Remove the current constraint from the model:
+            delete(local_model, c_irr)
+
+            # Unregister the current constraint from the model:
+            unregister(local_model, :c_irr)
+
+            # Set the objective function to minimize the flux through reaction i in the backward direction:
+            @objective(local_model, Min, V[i])
+
+            # Add a constraint that limits the flux through reaction i in the backward direction to be greater than or equal to -1:
+            @constraint(local_model, c_rev, V[i] >= -1)
+
+            # Optimize the model and retrieve the objective value:
+            optimize!(local_model)
+            opt_back = objective_value(local_model)
+
+            # Remove the current constraint from the model:
+            delete(local_model, c_rev)
+
+            # Unregister the current constraint from the model:
+            unregister(local_model, :c_rev)
+
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the forward direction:
+            if isapprox(opt_fwd, 0, atol=Tolerance)
+                Correction[i,i] = +1.0
+            # If the objective value is approximately 0, the reaction is considered to be blocked in the backward direction:
+            elseif isapprox(opt_back, 0, atol=Tolerance)
+                Correction[i,i] = -1.0
+            else
+                continue
+            end
+        end
     end
 
     for i = 1 : n
@@ -663,7 +733,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
 
     ## Forward
 
-    for i in rev_blocked_fwd
+    for i ∈ rev_blocked_fwd
         # Modify lower and upper bounds:
         ub[i] = lb[i] * -1
         lb[i] = 0.0
@@ -675,7 +745,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
 
     ## Backward
 
-    for i in rev_blocked_back
+    for i ∈ rev_blocked_back
         # Modify lower bounds:
         lb[i] = 0.0
         # Add to irreversible reactions list:
@@ -696,7 +766,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     ## Add remaining reversible reactions to the corrected reversible reactions list
 
     # Convert the remaining reversible reactions set back to a list:
-    for i in set_reversible_reactions_id
+    for i ∈ set_reversible_reactions_id
         append!(corrected_reversible_reactions_id, i)
     end
 
@@ -706,6 +776,12 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
         printstyled("Distributed Reversibility Correction:\n"; color=:cyan)
         println("Number of Proccess : $(nprocs())")
         println("Number of Workers  : $(nworkers())")
+        if OctuplePrecision
+            printstyled("Solver = Clarabel \n"; color=:green)
+        else
+            printstyled("Solver = $SolverName\n"; color=:green)
+        end
+        printstyled("Tolerance = $Tolerance\n"; color=:magenta)
         println("Number of reversibe blocked in forward  direction : $(length(rev_blocked_fwd))")
         println("Number of reversibe blocked in backward direction : $(length(rev_blocked_back))")
         println("Number of irreversible reactions after Correction : $(length(irreversible_reactions_id))")

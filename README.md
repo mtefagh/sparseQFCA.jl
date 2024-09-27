@@ -2,7 +2,7 @@
 
 | **Tests** | **Coverage** |
 |:---:|:---:|
-| [![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl) 
+| [![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl)
 
 ## sparseQFCA architecture
 *sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package providing a sparse Quantitative flux coupling analysis(QFCA). It uses parallel processing and is designed for finding flux coupling table and metabolic network reductions, specifically for QuantomeRedNet. Moreover, a Julia implementation of Swift Consistency Checking is also available as a preprocessing subroutine.
@@ -29,8 +29,8 @@
   solvers](https://jump.dev/JuMP.jl/stable/installation/#Supported-solvers).
   However, to perform analysis at least one of these solvers needs to be
   installed on your machine. For a pure Julia implementation, you may use e.g.
-  [`GLPK.jl`](https://www.gnu.org/software/glpk/), but other solvers (Tulip,
-  Gurobi, ...) work just as well.
+  [`HiGHS.jl`](https://github.com/jump-dev/HiGHS.jl), but other solvers ([`GLPK.jl`](https://github.com/jump-dev/GLPK.jl),
+  [`CPLEX.jl`](https://github.com/jump-dev/CPLEX.jl), [`MosekTools.jl`](https://github.com/jump-dev/MosekTools.jl),...) work just as well.
 
 :bulb: If you are new to Julia, it is advisable to [familiarize yourself with
 the environment
