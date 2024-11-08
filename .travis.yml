@@ -4,8 +4,7 @@ jobs:
       julia: 1.9
       os: linux
       script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
-                                               Pkg.instantiate()'
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
         - julia --project=docs/ docs/make.jl
         - run: julia --project=docs/ --code-coverage=user docs/make.jl
           env:
@@ -13,7 +12,7 @@ jobs:
             DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
         - uses: julia-actions/julia-processcoverage@v1
         - uses: coverallsapp/github-action@v2
-  include:
+
     - stage: "Deployment"
       language: julia
       os:
@@ -29,6 +28,13 @@ jobs:
         github-token: $GITHUB_TOKEN
         keep-history: true
         on:
-          branch: master
+          branch: main
       after_success:
         - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(Codecov.process_folder())'
+
+branches:
+  only:
+    - main  # Adjust this to your primary branch name, e.g., 'main' or 'master'
+  pull_requests:
+    branches:
+      - main  # This will run Travis only on pull requests to 'main'
