@@ -3,7 +3,7 @@
 using Distributed
 
 # Add worker processes to the Julia distributed computing environment:
-addprocs(7)
+#addprocs(7)
 println("Number of Proccess : $(nprocs())")
 println("Number of Workers  : $(nworkers())")
 
@@ -203,9 +203,9 @@ printstyled("#------------------------------------------------------------------
 ## ToyModel
 
 ToyModel = Model()
-modelName = "ToyModel"
+ModelName = "ToyModel"
 
-printstyled("$modelName :\n"; color=:yellow)
+printstyled("$ModelName :\n"; color=:yellow)
 
 # Genes:
 ToyModel.genes["g1"] = Gene()
@@ -318,7 +318,7 @@ ToyModel.reactions["EX_2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
-println("FBA - $modelName:")
+println("FBA - $ModelName:")
 
 S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector_ToyModel = sparseQFCA.dataOfModel(ToyModel)
 
@@ -336,6 +336,7 @@ V = Array{Float64}([])
 for i in 1:length(x)
     append!(V, value(x[i]))
 end
+println(V)
 
 index_c = findfirst(x -> x == 1.0, c_vector_ToyModel)
 println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V[index_c])")
@@ -343,31 +344,42 @@ println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V[index_c])")
 
 ## QuantomeRedNet
 
-printstyled("QuantomeRedNet - $modelName :\n"; color=:yellow)
+printstyled("QuantomeRedNet - $ModelName :\n"; color=:yellow)
 
-ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
-reducedModelName = "ToyModel_reduced"
+reducedModelName, A_matrix, reduction_map = sparseQFCA.quantomeReducer(ToyModel, ModelName, "HiGHS", true)
 
 println("compressedFBA - $reducedModelName:")
 
+ToyModel_reduced = load_model(JSONFBCModel, "../src/QuantomeRedNet/ReducedNetworks/$reducedModelName.json", A.CanonicalModel.Model)
 S_ToyModel_reduced, Metabolites_ToyModel_reduced, Reactions_ToyModel_reduced, Genes_ToyModel_reduced, m_ToyModel_reduced, n_ToyModel_reduced, n_genes_ToyModel_reduced, lb_ToyModel_reduced, ub_ToyModel_reduced, c_vector_ToyModel_reduced = sparseQFCA.dataOfModel(ToyModel_reduced)
 
 # Define the model
-FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
+FBA_model_reduced, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
 # Add decision variables
-n = length(Reactions_ToyModel_reduced)
-@variable(FBA_model, lb_ToyModel_reduced[i] <= x[i = 1:n_ToyModel_reduced] <= ub_ToyModel_reduced[i])
+n_ToyModel_reduced = length(Reactions_ToyModel_reduced)
+# Add decision variables without bounds
+@variable(FBA_model_reduced, x[1:n_ToyModel_reduced])
 # Set the objective function
-@objective(FBA_model, Max, (c_vector_ToyModel_reduced)'* x)
-@constraint(FBA_model, (S_ToyModel_reduced) * x .== 0)
+@objective(FBA_model_reduced, Max, (c_vector_ToyModel_reduced)'* x)
+@constraint(FBA_model_reduced, lb_ToyModel .<= A_matrix*x .<= ub_ToyModel)
+@constraint(FBA_model_reduced, (S_ToyModel_reduced) * x .== 0)
 # Solve the model
-optimize!(FBA_model)
-V = Array{Float64}([])
+optimize!(FBA_model_reduced)
+V_reduced = Array{Float64}([])
 for i in 1:length(x)
-    append!(V, value(x[i]))
+    append!(V_reduced, value(x[i]))
 end
 
-index_c = findfirst(x -> x == 1.0, c_vector_ToyModel_reduced)
+println("Reduced Flux Vector:")
+println(V_reduced)
+index_c_reduced = findfirst(x -> x == 1.0, c_vector_ToyModel_reduced)
 println("Biomass = $(Reactions_ToyModel_reduced[index_c]), Flux = $(V[index_c])")
+
+V_Original = A_matrix * V_reduced
+
+println("Original Flux Vector:")
+println(V_Original)
+index_c = findfirst(x -> x == 1.0, c_vector_ToyModel)
+println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V_Original[index_c])")
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)

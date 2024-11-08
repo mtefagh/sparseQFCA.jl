@@ -19,6 +19,9 @@ import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 
+import JSONFBCModels: JSONFBCModel
+import SBMLFBCModels: SBMLFBCModel
+
 include("../Pre_Processing/Solve.jl")
 using .Solve
 
@@ -67,7 +70,7 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
+function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
@@ -75,6 +78,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
 
     # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
     index_c = findfirst(x -> x == 1.0, c_vector)
+    index_c_original = index_c
 
     # Use the found index to retrieve the corresponding element from the Reactions array:
     Biomass = Reactions[index_c]
@@ -363,6 +367,9 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     DCE = Dict()
     counter = 1
 
+    optimal_Number = 0
+    infeasible_Number = 0
+
     # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
         # Define a model_irr using GenericModel from Clarabel.jl:
@@ -422,6 +429,26 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         # Solve the optimization problem for the current setup:
         optimize!(model_local)
 
+        #printstyled("termination_status : $(termination_status(model_local))\n"; color=:yellow)
+
+        # Check the optimization result
+        status = termination_status(model_local)
+        if status == MOI.OPTIMAL
+            optimal_Number += 1
+            #println("Optimal solution found:")
+            #println("Objective Value = ", objective_value(model_local))
+        elseif status == MOI.INFEASIBLE
+            infeasible_Number += 1
+            println("Model is infeasible.")
+            println("Check constraints for possible conflicts.")
+            # GLPK does not have an equivalent to Gurobi's compute_conflict!
+            # You can manually inspect constraints or use other methods
+        elseif status == MOI.UNBOUNDED
+            println("Model is unbounded.")
+        else
+            println("Optimization was stopped with status ", status)
+        end
+
         # Increment the counter to keep track of the number of optimizations performed:
         counter += 1
 
@@ -464,6 +491,10 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         unregister(model_local, :con6)  # Unregister this constraint for clean-up
 
     end
+
+    println("Number of Optimal: $optimal_Number")
+    println("Number of Infeasible: $infeasible_Number")
+
 
     # Convert matrix A to a matrix of Float64 data type for numerical stability:
     A = convert(Matrix{Float64}, A)
@@ -650,6 +681,22 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     # Filter out genes in the model that are present in Genes_removal:
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
 
+    S_reduced, Metabolites_reduced, Reactions_reduced, Genes_reduced, m_reduced, n_reduced, n_genes_reduced, lb_reduced, ub_reduced, c_vector_reduced = dataOfModel(model, 0)
+
+    # Find the index of the first occurrence where the element in c_vector is equal to 1.0 in Reduced Network:
+    index_c_reduced = findfirst(x -> x == 1.0, c_vector_reduced)
+
+    c_vector_reduced = A' * c_vector
+
+    for i ∈ model.reactions
+        index_Reactions_reduced = findfirst(x -> x == i.first, Reactions_reduced)
+        i.second.objective_coefficient = c_vector_reduced[index_Reactions_reduced]
+    end
+
+    ReducedModelName = ModelName * "_reduced"
+    model_reduced_json = convert(JSONFBCModel, model)
+    save_model(model_reduced_json, "../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json")
+
     ## Print out results if requested
 
     if printLevel > 0
@@ -672,7 +719,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         println("Reactions   : $(length(R̃))")
         println("A matrix    : $(row_A) x $(col_A)")
     end
-    return model
+    return ReducedModelName, A, reduction_map
 end
 
 end
