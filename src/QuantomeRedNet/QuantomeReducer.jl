@@ -46,6 +46,7 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 # INPUTS
 
 - `model`:                     A CanonicalModel that has been built using COBREXA's `load_model` function.
+- `ReducedModelName`           Name of the metabolic network.
 
 # OPTIONAL INPUTS
 
@@ -57,13 +58,15 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 
 # OUTPUTS
 
-- `reducedModel`               A reduced metabolic network.
+- `ReducedModelName`           Name of the reduced metabolic network.
+- `A`                          A `n` x `ñ` matrix representing the coefficients betwee reactions of original networks and reactions of reduced network.
+- `reduct-map`                 A dictionary to save the representatives of eliminations.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> reducedModel = quantomeReducer(model)
+julia> ReducedModelName, A, reduction_map = quantomeReducer(model, ModelName)
 ```
 
 See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributedReversibility_Correction()`, `distributedQFCA()`
@@ -78,7 +81,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
     index_c = findfirst(x -> x == 1.0, c_vector)
-    index_c_original = index_c
 
     # Use the found index to retrieve the corresponding element from the Reactions array:
     Biomass = Reactions[index_c]
@@ -367,9 +369,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     DCE = Dict()
     counter = 1
 
-    optimal_Number = 0
-    infeasible_Number = 0
-
     # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
         # Define a model_irr using GenericModel from Clarabel.jl:
@@ -429,26 +428,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         # Solve the optimization problem for the current setup:
         optimize!(model_local)
 
-        #printstyled("termination_status : $(termination_status(model_local))\n"; color=:yellow)
-
-        # Check the optimization result
-        status = termination_status(model_local)
-        if status == MOI.OPTIMAL
-            optimal_Number += 1
-            #println("Optimal solution found:")
-            #println("Objective Value = ", objective_value(model_local))
-        elseif status == MOI.INFEASIBLE
-            infeasible_Number += 1
-            println("Model is infeasible.")
-            println("Check constraints for possible conflicts.")
-            # GLPK does not have an equivalent to Gurobi's compute_conflict!
-            # You can manually inspect constraints or use other methods
-        elseif status == MOI.UNBOUNDED
-            println("Model is unbounded.")
-        else
-            println("Optimization was stopped with status ", status)
-        end
-
         # Increment the counter to keep track of the number of optimizations performed:
         counter += 1
 
@@ -491,10 +470,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         unregister(model_local, :con6)  # Unregister this constraint for clean-up
 
     end
-
-    println("Number of Optimal: $optimal_Number")
-    println("Number of Infeasible: $infeasible_Number")
-
 
     # Convert matrix A to a matrix of Float64 data type for numerical stability:
     A = convert(Matrix{Float64}, A)
