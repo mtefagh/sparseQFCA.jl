@@ -200,11 +200,12 @@ fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iI
 # Print a separator:
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
-## QuantomeRedNet
-
 ## ToyModel
 
 ToyModel = Model()
+modelName = "ToyModel"
+
+printstyled("$modelName :\n"; color=:yellow)
 
 # Genes:
 ToyModel.genes["g1"] = Gene()
@@ -317,15 +318,9 @@ ToyModel.reactions["EX_2"] = Reaction(
     objective_coefficient = 1.0,
 )
 
-printstyled("ToyModel :\n"; color=:yellow)
+println("FBA - $modelName:")
 
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-
-ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
-
-println("ToyModel - Reduced FBA:")
-
-S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector = sparseQFCA.dataOfModel(ToyModel_reduced)
+S_ToyModel, Metabolites_ToyModel, Reactions_ToyModel, Genes_ToyModel, m_ToyModel, n_ToyModel, n_genes_ToyModel, lb_ToyModel, ub_ToyModel, c_vector_ToyModel = sparseQFCA.dataOfModel(ToyModel)
 
 # Define the model
 FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
@@ -333,7 +328,7 @@ FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
 n = length(Reactions_ToyModel)
 @variable(FBA_model, lb_ToyModel[i] <= x[i = 1:n_ToyModel] <= ub_ToyModel[i])
 # Set the objective function
-@objective(FBA_model, Max, (c_vector)'* x)
+@objective(FBA_model, Max, (c_vector_ToyModel)'* x)
 @constraint(FBA_model, (S_ToyModel) * x .== 0)
 # Solve the model
 optimize!(FBA_model)
@@ -342,65 +337,29 @@ for i in 1:length(x)
     append!(V, value(x[i]))
 end
 
-index_c = findfirst(x -> x == 1.0, c_vector)
-println("Biomass = $(Reactions_ToyModel[index_c]) , Flux = $(V[index_c])")
+index_c = findfirst(x -> x == 1.0, c_vector_ToyModel)
+println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V[index_c])")
 
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
 
-## ToyModel2
+## QuantomeRedNet
 
-printstyled("ToyModel2 :\n"; color=:yellow)
+printstyled("QuantomeRedNet - $modelName :\n"; color=:yellow)
 
-ToyModel2 = Model()
+ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel, "HiGHS", true)
+reducedModelName = "ToyModel_reduced"
 
-# Genes:
-ToyModel2.genes["g1"] = Gene()
+println("compressedFBA - $reducedModelName:")
 
-## Metabolites
-
-# IntraCellular:
-
-#m1c
-ToyModel2.metabolites["m1"] = Metabolite(name = "M1_c", compartment = "inside")
-
-## Reactions
-
-M = sparseQFCA.getM(0)
-
-ToyModel2.reactions["rxn1"] = Reaction(
-    name = "rxn1",
-    lower_bound = 0.0,
-    upper_bound = M,
-    stoichiometry = Dict("m1" => 2.0),
-    gene_association_dnf = [["g1"]],
-    objective_coefficient = 0.0,
-)
-
-ToyModel2.reactions["rxn2"] = Reaction(
-    name = "rxn2",
-    lower_bound = 0.0,
-    upper_bound = M,
-    stoichiometry = Dict("m1" => -1.0),
-    gene_association_dnf = [],
-    objective_coefficient = 1.0,
-)
-
-printstyled("QuantomeRedNet :\n"; color=:yellow)
-
-ToyModel_reduced = sparseQFCA.quantomeReducer(ToyModel2, "HiGHS", true)
-
-println("ToyModel2 - Reduced FBA:")
-
-S_ToyModel2, Metabolites_ToyModel2, Reactions_ToyModel2, Genes_ToyModel2, m_ToyModel2, n_ToyModel2, n_genes_ToyModel2, lb_ToyModel2, ub_ToyModel2, c_vector_ToyModel2 = sparseQFCA.dataOfModel(ToyModel_reduced)
+S_ToyModel_reduced, Metabolites_ToyModel_reduced, Reactions_ToyModel_reduced, Genes_ToyModel_reduced, m_ToyModel_reduced, n_ToyModel_reduced, n_genes_ToyModel_reduced, lb_ToyModel_reduced, ub_ToyModel_reduced, c_vector_ToyModel_reduced = sparseQFCA.dataOfModel(ToyModel_reduced)
 
 # Define the model
 FBA_model, solver = sparseQFCA.changeSparseQFCASolver("HiGHS")
 # Add decision variables
-n = length(Reactions_ToyModel2)
-@variable(FBA_model, lb_ToyModel2[i] <= x[i = 1:n_ToyModel2] <= ub_ToyModel2[i])
+n = length(Reactions_ToyModel_reduced)
+@variable(FBA_model, lb_ToyModel_reduced[i] <= x[i = 1:n_ToyModel_reduced] <= ub_ToyModel_reduced[i])
 # Set the objective function
-@objective(FBA_model, Max, (c_vector_ToyModel2)'* x)
-@constraint(FBA_model, (S_ToyModel2) * x .== 0)
+@objective(FBA_model, Max, (c_vector_ToyModel_reduced)'* x)
+@constraint(FBA_model, (S_ToyModel_reduced) * x .== 0)
 # Solve the model
 optimize!(FBA_model)
 V = Array{Float64}([])
@@ -408,5 +367,7 @@ for i in 1:length(x)
     append!(V, value(x[i]))
 end
 
-index_c_ToyModel2 = findfirst(x -> x == 1.0, c_vector_ToyModel2)
-println("Biomass = $(Reactions_ToyModel2[index_c_ToyModel2]) , Flux = $(V[index_c_ToyModel2])")
+index_c = findfirst(x -> x == 1.0, c_vector_ToyModel_reduced)
+println("Biomass = $(Reactions_ToyModel_reduced[index_c]), Flux = $(V[index_c])")
+
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
