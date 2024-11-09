@@ -12,24 +12,6 @@ jobs:
         # Set up the package and run tests with coverage
         - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.test(coverage=true)'
 
-      after_success:
-        # Submit coverage to Coveralls and Codecov
-        - julia -e 'using Coverage; Coveralls.submit(process_folder())'
-        - julia -e 'using Coverage; Codecov.submit(Codecov.process_folder())'
-
-    - stage: "Documentation"
-      julia: 1.9
-      os: linux
-      script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl
-        - run: julia --project=docs/ --code-coverage=user docs/make.jl
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-        - uses: julia-actions/julia-processcoverage@v1
-        - uses: coverallsapp/github-action@v2
-
     - stage: "Deployment"
       os: linux
       language: julia  # Julia language is primary
