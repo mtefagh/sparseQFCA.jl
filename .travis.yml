@@ -1,5 +1,7 @@
+language: julia  # Primary language is set to Julia
+
 rvm:
-  - 2.7  # Specifies Ruby 2.7 to resolve the json_pure dependency issue
+  - 2.7  # Specifies Ruby 2.7 to fix json_pure dependency issue in deployment
 
 jobs:
   include:
@@ -29,11 +31,10 @@ jobs:
         - uses: coverallsapp/github-action@v2
 
     - stage: "Deployment"
-      language: julia
-      os:
-        - linux
-      julia:
-        - 1.9.2
+      os: linux
+      language: julia  # Julia language is primary
+      julia: 1.9.2
+      rvm: 2.7  # Specifies Ruby 2.7 for json_pure compatibility in deployment
       notifications:
         email: true
       sudo: false
