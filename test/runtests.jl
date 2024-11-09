@@ -3,7 +3,7 @@
 using Distributed
 
 # Add worker processes to the Julia distributed computing environment:
-#addprocs(7)
+addprocs(7)
 println("Number of Proccess : $(nprocs())")
 println("Number of Workers  : $(nworkers())")
 
@@ -208,12 +208,10 @@ ModelName = "ToyModel"
 printstyled("$ModelName :\n"; color=:yellow)
 
 # Genes:
-ToyModel.genes["g1"] = Gene()
-ToyModel.genes["g2"] = Gene()
-ToyModel.genes["g3"] = Gene()
-ToyModel.genes["g4"] = Gene()
-ToyModel.genes["g5"] = Gene()
-ToyModel.genes["g6"] = Gene()
+for i = 1:6
+    gene = "G" * "$i"
+    ToyModel.genes[gene] = Gene()
+end
 
 ## Metabolites
 
@@ -247,7 +245,7 @@ ToyModel.reactions["M1t"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m5" => -1.0, "m1" => 1.0),
-    gene_association_dnf = [["g1"]],
+    gene_association_dnf = [["G1"]],
     objective_coefficient = 0.0,
 )
 
@@ -256,7 +254,7 @@ ToyModel.reactions["rxn1"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m1" => -2.0, "m2" => 1.0, "m3" => 1.0),
-    gene_association_dnf = [["g2"]],
+    gene_association_dnf = [["G2"]],
     objective_coefficient = 0.0,
 )
 
@@ -265,7 +263,7 @@ ToyModel.reactions["rxn2"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m2" => -1.0, "m3" => 1.0),
-    gene_association_dnf = [["g3"]],
+    gene_association_dnf = [["G3"]],
     objective_coefficient = 0.0,
 )
 
@@ -274,7 +272,7 @@ ToyModel.reactions["M2t"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m2" => -1.0, "m5" => 1.0),
-    gene_association_dnf = [["g4"]],
+    gene_association_dnf = [["G4"]],
     objective_coefficient = 0.0,
 )
 
@@ -285,7 +283,7 @@ ToyModel.reactions["rxn3"] = Reaction(
     lower_bound = -M,
     upper_bound = M,
     stoichiometry = Dict("m1" => -1.0, "m4" => 1.0),
-    gene_association_dnf = [["g5"]],
+    gene_association_dnf = [["G5"]],
     objective_coefficient = 0.0,
 )
 
@@ -294,7 +292,7 @@ ToyModel.reactions["M3t"] = Reaction(
     lower_bound = -M,
     upper_bound = M,
     stoichiometry = Dict("m3" => -1.0, "m6" => 1.0),
-    gene_association_dnf = [["g6"]],
+    gene_association_dnf = [["G6"]],
     objective_coefficient = 0.0,
 )
 
@@ -340,7 +338,6 @@ println(V)
 
 index_c = findfirst(x -> x == 1.0, c_vector_ToyModel)
 println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V[index_c])")
-
 
 ## QuantomeRedNet
 
