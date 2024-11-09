@@ -1,3 +1,6 @@
+rvm:
+  - 2.7  # Specifies Ruby 2.7 to resolve the json_pure dependency issue
+
 jobs:
   include:
     - stage: "Test and Coverage"
