@@ -14,17 +14,18 @@ jobs:
         - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.test(coverage=true)'
         
     - stage: "Documentation"
-      julia: 1.9
+      julia: 1.8
       os: linux
       script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
+                                               Pkg.instantiate()'
         - julia --project=docs/ docs/make.jl
         - run: julia --project=docs/ --code-coverage=user docs/make.jl
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
         - uses: julia-actions/julia-processcoverage@v1
-        - uses: coverallsapp/github-action@v2
+        - uses: codecov/codecov-action@v1
         
     - stage: "Deployment"
       os: linux
