@@ -7,7 +7,7 @@ jobs:
   include:
   
     - stage: "Test and Coverage"
-      julia: 1.9
+      julia: 1.9.2
       os: linux
       script:
         # Set up the package and run tests with coverage
@@ -16,7 +16,7 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
         
     - stage: "Documentation"
-      julia: 1.8
+      julia: 1.9.2
       os: linux
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
