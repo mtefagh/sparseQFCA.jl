@@ -56,7 +56,7 @@ is considered blocked. The function returns the IDs of the blocked reactions.
 julia> blocked_index = find_blocked_reactions(model)
 ```
 
-See also: `dataOfModel()`, `reversibility()`
+See also: `dataOfModel()`, `reversibility()`, `getM()`
 
 """
 

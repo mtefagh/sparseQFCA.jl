@@ -19,6 +19,9 @@ import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 
+import JSONFBCModels: JSONFBCModel
+import SBMLFBCModels: SBMLFBCModel
+
 include("../Pre_Processing/Solve.jl")
 using .Solve
 
@@ -43,6 +46,7 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 # INPUTS
 
 - `model`:                     A CanonicalModel that has been built using COBREXA's `load_model` function.
+- `ReducedModelName`           Name of the metabolic network.
 
 # OPTIONAL INPUTS
 
@@ -54,20 +58,22 @@ for DCE-induced reductions. Finally, it generates information about the reductio
 
 # OUTPUTS
 
-- `reducedModel`               A reduced metabolic network.
+- `ReducedModelName`           Name of the reduced metabolic network.
+- `A`                          A `n` x `ñ` matrix representing the coefficients betwee reactions of original networks and reactions of reduced network.
+- `reduct-map`                 A dictionary to save the representatives of eliminations.
 
 # EXAMPLES
 
 - Full input/output example
 ```julia
-julia> reducedModel = quantomeReducer(model)
+julia> ReducedModelName, A, reduction_map = quantomeReducer(model, ModelName)
 ```
 
 See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributedReversibility_Correction()`, `distributedQFCA()`
 
 """
 
-function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
+function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
@@ -650,6 +656,22 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
     # Filter out genes in the model that are present in Genes_removal:
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
 
+    S_reduced, Metabolites_reduced, Reactions_reduced, Genes_reduced, m_reduced, n_reduced, n_genes_reduced, lb_reduced, ub_reduced, c_vector_reduced = dataOfModel(model, 0)
+
+    # Find the index of the first occurrence where the element in c_vector is equal to 1.0 in Reduced Network:
+    index_c_reduced = findfirst(x -> x == 1.0, c_vector_reduced)
+
+    c_vector_reduced = A' * c_vector
+
+    for i ∈ model.reactions
+        index_Reactions_reduced = findfirst(x -> x == i.first, Reactions_reduced)
+        i.second.objective_coefficient = c_vector_reduced[index_Reactions_reduced]
+    end
+
+    ReducedModelName = ModelName * "_reduced"
+    model_reduced_json = convert(JSONFBCModel, model)
+    save_model(model_reduced_json, "../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json")
+
     ## Print out results if requested
 
     if printLevel > 0
@@ -672,7 +694,7 @@ function quantomeReducer(model, SolverName::String="HiGHS", OctuplePrecision::Bo
         println("Reactions   : $(length(R̃))")
         println("A matrix    : $(row_A) x $(col_A)")
     end
-    return model
+    return ReducedModelName, A, reduction_map
 end
 
 end

@@ -1,25 +1,32 @@
+language: julia  # Primary language is set to Julia
+
+rvm:
+  - 2.7  # Specifies Ruby 2.7 to fix json_pure dependency issue in deployment
+
 jobs:
   include:
-    - stage: "Documentation"
-      julia: 1.9
+  
+    - stage: "Test and Coverage"
+      julia: 1.9.2
       os: linux
       script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
-                                               Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl
-        - run: julia --project=docs/ --code-coverage=user docs/make.jl
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-        - uses: julia-actions/julia-processcoverage@v1
-        - uses: coverallsapp/github-action@v2
-  include:
+        # Set up the package and run tests with coverage
+        - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.test(coverage=true)'
+        # Upload coverage to Codecov
+        - bash <(curl -s https://codecov.io/bash)
+        
+    - stage: "Documentation"
+      julia: 1.9.2
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        - julia --project=docs/ docs/make.jl --code-coverage=user
+        
     - stage: "Deployment"
-      language: julia
-      os:
-        - linux
-      julia:
-        - 1.9.2
+      os: linux
+      language: julia  # Julia language is primary
+      julia: 1.9.2
+      rvm: 2.7  # Specifies Ruby 2.7 for json_pure compatibility in deployment
       notifications:
         email: true
       sudo: false
@@ -30,5 +37,10 @@ jobs:
         keep-history: true
         on:
           branch: master
-      after_success:
-        - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(Codecov.process_folder())'
+
+branches:
+  only:
+    - master
+  pull_requests:
+    branches:
+      - master
