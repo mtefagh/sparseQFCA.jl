@@ -1,7 +1,7 @@
 name = "sparseQFCA"
 uuid = "077cf62c-ad2d-5edd-99ec-638372f8b004"
 authors = ["Mojtaba Tefagh <mtefagh@sharif.edu>", "Iman Ghadimi <iman.diligent@gmail.com>"]
-version = "2.2.0"
+version = "2.1.0"
 
 [deps]
 AbstractFBCModels = "5a4f3dfa-1789-40f8-8221-69268c29937c"
