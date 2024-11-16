@@ -1,35 +1,46 @@
-language: julia  # Primary language is set to Julia
+language: julia  # Primary language is Julia
 
-rvm:
-  - 2.7  # Specifies Ruby 2.7 to fix json_pure dependency issue in deployment
+branches:
+  only:
+    - master  # Only run CI/CD workflows on the master branch
+  pull_requests:
+    branches:
+      - master  # Include pull requests targeting master
 
 jobs:
   include:
-  
+
     - stage: "Test and Coverage"
       julia: 1.9.2
       os: linux
       script:
-        # Set up the package and run tests with coverage
-        - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.test(coverage=true)'
-        # Upload coverage to Codecov
-        - bash <(curl -s https://codecov.io/bash)
-        
+        - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.test(coverage=true)'
+        - bash <(curl -s https://codecov.io/bash)  # Submitting to Codecov
+      after_success:
+        - julia -e 'using Coverage; Coveralls.submit(process_folder())'  # Submitting to Coveralls
+
     - stage: "Documentation"
       julia: 1.9.2
       os: linux
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
         - julia --project=docs/ docs/make.jl --code-coverage=user
-        
+        - run: julia --project=docs/ --code-coverage=user docs/make.jl
+        steps:
+        - uses: actions/checkout@master
+        - uses: codecov/codecov-action@v4
+          env:
+            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     - stage: "Deployment"
       os: linux
-      language: julia  # Julia language is primary
+      language: julia
       julia: 1.9.2
-      rvm: 2.7  # Specifies Ruby 2.7 for json_pure compatibility in deployment
+      rvm: 2.7  # Specify Ruby version for deployment
       notifications:
         email: true
-      sudo: false
+      before_install:
+        - gem install json_pure -v 2.7.6  # Install json_pure only for deployment
       deploy:
         provider: pages
         skip-cleanup: true
@@ -37,10 +48,5 @@ jobs:
         keep-history: true
         on:
           branch: master
-
-branches:
-  only:
-    - master
-  pull_requests:
-    branches:
-      - master
+      after_success:
+        - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(Codecov.process_folder())'
