@@ -1,1 +1,77 @@
-{"metabolites":[],"reactions":[{"name":"transport m2","metabolites":{},"lower_bound":0.0,"id":"M2t","notes":{},"gene_reaction_rule":"(G4) || (G1) || (G6) || (G2)","annotation":{},"upper_bound":1.0e6,"objective_coefficient":1.0},{"name":"rxn2","metabolites":{},"lower_bound":0.0,"id":"rxn2","notes":{},"gene_reaction_rule":"(G3) || (G1) || (G6) || (G2)","annotation":{},"upper_bound":1.0e6,"objective_coefficient":2.0}],"genes":[{"name":null,"id":"G1","notes":{},"annotation":{}},{"name":null,"id":"G2","notes":{},"annotation":{}},{"name":null,"id":"G3","notes":{},"annotation":{}},{"name":null,"id":"G4","notes":{},"annotation":{}},{"name":null,"id":"G6","notes":{},"annotation":{}}]}
+{
+ "metabolites": [],
+ "reactions": [
+  {
+   "name": "transport m2",
+   "metabolites": {},
+   "lower_bound": 0.0,
+   "id": "M2t",
+   "notes": {},
+   "gene_reaction_rule": "(((((((((((G4) || (G1 && G7) || (G3 && G5)) && ((G7)))) && ((G8)))) && ((G1 && G2) || (G3)))) && ((G6)))) && ((G2) || (G3)))",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 1.0
+  },
+  {
+   "name": "rxn2",
+   "metabolites": {},
+   "lower_bound": 0.0,
+   "id": "rxn2",
+   "notes": {},
+   "gene_reaction_rule": "(((((((((((G3 && G4) || (G5 && G6)) && ((G7)))) && ((G8)))) && ((G1 && G2) || (G3)))) && ((G6)))) && ((G2) || (G3)))",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 2.0
+  }
+ ],
+ "genes": [
+  {
+   "name": null,
+   "id": "G1",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G2",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G3",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G4",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G5",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G6",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G7",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G8",
+   "notes": {},
+   "annotation": {}
+  }
+ ]
+}
