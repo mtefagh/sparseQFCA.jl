@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 #=
-    Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossy compression in Information Theory.
+    Purpose:    Metabolic Network Reductions based on Quantitative Flux Coupling Analysis and the concept of lossless compression in Information Theory.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       May 2023
 =#
@@ -10,7 +10,7 @@ module QuantomeReducer
 
 export quantomeReducer
 
-using COBREXA, SparseArrays, JuMP, LinearAlgebra, Distributed, SharedArrays
+using COBREXA, SparseArrays, JuMP, LinearAlgebra, Distributed, SharedArrays, JSON, JLD2
 
 import CDDLib
 import Clarabel
@@ -97,6 +97,9 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     Reaction_Ids = collect(1:n)
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
 
+    irreversible_reactions_id = sort(irreversible_reactions_id)
+    reversible_reactions_id = sort(reversible_reactions_id)
+
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
@@ -121,6 +124,9 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, SolverName, false)
+
+    irreversible_reactions_id = sort(irreversible_reactions_id)
+    reversible_reactions_id = sort(reversible_reactions_id)
 
     # Get the dimensions of the updated stoichiometric matrix:
     row_S, col_S = size(S)
@@ -428,9 +434,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         # Solve the optimization problem for the current setup:
         optimize!(model_local)
 
-        # Increment the counter to keep track of the number of optimizations performed:
-        counter += 1
-
         # Get the values of the λ variables after solving the optimization problem:
         λ_vec = value.(λ)
 
@@ -521,7 +524,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     ## Genes
 
-    # Iterate through each reaction in the model:
     for i ∈ model.reactions
         # Iterate through the sorted reduction_map (which maps reactions to a list of associated reactions):
         for (key, value) ∈ sort(reduction_map)
@@ -530,37 +532,20 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
                 # Loop through the second element of the value list, which contains a set of reactions:
                 for j ∈ value[2]
                     # Check if the gene association for the current reaction and the related reaction is not empty:
-                    if !isnothing(i.second.gene_association_dnf) && !isnothing(model.reactions[Reactions[j]].gene_association_dnf)
-                        # Concatenate the gene associations of the current reaction with those of the related reaction:
-                        i.second.gene_association_dnf = vcat(i.second.gene_association_dnf, model.reactions[Reactions[j]].gene_association_dnf)
+                    if !isnothing(i.second.gene_association_dnf) && !isnothing(model.reactions[Reactions[j]].gene_association_dnf) && (j != value[1])
+
+                        # Combine the original expression with the new one using "And" logic:
+                        new_terms = ["(" * join(group, " && ") * ")" for group in model.reactions[Reactions[j]].gene_association_dnf]
+
+                        # Wrap the original expression in parentheses and combine with the new terms:
+                        original_expr = ["(" * join(group, " && ") * ")" for group in i.second.gene_association_dnf]
+                        combined_expr = ["(" * join(original_expr, " || ") * ") && (" * join(new_terms, " || ") * ")"]
+
+                        # Update the gene association:
+                        i.second.gene_association_dnf = [combined_expr]
                     end
                 end
             end
-        end
-    end
-
-    # Iterate through each reaction in the model:
-    for i ∈ model.reactions
-        # Check if the gene association exists and is not nothing:
-        if !isnothing(i.second.gene_association_dnf)
-            # Flatten the non-empty elements of the gene_association_dnf list into a single iterable:
-            flattened = filter(!isempty, i.second.gene_association_dnf) |> Iterators.flatten
-            # Create a set to keep track of unique genes:
-            seen = Set{String}()
-            # Create an empty vector to store unique gene associations:
-            result = Vector{Vector{String}}()
-            # Iterate through the flattened list of genes:
-            for gene ∈ flattened
-                # Check if the gene has not been seen before:
-                if !(gene in seen)
-                    # Add the gene to the set of seen genes:
-                    push!(seen, gene)
-                    # Add the gene as a new vector to the result list:
-                    push!(result, [gene])
-                end
-            end
-            # Update the gene_association_dnf with the unique gene associations:
-            i.second.gene_association_dnf = result
         end
     end
 
@@ -647,11 +632,18 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     # Remove duplicate genes from Genes_final:
     Genes_final = unique(Genes_final)
 
-    # Flatten the nested gene lists in Genes_final into a single list:
-    Genes_final = collect(Iterators.flatten(Genes_final))
+    # Regular expression to match genes (e.g., G1, G2, ...)
+    gene_pattern = r"G\d+"
+
+    # Flatten the nested structure and extract unique genes
+    flattened_genes = reduce(vcat, Genes_final) # Flatten the nested arrays
+    Genes_reduced = unique([match.match for line in flattened_genes for match in eachmatch(gene_pattern, line)])
+
+    # Sort the genes if needed
+    Genes_reduced = sort(Genes_reduced)
 
     # Determine the genes that need to be removed by finding the difference:
-    Genes_removal = setdiff(Genes, Genes_final)
+    Genes_removal = setdiff(Genes, Genes_reduced)
 
     # Filter out genes in the model that are present in Genes_removal:
     filter!(pair -> !(pair.first in Genes_removal), model.genes)
@@ -672,6 +664,31 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     model_reduced_json = convert(JSONFBCModel, model)
     save_model(model_reduced_json, "../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json")
 
+    # Read the JSON file
+    data = JSON.parsefile("../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json")
+
+    # Process reactions to fix gene_reaction_rule
+    for reaction in data["reactions"]
+        # Fix invalid gene_reaction_rule entries
+        if haskey(reaction, "gene_reaction_rule")
+            rule = reaction["gene_reaction_rule"]
+
+            # Replace "()" with an empty string
+            if rule == "()"
+                reaction["gene_reaction_rule"] = ""
+            end
+
+        end
+    end
+
+    # Write the corrected JSON file
+    open("../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json", "w") do file
+        JSON.print(file, data, 1)  # Use 'indent=1' for indentation
+    end
+
+    # Save matrix to a file
+    @save "../src/QuantomeRedNet/ReducedNetworks/A_$ReducedModelName.jld2" A
+
     ## Print out results if requested
 
     if printLevel > 0
@@ -689,7 +706,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         println("Reactions   : $(n)")
         println("Reduced Network:")
         println("S           : $(row_S̃) x $(col_S̃)")
-        println("Genes       : $(length(Genes_final))")
+        println("Genes       : $(length(Genes_reduced))")
         println("Metabolites : $(length(Metabolites_reduced))")
         println("Reactions   : $(length(R̃))")
         println("A matrix    : $(row_A) x $(col_A)")
