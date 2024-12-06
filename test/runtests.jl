@@ -14,10 +14,9 @@ include("TestData.jl")
 @everywhere include("../src/sparseQFCA.jl")
 
 # Import required Julia modules:
-using COBREXA, JuMP, Test, Distributed
-using JuMP, HiGHS, Clarabel
-
+using COBREXA, JuMP, Test, Distributed, JuMP, HiGHS, Clarabel, JSON
 using .TestData, .sparseQFCA
+
 import AbstractFBCModels as A
 import AbstractFBCModels.CanonicalModel: Model
 import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
@@ -208,7 +207,7 @@ ModelName = "ToyModel"
 printstyled("$ModelName :\n"; color=:yellow)
 
 # Genes:
-for i = 1:6
+for i = 1:9
     gene = "G" * "$i"
     ToyModel.genes[gene] = Gene()
 end
@@ -233,7 +232,6 @@ ToyModel.metabolites["m5"] = Metabolite(name = "M1_e", compartment = "outside")
 #m3e
 ToyModel.metabolites["m6"] = Metabolite(name = "M3_e", compartment = "outside")
 
-
 ## Reactions
 
 M = sparseQFCA.getM(0)
@@ -245,7 +243,7 @@ ToyModel.reactions["M1t"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m5" => -1.0, "m1" => 1.0),
-    gene_association_dnf = [["G1"]],
+    gene_association_dnf = [["G1","G2"],["G3"]],
     objective_coefficient = 0.0,
 )
 
@@ -254,7 +252,7 @@ ToyModel.reactions["rxn1"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m1" => -2.0, "m2" => 1.0, "m3" => 1.0),
-    gene_association_dnf = [["G2"]],
+    gene_association_dnf = [["G2"], ["G3"]],
     objective_coefficient = 0.0,
 )
 
@@ -263,7 +261,7 @@ ToyModel.reactions["rxn2"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m2" => -1.0, "m3" => 1.0),
-    gene_association_dnf = [["G3"]],
+    gene_association_dnf = [["G3","G4"],["G5","G6"]],
     objective_coefficient = 0.0,
 )
 
@@ -272,7 +270,7 @@ ToyModel.reactions["M2t"] = Reaction(
     lower_bound = 0.0,
     upper_bound = M,
     stoichiometry = Dict("m2" => -1.0, "m5" => 1.0),
-    gene_association_dnf = [["G4"]],
+    gene_association_dnf = [["G4"], ["G1","G7"], ["G3","G5"]],
     objective_coefficient = 0.0,
 )
 
@@ -283,7 +281,7 @@ ToyModel.reactions["rxn3"] = Reaction(
     lower_bound = -M,
     upper_bound = M,
     stoichiometry = Dict("m1" => -1.0, "m4" => 1.0),
-    gene_association_dnf = [["G5"]],
+    gene_association_dnf = [["G9"]],
     objective_coefficient = 0.0,
 )
 
@@ -303,7 +301,7 @@ ToyModel.reactions["EX_1"] = Reaction(
     lower_bound = -M,
     upper_bound = M,
     stoichiometry = Dict("m5" => -1.0),
-    gene_association_dnf = [[]],
+    gene_association_dnf = [["G7"]],
     objective_coefficient = 0.0,
 )
 
@@ -312,9 +310,19 @@ ToyModel.reactions["EX_2"] = Reaction(
     lower_bound = -M,
     upper_bound = M,
     stoichiometry = Dict("m6" => -1.0),
-    gene_association_dnf = [],
+    gene_association_dnf = [["G8"]],
     objective_coefficient = 1.0,
 )
+
+ModelName = "ToyModel"  # Define the model name as a string
+ToyModel_json = convert(JSONFBCModel, ToyModel)
+save_model(ToyModel_json, "../test/Models/$ModelName.json")  # Use the string in the file path
+# Read the JSON file
+data = JSON.parsefile("Models/$ModelName.json")
+# Write the corrected JSON file
+open("Models/$ModelName.json", "w") do file
+    JSON.print(file, data, 1)  # Use 'indent=1' for indentation
+end
 
 println("FBA - $ModelName:")
 
@@ -341,6 +349,8 @@ println("Biomass = $(Reactions_ToyModel[index_c]), Flux = $(V[index_c])")
 
 ## QuantomeRedNet
 
+ModelName = "ToyModel"
+myModel_ToyModel = load_model(JSONFBCModel, "Models/ToyModel.json", A.CanonicalModel.Model)
 printstyled("QuantomeRedNet - $ModelName :\n"; color=:yellow)
 
 reducedModelName, A_matrix, reduction_map = sparseQFCA.quantomeReducer(ToyModel, ModelName, "HiGHS", true)
