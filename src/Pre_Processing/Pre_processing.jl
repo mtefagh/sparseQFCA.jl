@@ -630,7 +630,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     n = length(lb)
 
     # Set the tolerance value:
-    Tolerance = getTolerance()
+    Tolerance = 1e-6
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
