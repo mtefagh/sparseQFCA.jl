@@ -2,10 +2,10 @@
 
 | **Tests** | **Coverage** |
 |:---:|:---:|
-| [![Build Status](https://travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl)
+| [![Build Status](https://api.travis-ci.com/mtefagh/sparseQFCA.jl.svg?branch=master)](https://app.travis-ci.com/mtefagh/sparseQFCA.jl) | [![Coverage Status](https://coveralls.io/repos/github/mtefagh/sparseQFCA.jl/badge.svg?branch=master)](https://coveralls.io/github/mtefagh/sparseQFCA.jl?branch=master) [![codecov](https://codecov.io/gh/mtefagh/sparseQFCA.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mtefagh/sparseQFCA.jl)
 
 ## sparseQFCA architecture
-*sparseQFCA* is a registered [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package providing a sparse Quantitative flux coupling analysis(QFCA). It uses parallel processing and is designed for finding flux coupling table and metabolic network reductions, specifically for QuantomeRedNet. Moreover, a Julia implementation of Swift Consistency Checking is also available as a preprocessing subroutine.
+The *sparseQFCA* repository offers a [<img src="https://julialang.org/assets/infra/logo.svg" height="20" />](https://julialang.org/) is a Julia package for applying convex optimization techniques to constraint-based modeling of metabolic networks. It includes functions for consistency checking, reversibility correction, and flux coupling analysis. The repository also introduces [QuantomeRedNet](https://github.com/mtefagh/sparseQFCA.jl/blob/master/example/QuantomeRedNet.ipynb), a module designed to provide a loss-less method for the quantitative reduction of metabolic networks, which is particularly beneficial for metabolic engineering and can be effectively used in strain design algorithms. All optimization algorithms are modeled using the [JuMP.jl](https://github.com/jump-dev/JuMP.jl) package and are implemented with parallel processing, utilizing [Distributed.jl](https://github.com/JuliaLang/Distributed.jl) for efficient execution.
 
 ![sparseQFCA architecture](/example/sparseQFCA.png "sparseQFCA architecture")
 

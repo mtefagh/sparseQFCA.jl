@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------------------------------------------------------------------------------
 #=
-    Purpose:    Identifying blocked reactions in metabolic networks using Convex Optimization(1LP) and Gaussian Elimination
+    Purpose:    Identifying blocked reactions in metabolic networks using Convex Optimization(1LP) and Gaussian Elimination.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       July 2022
 =#
@@ -25,7 +25,7 @@ using .Pre_processing
 """
     Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
 
-A general type for storing a CoreModel which contains the following fields to run swiftCC():
+A general type for storing a CanonicalModel which contains the following fields to run swiftCC():
 
 - `S`:              LHS matrix (m x n)
 - `Metabolites`:    List of metabolic network metabolites.

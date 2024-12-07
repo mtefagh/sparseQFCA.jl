@@ -1,0 +1,70 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - master
+    tags: '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test-and-coverage:
+    name: Test and Coverage
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@master
+
+      # Set up Julia
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: '1.9.2'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: julia -e 'using Pkg; Pkg.instantiate()'
+
+      # Run tests with coverage enabled
+      - name: Run tests with coverage
+        env:
+          JULIA_COVERAGE: true
+        run: julia --project=. -e 'using Pkg; Pkg.test(coverage=true)'
+
+      # Upload coverage to Codecov
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  documentation:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@master
+
+      # Set up Julia
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: '1.9.2'
+
+      # Install dependencies for documentation
+      - name: Install dependencies for docs
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
+      # Build Documentation
+      - name: Build Documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For GitHub authentication
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For SSH deploy key
+        run: julia --project=docs/ docs/make.jl
+
+      # Upload Coverage to Codecov (optional to run in documentation)
+      - name: Upload Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
