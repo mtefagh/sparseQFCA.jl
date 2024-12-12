@@ -36,7 +36,6 @@ jobs:
       os: linux
       language: julia
       julia: 1.10.7
-      rvm: 2.7  # Specify Ruby version for deployment
       notifications:
         email: true
       before_install:
