@@ -472,6 +472,12 @@ println(V)
 
 println("Biomass = $(Reactions_ToyModel[index_c_Toymodel]), Flux = $(V[index_c_Toymodel])")
 
+Original_ObjectiveValue = objective_value(FBA_model)
+Corrected_ObjectiveValue = objective_value(FBA_model_correction)
+Compressed_ObjectiveValue = objective_value(FBA_model_reduced)
+
+@test FBATest(Original_ObjectiveValue, Corrected_ObjectiveValue, Compressed_ObjectiveValue)
+
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
 ## ToyModel2
@@ -667,6 +673,12 @@ println("V = A * V_reduced")
 println(V)
 
 println("Biomass = $(Reactions_ToyModel[index_c_Toymodel]), Flux = $(V[index_c_Toymodel])")
+
+Original_ObjectiveValue = objective_value(FBA_model)
+Corrected_ObjectiveValue = objective_value(FBA_model_correction)
+Compressed_ObjectiveValue = objective_value(FBA_model_reduced)
+
+@test FBATest(Original_ObjectiveValue, Corrected_ObjectiveValue, Compressed_ObjectiveValue)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
@@ -902,6 +914,12 @@ println("V = A * V_reduced")
 println(V)
 
 println("Biomass = $(Reactions_ToyModel[index_c_Toymodel]), Flux = $(V[index_c_Toymodel])")
+
+Original_ObjectiveValue = objective_value(FBA_model)
+Corrected_ObjectiveValue = objective_value(FBA_model_correction)
+Compressed_ObjectiveValue = objective_value(FBA_model_reduced)
+
+@test FBATest(Original_ObjectiveValue, Corrected_ObjectiveValue, Compressed_ObjectiveValue)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
@@ -1158,5 +1176,11 @@ println("V = A * V_reduced")
 println(V)
 
 println("Biomass = $(Reactions_ToyModel4[index_c_ToyModel4]), Flux = $(V[index_c_ToyModel4])")
+
+Original_ObjectiveValue = objective_value(FBA_model)
+Corrected_ObjectiveValue = objective_value(FBA_model_correction)
+Compressed_ObjectiveValue = objective_value(FBA_model_reduced)
+
+@test FBATest(Original_ObjectiveValue, Corrected_ObjectiveValue, Compressed_ObjectiveValue)
 
 printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)

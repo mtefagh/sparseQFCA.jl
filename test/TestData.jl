@@ -6,8 +6,8 @@ import JSONFBCModels: JSONFBCModel
 
 import AbstractFBCModels as A
 
-export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,
-       blockedTest_e_coli_core, blockedTest_iIS312, QFCATest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312
+export myModel_e_coli_core, myModel_iIS312, fctable_FFCA_e_coli_core, fctable_FFCA_iIS312,blockedTest_e_coli_core,
+       blockedTest_iIS312, QFCATest_iIS312, distributedQFCATest_e_coli_core, distributedQFCATest_iIS312, FBATest
 
 using COBREXA, DelimitedFiles, SparseArrays
 
@@ -28,5 +28,8 @@ blockedTest_iIS312(list_TheNaive, list_SwiftCC) = all(list_TheNaive .== list_Swi
 QFCATest_iIS312(fctable_QFCA_iIS312) = all(fctable_QFCA_iIS312 .== fctable_FFCA_iIS312)
 distributedQFCATest_e_coli_core(fctable_distributedQFCA_e_coli_core) = all(fctable_distributedQFCA_e_coli_core .== fctable_FFCA_e_coli_core)
 distributedQFCATest_iIS312(fctable_distributedQFCA_iIS312) = all(fctable_distributedQFCA_iIS312 .== fctable_FFCA_iIS312)
+FBATest(Original_ObjectiveValue, Corrected_ObjectiveValue, Compressed_ObjectiveValue; atol=1e-2) =
+    all(isapprox(Original_ObjectiveValue, Corrected_ObjectiveValue; atol=atol) &&
+        isapprox(Original_ObjectiveValue, Compressed_ObjectiveValue; atol=atol))
 
 end
