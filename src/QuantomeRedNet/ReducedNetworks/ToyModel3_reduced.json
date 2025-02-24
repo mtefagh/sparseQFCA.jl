@@ -1,0 +1,73 @@
+{
+ "metabolites": [
+  {
+   "compartment": "inside",
+   "name": "M2_c",
+   "formula": null,
+   "id": "m2",
+   "charge": null,
+   "notes": {},
+   "annotation": {}
+  }
+ ],
+ "reactions": [
+  {
+   "name": "rxn3",
+   "metabolites": {
+    "m2": -1.0000000000287557e-6
+   },
+   "lower_bound": 0.0,
+   "id": "R3",
+   "notes": {},
+   "gene_reaction_rule": "(G3)",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 0.0
+  },
+  {
+   "name": "rxn4",
+   "metabolites": {
+    "m2": -1.0000000000287557e-6
+   },
+   "lower_bound": 0.0,
+   "id": "R4",
+   "notes": {},
+   "gene_reaction_rule": "(G4)",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 1.0
+  }
+ ],
+ "genes": [
+  {
+   "name": null,
+   "id": "G1",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G2",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G3",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G4",
+   "notes": {},
+   "annotation": {}
+  },
+  {
+   "name": null,
+   "id": "G5",
+   "notes": {},
+   "annotation": {}
+  }
+ ]
+}
