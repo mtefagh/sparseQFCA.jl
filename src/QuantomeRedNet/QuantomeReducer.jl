@@ -88,28 +88,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     # Use the found index to retrieve the corresponding element from the Reactions array:
     Biomass = Reactions[index_c]
 
-    # Define the model
-    FBA_model, solver = changeSparseQFCASolver("HiGHS")
-    # Add decision variables
-    n = length(Reactions)
-    @variable(FBA_model, lb[i] <= x[i = 1:n] <= ub[i])
-    # Set the objective function
-    println("Objective Function = C'x = $((c_vector)'* x)")
-    @objective(FBA_model, Max, (c_vector)'* x)
-    @constraint(FBA_model, (S) * x .== 0)
-    # Solve the model
-    optimize!(FBA_model)
-    V_initial = Array{Float64}([])
-    for i in 1:length(x)
-        append!(V_initial, value(x[i]))
-    end
-
-    println("V_initial:")
-    println(V_initial)
-    println("V_initial : $(length(V_initial))")
-    println("objective_value = $(objective_value(FBA_model))")
-    println("Biomass = $(Reactions[index_c]), Flux = $(V_initial[index_c])")
-
     row_S, col_S = size(S)
 
     # Create an array of reaction IDs:
@@ -147,30 +125,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
     # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, SolverName, false)
-
-    println("FBA after Correction:")
-
-    # Define the model
-    FBA_model_correction, solver = changeSparseQFCASolver("HiGHS")
-    # Add decision variables
-    n = length(Reactions)
-    @variable(FBA_model_correction, lb[i] <= x[i = 1:n] <= ub[i])
-    # Set the objective function
-    println("Objective Function = C'x = $((c_vector)'* x)")
-    @objective(FBA_model_correction, Max, (c_vector)'* x)
-    @constraint(FBA_model_correction, (S) * x .== 0)
-    # Solve the model
-    optimize!(FBA_model_correction)
-    V_correction = Array{Float64}([])
-    for i in 1:length(x)
-        append!(V_correction, value(x[i]))
-    end
-
-    println("V_correction:")
-    println(V_correction)
-    println("V_correction : $(length(V_correction))")
-    println("objective_value = $(objective_value(FBA_model_correction))")
-    println("Biomass = $(Reactions[index_c]), Flux = $(V_correction[index_c])")
 
     irreversible_reactions_id = sort(irreversible_reactions_id)
     reversible_reactions_id = sort(reversible_reactions_id)
@@ -395,7 +349,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     for i = 1:n
         if i ∈ blocked_index
             # Set the entire row to 0.0 in 'A' for the indices present in 'blocked_index':
-            println("A[$i, :] .= 0.0")
             A[i, :] .= 0.0
         end
     end
@@ -445,9 +398,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     S, Metabolites_reduced, Metabolites_elimination  = remove_zeroRows(S, Metabolites)
     row, col = size(S)
 
-    optimal_Number = 0
-    infeasible_Number = 0
-
     # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
         # Define a model_irr using GenericModel from Clarabel.jl:
@@ -485,7 +435,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     # Create a new array without the blocked indices
     lb_noBlocked = [lb[i] for i in 1:length(lb) if i ∉ blocked_index]
-    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, Reaction_Ids_noBlocked, printLevel)
+    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, Reaction_Ids_noBlocked, 0)
 
     for i in reversible_reactions_id_noBlocked
         #println("$i in reversible_reactions_id_noBlocked")
@@ -540,15 +490,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
             # Check the optimization result
             status = termination_status(model_local)
-            if status == MOI.OPTIMAL
-                optimal_Number += 1
-            elseif status == MOI.INFEASIBLE
-                infeasible_Number += 1
-            elseif status == MOI.UNBOUNDED
-                #println("Model is unbounded.")
-            else
-                #println("Optimization was stopped with status ", status)
-            end
 
             # Get the values of the λ variables after solving the optimization problem:
             λ_vec = value.(λ)
@@ -594,9 +535,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
             #printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
         end
     end
-
-    println("Number of Optimal: $optimal_Number")
-    println("Number of Infeasible: $infeasible_Number")
 
     for key ∈ sort(collect(keys(FC_Clusters_coefficients)))
         if FC_Clusters_coefficients[key][1] in remove_list_DC
@@ -652,9 +590,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         # Incrementing the counter c by 1:
         c += 1
     end
-
-    println("reduction_map:")
-    println(sort(reduction_map))
 
     ## Update lb & Up
 
@@ -725,80 +660,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     S_reduced, Metabolites_reduced, Reactions_reduced, Genes_reduced, m_reduced, n_reduced, n_genes_reduced, lb_reduced, ub_reduced, c_vector_reduced = dataOfModel(model, 0)
 
-    Reaction_Ids_reduced = collect(1:n_reduced)
-    irreversible_reactions_id_reduced, reversible_reactions_id_reduced = reversibility(lb_reduced, Reaction_Ids_reduced, printLevel)
-
-    S_reduced = dropzeros!(S_reduced)
-
-    # Find the index of the first occurrence where the element in c_vector is equal to 1.0 in Reduced Network:
-    index_c_reduced = findfirst(x -> x == 1.0, c_vector_reduced)
-
-    c_vector_reduced = A' * c_vector
-
-    S_reduced, Metabolites_reduced, Metabolites_elimination = remove_zeroRows(S_reduced, Metabolites_reduced)
-
-    # Define the model
-    FBA_model_reduced, solver = changeSparseQFCASolver("HiGHS")  # HiGHS supports LP/MILP
-
-    # Add decision variables
-    @variable(FBA_model_reduced, x[1:n_reduced])
-    @variable(FBA_model_reduced, t >= 0)  # Auxiliary variable for norm constraint
-
-    t = 1e-3
-
-    @constraint(FBA_model_reduced, lb .<= A * x .<= ub)
-
-    # Replace Norm-2 with Norm-Infinity constraints
-    @constraint(FBA_model_reduced, S_reduced * x .<= t)
-    @constraint(FBA_model_reduced, S_reduced * x .>= -t)
-
-    # Set objective
-    @objective(FBA_model_reduced, Max, dot(c_vector_reduced, x))
-
-    # Solve the model
-    optimize!(FBA_model_reduced)
-
-    println("t = $(value(t))")
-
-    # Extract results
-    V_reduced = []
-    for i in 1:length(x)
-        append!(V_reduced, value(x[i]))
-    end
-
-    println("V_initial: FBA(Original)")
-    println(V_initial)
-
-    println("termination_status = $(termination_status(FBA_model))")
-    println("objective_value = $(objective_value(FBA_model))")
-    println("Biomass = $(Reactions[index_c_initial]), Flux = $(V_initial[index_c_initial])")
-
-    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-    println("V_correction:")
-    println(V_correction)
-    println("V_correction : $(length(V_correction))")
-    println("objective_value = $(objective_value(FBA_model_correction))")
-    println("Biomass = $(Reactions[index_c_initial]), Flux = $(V_correction[index_c_initial])")
-
-    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-    println("V_reduced: FBA(Compressed)")
-    println(V_reduced)
-
-    println("termination_status = $(termination_status(FBA_model_reduced))")
-    println("objective_value = $(objective_value(FBA_model_reduced))")
-    println("Biomass = $(Reactions_reduced[index_c_reduced]), Flux = $(V_reduced[index_c_reduced])")
-
-    printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-
-    V = A * V_reduced
-
-    println("V = A * V_reduced")
-    println(V)
-
-    println("Biomass = $(Reactions[index_c_initial]), Flux = $(V[index_c_initial])")
-
     for i ∈ model.reactions
         index_Reactions_reduced = findfirst(x -> x == i.first, Reactions_reduced)
         i.second.objective_coefficient = c_vector_reduced[index_Reactions_reduced]
@@ -833,7 +694,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         JSON.print(file, data, 1)  # Use 'indent=1' for indentation
     end
 
-    println("Tolerance = $Tolerance")
     # Save matrix to a file
     @save "../src/QuantomeRedNet/ReducedNetworks/A_$ReducedModelName.jld2" A
 

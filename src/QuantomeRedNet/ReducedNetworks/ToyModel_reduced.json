@@ -32,7 +32,7 @@
   {
    "name": "transport m2",
    "metabolites": {
-    "m3": -4.440892098500626e-16,
+    "m3": -6.661338147750939e-16,
     "m2": -1.0000000000287557e-6,
     "m5": 1.0000000000287557e-6
    },
@@ -42,12 +42,12 @@
    "gene_reaction_rule": "(G1 and G7) or (G3 and G5) or (G4)",
    "annotation": {},
    "upper_bound": 1000.0,
-   "objective_coefficient": 0.9999990000000004
+   "objective_coefficient": 1.0
   },
   {
    "name": "rxn3",
    "metabolites": {
-    "m3": 9.999999991405772e-7,
+    "m3": 9.99999998696488e-7,
     "m2": -1.0000000000287557e-6,
     "m5": 0.0
    },
@@ -57,7 +57,7 @@
    "gene_reaction_rule": "(G3 and G4) or (G5 and G6)",
    "annotation": {},
    "upper_bound": 1000.0,
-   "objective_coefficient": 1.9999980000000008
+   "objective_coefficient": 0.0
   }
  ],
  "genes": [
