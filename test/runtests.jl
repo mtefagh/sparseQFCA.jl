@@ -26,7 +26,7 @@ import AbstractFBCModels.CanonicalModel: Reaction, Metabolite, Gene, Coupling
 import JSONFBCModels: JSONFBCModel
 
 ### sparseQFCA:
-#=
+
 # Print a message indicating that sparseQFCA is being run on e_coli_core:
 printstyled("sparseQFCA :\n"; color=:yellow)
 printstyled("iIS312 :\n"; color=:yellow)
@@ -59,7 +59,7 @@ fctable_QFCA_iIS312 = @time sparseQFCA.QFCA(S_iIS312, rev_iIS312)[end]
 # Test that the results of QFCA are correct for the iIS312 model:
 @test QFCATest_iIS312(fctable_QFCA_iIS312)
 # Print a separator:
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
 ### Consistency_Checking:
 
@@ -126,7 +126,7 @@ blockedList_swiftCC_iIS312, dualVar_e_coli_core_iIS312  = @time sparseQFCA.swift
 # Test that the results of the naive approach and swiftCC approach are the same:
 @test blockedTest_iIS312(blockedList_TheNaive_iIS312, blockedList_swiftCC_iIS312)
 # Print a separator:
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
 
 ### distributedQFCA:
 
@@ -200,8 +200,8 @@ fctable_distributedQFCA_iIS312 = convert(Matrix{Int}, fctable_distributedQFCA_iI
 # Test that the results of distributedQFCA are correct for the iIS312 model:
 @test distributedQFCATest_iIS312(fctable_distributedQFCA_iIS312)
 # Print a separator:
-printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:yellow)
-=#
+printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+
 ## ToyModel
 
 ToyModel = Model()
@@ -211,7 +211,7 @@ printstyled("$ModelName :\n"; color=:yellow)
 
 # Genes:
 for i = 1:9
-    gene = "b" * "$i"
+    gene = "G" * "$i"
     ToyModel.genes[gene] = Gene()
 end
 
