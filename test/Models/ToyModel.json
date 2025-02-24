@@ -74,7 +74,7 @@
    "metabolites": {
     "m6": -1.0
    },
-   "lower_bound": -1000.0,
+   "lower_bound": -20.0,
    "id": "EX_2",
    "notes": {},
    "gene_reaction_rule": "(G8)",
@@ -91,7 +91,7 @@
    "lower_bound": 0.0,
    "id": "M1t",
    "notes": {},
-   "gene_reaction_rule": "(G1 && G2) || (G3)",
+   "gene_reaction_rule": "(G1 and G2) or (G3)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -105,7 +105,7 @@
    "lower_bound": 0.0,
    "id": "M2t",
    "notes": {},
-   "gene_reaction_rule": "(G4) || (G1 && G7) || (G3 && G5)",
+   "gene_reaction_rule": "(G4) or (G1 and G7) or (G3 and G5)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -127,14 +127,13 @@
   {
    "name": "rxn1",
    "metabolites": {
-    "m3": 1.0,
-    "m2": 1.0,
-    "m1": -2.0
+    "m4": 1.0,
+    "m1": -1.0
    },
-   "lower_bound": 0.0,
+   "lower_bound": -1000.0,
    "id": "rxn1",
    "notes": {},
-   "gene_reaction_rule": "(G2) || (G3)",
+   "gene_reaction_rule": "(G9)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -143,12 +142,13 @@
    "name": "rxn2",
    "metabolites": {
     "m3": 1.0,
-    "m2": -1.0
+    "m2": 1.0,
+    "m1": -2.0
    },
    "lower_bound": 0.0,
    "id": "rxn2",
    "notes": {},
-   "gene_reaction_rule": "(G3 && G4) || (G5 && G6)",
+   "gene_reaction_rule": "(G2) or (G3)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -156,13 +156,13 @@
   {
    "name": "rxn3",
    "metabolites": {
-    "m4": 1.0,
-    "m1": -1.0
+    "m3": 1.0,
+    "m2": -1.0
    },
-   "lower_bound": -1000.0,
+   "lower_bound": 0.0,
    "id": "rxn3",
    "notes": {},
-   "gene_reaction_rule": "(G9)",
+   "gene_reaction_rule": "(G3 and G4) or (G5 and G6)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -171,55 +171,55 @@
  "genes": [
   {
    "name": null,
-   "id": "G1",
+   "id": "b1",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G2",
+   "id": "b2",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G3",
+   "id": "b3",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G4",
+   "id": "b4",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G5",
+   "id": "b5",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G6",
+   "id": "b6",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G7",
+   "id": "b7",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G8",
+   "id": "b8",
    "notes": {},
    "annotation": {}
   },
   {
    "name": null,
-   "id": "G9",
+   "id": "b9",
    "notes": {},
    "annotation": {}
   }
