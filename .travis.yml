@@ -3,9 +3,6 @@ language: julia  # Primary language is Julia
 branches:
   only:
     - master  # Only run CI/CD workflows on the master branch
-  pull_requests:
-    branches:
-      - master  # Include pull requests targeting master
 
 jobs:
   include:
@@ -14,32 +11,20 @@ jobs:
       julia: 1.10.7
       os: linux
       script:
-        - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.test(coverage=true)'
+        - julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.test(coverage=true)'
         - bash <(curl -s https://codecov.io/bash)  # Submitting to Codecov
-      after_success:
-        - julia -e 'using Coverage; Coveralls.submit(process_folder())'  # Submitting to Coveralls
 
     - stage: "Documentation"
       julia: 1.10.7
       os: linux
       script:
         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl --code-coverage=user
-        - run: julia --project=docs/ --code-coverage=user docs/make.jl
-        steps:
-        - uses: actions/checkout@master
-        - uses: codecov/codecov-action@v5
-          env:
-            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        - julia --project=docs/ --code-coverage=user docs/make.jl
 
     - stage: "Deployment"
       os: linux
       language: julia
       julia: 1.10.7
-      notifications:
-        email: true
-      before_install:
-        - gem install json_pure -v 2.7.6  # Install json_pure only for deployment
       deploy:
         provider: pages
         skip-cleanup: true
@@ -47,5 +32,3 @@ jobs:
         keep-history: true
         on:
           branch: master
-      after_success:
-        - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(Codecov.process_folder())'
