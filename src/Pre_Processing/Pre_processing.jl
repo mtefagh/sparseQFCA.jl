@@ -88,12 +88,6 @@ function dataOfModel(model, printLevel::Int=1)
     # Objective coefficients vector:
     c_vector = A.objective(model)
 
-    # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
-    index_c = findfirst(x -> x == 1.0, c_vector)
-
-    # Use the found index to retrieve the corresponding element from the Reactions array:
-    Biomass = Reactions[index_c]
-
     ## Sorting Reactions (Commented out)
 
     #=
@@ -406,7 +400,7 @@ function homogenization(lb::Array{Float64,1}, ub::Array{Float64,1}, printLevel::
     end
 
     # Set a large number for M:
-    M = getM()
+    M = getM(printLevel)
 
     # If the lower bound is greater than zero, set it to zero:
     lb[lb .>= 0] .= 0
@@ -626,11 +620,16 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     # Extracting the IDs of reversible reactions from the ModelObject_QFCA:
     reversible_reactions_id = ModelObject_Correction.reversible_reactions_id
 
+    lb_homo = copy(lb)
+    ub_homo = copy(ub)
+
+    lb_homo, ub_homo = homogenization(lb_homo, ub_homo, 0)
+
     # Define the number of variables in the model:
     n = length(lb)
 
     # Set the tolerance value:
-    Tolerance = 1e-6
+    Tolerance = getTolerance()
 
     # Initialize empty arrays to store the IDs of blocked reversible reactions in the forward and backward directions:
     rev_blocked_fwd = Array{Int64}([])
@@ -655,7 +654,7 @@ function distributedReversibility_Correction(ModelObject_Correction::Model_Corre
     end
 
     # Define variables V:
-    @variable(local_model, lb[i] <= V[i = 1:n] <= ub[i])
+    @variable(local_model, lb_homo[i] <= V[i = 1:n] <= ub_homo[i])
 
     # Add the stoichiometric constraints to the model:
     @constraint(local_model, S * V .== 0)

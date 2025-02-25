@@ -1,0 +1,24 @@
+{
+ "metabolites": [],
+ "reactions": [
+  {
+   "name": "rxn1",
+   "metabolites": {},
+   "lower_bound": 0.0,
+   "id": "rxn1",
+   "notes": {},
+   "gene_reaction_rule": "(G1)",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 1.0
+  }
+ ],
+ "genes": [
+  {
+   "name": null,
+   "id": "G1",
+   "notes": {},
+   "annotation": {}
+  }
+ ]
+}

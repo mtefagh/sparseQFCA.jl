@@ -160,6 +160,11 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
     n_irr = length(irreversible_reactions_id)
     n_rev = length(reversible_reactions_id)
 
+    lb_homo = copy(lb)
+    ub_homo = copy(ub)
+
+    lb_homo, ub_homo = homogenization(lb_homo, ub_homo, 0)
+
     ## Find irreversible blocked reactions in 1 LP problem
 
     # Set the lower and upper bounds of the "u" variables to 0 and 1, respectively:
@@ -185,7 +190,7 @@ function swiftCC(ModelObject_CC::Model_CC, SolverName::String="HiGHS", OctuplePr
     end
 
     # Define variables V and u with their lower and upper bounds:
-    @variable(model, lb[i] <= V[i = 1:n] <= ub[i])
+    @variable(model, lb_homo[i] <= V[i = 1:n] <= ub_homo[i])
     @variable(model, lb_u[i] <= u[i = 1:n_irr] <= ub_u[i])
 
     # Add a constraint that ensures the mass balance of the system:

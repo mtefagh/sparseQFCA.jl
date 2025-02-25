@@ -78,7 +78,7 @@ and assigns values to its fields based on the other arguments passed in.
 
 """
 
-function model_QFCA_Constructor(ModelObject::Model_QFCA, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
+function model_QFCA_Constructor(ModelObject_QFCA::Model_QFCA, S::Union{SparseMatrixCSC{Float64,Int64}, AbstractMatrix}, Metabolites::Array{String,1}, Reactions::Array{String,1},
                                 Genes::Array{String,1},m::Int, n::Int, lb::Array{Float64,1}, ub::Array{Float64,1}, irreversible_reactions_id::Array{Int64}, reversible_reactions_id::Array{Int64})
      ModelObject_QFCA.S = S
      ModelObject_QFCA.Metabolites = Metabolites
@@ -92,9 +92,8 @@ function model_QFCA_Constructor(ModelObject::Model_QFCA, S::Union{SparseMatrixCS
      ModelObject_QFCA.reversible_reactions_id = reversible_reactions_id
 end
 
-
 """
-    distributedQFCA(myModel)
+    distributedQFCA(myModel, blocked_index)
 
 The function first exports data from ModelObject_QFCA and calculates directional couplings and coefficients for each pair of reactions in the model.
 It also has the option to remove reactions from the model and recalculate the couplings. The function uses parallel processing to distribute
@@ -222,7 +221,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
 
     ## Remove all rows from a given sparse matrix S that contain only zeros and the corresponding metabolites from the Metabolites array
 
-    S_noBlocked, Metabolites = remove_zeroRows(S_noBlocked,Metabolites)
+    S_noBlocked, Metabolites, Metabolites_elimination = remove_zeroRows(S_noBlocked, Metabolites)
 
     ## Create a new instance of the input model with homogenous bounds
 
@@ -420,7 +419,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
     end
 
     ## Loop through each key in FC_OneMet dictionary
-
+#=
     for key ∈ sort(collect(keys(FC_OneMet)))
         # Check if the row index and column index of the key in PC matches the tuple value in FC_OneMet:
         if (PC[key][1] == FC_OneMet[key][1]) && (PC[key][2] == FC_OneMet[key][2])
@@ -435,7 +434,7 @@ function distributedQFCA(ModelObject_QFCA::Model_QFCA, blocked_index::Vector{Int
         Fc_Coefficients[PC[key][2],PC[key][1]] = abs(S_noBlocked[key ,FC_OneMet[key][1]]) / abs(S_noBlocked[key ,FC_OneMet[key][2]])
         end
     end
-
+=#
     ## Solve an LU decomposition for each pair of partially coupled nodes to determine fully coupling
 
     # Start a distributed loop over keys in PC, sorted in ascending order:

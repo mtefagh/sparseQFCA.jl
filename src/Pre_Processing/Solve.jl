@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------
 #=
-    Purpose:    Solver interface for solving LPs
+    Purpose:    Solver Interface for Linear, Mixed-Integer, and Conic Optimization.
     Author:     Iman Ghadimi, Mojtaba Tefagh - Sharif University of Technology
     Date:       September 2024
 =#
@@ -79,15 +79,15 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Set verbose attribute to false (disable verbose output):
             set_optimizer_attribute(model, "output_flag", false)
             # Set tolerances for increased accuracy
-            set_optimizer_attribute(model, "primal_feasibility_tolerance", 1e-9)
-            set_optimizer_attribute(model, "dual_feasibility_tolerance", 1e-9)
+            #set_optimizer_attribute(model, "primal_feasibility_tolerance", 1e-6)
+            #set_optimizer_attribute(model, "dual_feasibility_tolerance", 1e-6)
             # Return the created model and solver configuration:
             return model, solver
         catch
             # Handle the error if HiGHS cannot be set:
             error("The solver `HiGHS` cannot be set using `changeSparseQFCASolver()`.")
         end
-#=
+
     # If the solver is "CPLEX":
     elseif name == "CPLEX"
         try
@@ -105,7 +105,7 @@ function changeSparseQFCASolver(name, printLevel::Int=1)
             # Handle the error if CPLEX cannot be set:
             error("The solver `CPLEX` cannot be set using `changeSparseQFCASolver()`.")
         end
-=#
+
     # If the solver is "Clp":
     elseif name == "Clp"
         try

@@ -73,29 +73,28 @@ See also: `dataOfModel()`, , `reversibility()`, `homogenization()`, `distributed
 
 """
 
-function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, Tolerance::Float64=1e-6, printLevel::Int=1)
+function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePrecision::Bool=false, removing::Bool=false, representatives::Vector{Int64}=[], Tolerance::Float64=1e-6, printLevel::Int=1)
 
     ## Extracte relevant data from input model
 
     S, Metabolites, Reactions, Genes, m, n, n_genes, lb, ub, c_vector = dataOfModel(model, printLevel)
 
+    c_vector_initial = copy(c_vector)
+
     # Find the index of the first occurrence where the element in c_vector is equal to 1.0:
     index_c = findfirst(x -> x == 1.0, c_vector)
+    index_c_initial = copy(index_c)
 
     # Use the found index to retrieve the corresponding element from the Reactions array:
     Biomass = Reactions[index_c]
 
     row_S, col_S = size(S)
 
-    ## Ensure that the bounds of all reactions are homogenous
-
-    lb, ub = homogenization(lb, ub)
-
-    ## Separate reactions into reversible and irreversible sets
-
     # Create an array of reaction IDs:
     Reaction_Ids = collect(1:n)
     irreversible_reactions_id, reversible_reactions_id = reversibility(lb, Reaction_Ids, printLevel)
+
+    ## Separate reactions into reversible and irreversible sets
 
     irreversible_reactions_id = sort(irreversible_reactions_id)
     reversible_reactions_id = sort(reversible_reactions_id)
@@ -103,6 +102,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     ## Create a new instance of the input model with homogenous bounds
 
     ModelObject_CC = Model_CC(S, Metabolites, Reactions, Genes, m, n, lb, ub)
+    model_CC_Constructor(ModelObject_CC , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub)
     blocked_index, ν  = swiftCC(ModelObject_CC, SolverName, false, Tolerance, printLevel)
     blocked_index_rev = blocked_index ∩ reversible_reactions_id
 
@@ -121,7 +121,8 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     # Create a new Model_Correction object with the current data:
     ModelObject_Crrection = Model_Correction(S, Metabolites, Reactions, Genes, m, n, lb, ub, irreversible_reactions_id, reversible_reactions_id)
-
+    # Reconstruct the corrected model with updated parameters:
+    model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
     # Apply distributedReversibility_Correction() to the model and update Reversibility, S and bounds:
     S, lb, ub, irreversible_reactions_id, reversible_reactions_id = distributedReversibility_Correction(ModelObject_Crrection, blocked_index_rev, SolverName, false)
 
@@ -141,13 +142,10 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         Dict_bounds[Reactions[i]] = lb[i], ub[i]
     end
 
-    # Reconstruct the corrected model with updated parameters:
-    model_Correction_Constructor(ModelObject_Crrection , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
-
     ## Obtain blocked_index, fctable, Fc_Coefficients, and Dc_Coefficients
 
     ModelObject_QFCA = Model_QFCA(S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
-
+    model_QFCA_Constructor(ModelObject_QFCA , S, Metabolites, Reactions, Genes, row_S, col_S, lb, ub, irreversible_reactions_id, reversible_reactions_id)
     # Convert to Vector{Int64}:
     blocked_index = convert(Vector{Int64}, blocked_index)
     fctable, Fc_Coefficients, Dc_Coefficients = distributedQFCA(ModelObject_QFCA, blocked_index, SolverName, false)
@@ -278,6 +276,9 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         end
     end
 
+    FC_representatives = sort(FC_representatives)
+    FC_cluster_members = sort(FC_cluster_members)
+
     ## Create a new dictionary FC_Clusters
 
     FC_Clusters = Dict()
@@ -304,7 +305,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         # Iterate over the columns:
         for j = 1:col_fctable
             # Check if the value at position (i, j) in fctable is equal to 4.0:
-            if 4.0 ∈ fctable[i, :]
+            if (4.0 ∈ fctable[i, :]) # && (Reaction_Ids_noBlocked[i] ∉ representatives)
                 # If the condition is true, append the corresponding Reaction ID to remove_list_DC:
                 append!(remove_list_DC, Reaction_Ids_noBlocked[i])
                 # Exit the inner loop as the reaction has been found and added to remove_list_DC:
@@ -323,8 +324,9 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     irreversible_reactions_id = sort(irreversible_reactions_id)
     reversible_reactions_id = sort(reversible_reactions_id)
 
-    # Create the 'Eliminations' array by taking the union of 'blocked_index', 'remove_list_DC', and 'FC_cluster_members':
+    #remove_list_DC = setdiff(remove_list_DC, FC_representatives)
 
+    # Create the 'Eliminations' array by taking the union of 'blocked_index', 'remove_list_DC', and 'FC_cluster_members':
     Eliminations = union(blocked_index, remove_list_DC, FC_cluster_members)
 
     # Sort Eliminations:
@@ -338,6 +340,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     # Create a shared array 'A' of size (A_rows_original, A_cols_reduced) with initial values set to false:
     n = length(A_rows_original)
     ñ = length(A_cols_reduced)
+
     A = SharedArray{Float64, 2}((n,ñ), init = false)
 
     ## Blocked
@@ -358,15 +361,31 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         A[A_cols_reduced[i], i] = 1.0
     end
 
+    # Create FC_Final_coefficients
+    FC_Clusters_coefficients = Dict()
+    c = 1
+    for key in keys(sort(FC_Clusters))
+        reaction_id, coupled_indices = FC_Clusters[key]
+        reaction_id_original = findfirst(x -> x == reaction_id, Reaction_Ids_noBlocked)
+        coefficients = Array{Float64}([])
+        for idx in coupled_indices
+            idx_original = findfirst(x -> x == idx, Reaction_Ids_noBlocked)
+            coefficient = Fc_Coefficients[reaction_id_original, idx_original]
+            append!(coefficients, coefficient)
+        end
+        FC_Clusters_coefficients[c] = (reaction_id, coupled_indices, coefficients)
+        c += 1
+    end
+
     ## FC
 
-    # Iterate over keys in 'FC_Coef' sorted in ascending order:
-    for key ∈ sort(collect(keys(FC_Coef)))
-        if FC_Coef[key][1] ∈ A_cols_reduced
-            # Find the index in 'A_cols_reduced' where the first element of 'FC_Coef[key]' is present:
-            index = findfirst(x -> x == FC_Coef[key][1], A_cols_reduced)
-            # Set the corresponding element in 'A' to the third element of 'FC_Coef[key]':
-            A[FC_Coef[key][2], index] = 1 / FC_Coef[key][3]
+    for key ∈ sort(collect(keys(FC_Clusters_coefficients)))
+        reaction_id, coupled_indices, coefficients = FC_Clusters_coefficients[key]
+        if reaction_id ∈ A_cols_reduced
+            col = findfirst(x -> x == reaction_id, A_cols_reduced)
+            for (row, coefficient) in zip(coupled_indices, coefficients)
+                A[row, col] = 1 / coefficient
+            end
         end
     end
 
@@ -374,6 +393,10 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
 
     DCE = Dict()
     counter = 1
+
+    row, col = size(S)
+    S, Metabolites_reduced, Metabolites_elimination  = remove_zeroRows(S, Metabolites)
+    row, col = size(S)
 
     # Check if we're using octuple precision (very high precision floating-point numbers):
     if OctuplePrecision
@@ -393,89 +416,135 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         model_local, solver = changeSparseQFCASolver(SolverName)
     end
 
+    # Remove blocked indices from the stoichiometric matrix S
+    S_noBlocked = S[:, setdiff(1:n, blocked_index)]
+    n_noBlocked = size(S_noBlocked, 2)
+
     # Define the decision variables λ (for reactions), ν (for metabolites), and t (a scalar variable):
-    @variable(model_local, λ[1:n])
+    @variable(model_local, λ[1:n_noBlocked])
     @variable(model_local, ν[1:m])
     @variable(model_local, t)
 
-    # Set the objective function to minimize t (scalar variable):
     @objective(model_local, Min, t)
 
     # Constraint 1: λ and t must satisfy the NormOneCone (a type of norm constraint):
     con1 = @constraint(model_local, [t; λ] in MOI.NormOneCone(1 + length(λ)))
 
     # Constraint 2: The dual variable λ must be equal to the transposed stoichiometric matrix (S') times ν:
-    con2 = @constraint(model_local, λ == S' * ν)
+    con2 = @constraint(model_local, λ == S_noBlocked' * ν)
 
-    # Constraint 3: Ensure that λ is 0 for reversible reactions (the reaction flux is zero for reversible reactions):
-    con3 = @constraint(model_local, [j in reversible_reactions_id], λ[j] == 0.0)
+    # Create a new array without the blocked indices
+    lb_noBlocked = [lb[i] for i in 1:length(lb) if i ∉ blocked_index]
+    irreversible_reactions_id_noBlocked, reversible_reactions_id_noBlocked = reversibility(lb_noBlocked, Reaction_Ids_noBlocked, 0)
 
-    ## Perform distributed optimization for each reaction in the remove_list_DC list
-
-    @sync @distributed for i ∈ remove_list_DC
-
-        # Save i as the row number to process the current reaction:
-        row = i
-
-        # Compute the linear combination for DCE by excluding the current reaction (i):
-        DCE_LinearCombination = setdiff(1:n, i)
-
-        ## Define additional constraints for the optimization problem
-
-        # Constraint 4: Set λ to zero for specific reactions in the Eliminations ∩ DCE_LinearCombination set:
-        con4 = @constraint(model_local, [j in Eliminations ∩ DCE_LinearCombination], λ[j] == 0.0)
-
-        # Constraint 5: Set λ to be non-negative for the remaining reactions in DCE_LinearCombination:
-        con5 = @constraint(model_local, [j in DCE_LinearCombination], λ[j] >= 0.0)
-
-        # Constraint 6: Force λ for the current reaction (i) to be -1:
-        con6 = @constraint(model_local, λ[i] == -1.0)
-
-        # Solve the optimization problem for the current setup:
-        optimize!(model_local)
-
-        # Get the values of the λ variables after solving the optimization problem:
-        λ_vec = value.(λ)
-
-        # Create an empty array to store the indices of the non-zero λ values:
-        cols = Array{Int64}([])
-
-        # Loop through the λ vector and check for values above the defined tolerance:
-        for i = 1:length(λ_vec)
-            if λ_vec[i] > Tolerance
-                # Find the column index of the corresponding reaction in A_cols_reduced:
-                index = findfirst(x -> x == i, A_cols_reduced)
-
-                # Update the corresponding value in matrix A for the current row:
-                A[row, index] = λ_vec[i]
-            end
-        end
-
-        ## Condition 4: Remove all constraints in con4 from the model once used
-
-        constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
-        for i ∈ constraint_refs_con4
-            delete(model_local, i)  # Remove the constraint from the model
-            unregister(model_local, :i)  # Unregister the constraint for clean-up
-        end
-
-        ## Condition 5: Remove all constraints in con5 from the model once used
-
-        constraint_refs_con5 = [con5[i] for i in eachindex(con5)]
-        for i ∈ constraint_refs_con5
-            delete(model_local, i)  # Remove the constraint from the model
-            unregister(model_local, :i)  # Unregister the constraint for clean-up
-        end
-
-        ## Condition 6: Remove the current λ constraint (con6) from the model
-
-        delete(model_local, con6)  # Remove the specific λ[i] == -1 constraint
-        unregister(model_local, :con6)  # Unregister this constraint for clean-up
-
+    for i in reversible_reactions_id_noBlocked
+        #println("$i in reversible_reactions_id_noBlocked")
+        index = findfirst(x -> x == i, Reaction_Ids_noBlocked)
+        #println("$index in Reaction_Ids_noBlocked")
+        # Constraint 3: Ensure that λ is 0 for reversible reactions (the reaction flux is zero for reversible reactions):
+        con3 = @constraint(model_local, λ[index] == 0.0)
     end
 
-    # Convert matrix A to a matrix of Float64 data type for numerical stability:
-    A = convert(Matrix{Float64}, A)
+    Eliminations = setdiff(Eliminations, blocked_index)
+
+    Eliminations_noBlocked = Array{Int64}([])
+    for i in Eliminations
+        index = findfirst(x -> x == i, Reaction_Ids_noBlocked)
+        append!(Eliminations_noBlocked, index)
+    end
+
+    remove_list_DC_noBlocked = Array{Int64}([])
+    for i in remove_list_DC
+        index = findfirst(x -> x == i, Reaction_Ids_noBlocked)
+        append!(remove_list_DC_noBlocked, index)
+    end
+
+    ## Perform distributed optimization for each reaction in the remove_list_DC list
+    counter = 1
+
+    for i ∈ remove_list_DC_noBlocked
+
+        # Save i as the row number to process the current reaction:
+        row = remove_list_DC[counter]
+
+        counter += 1
+
+        if row ∉ FC_cluster_members
+
+            # Compute the linear combination for DCE by excluding the current reaction (i):
+            DCE_LinearCombination = setdiff(1:n_noBlocked, i)
+
+            ## Define additional constraints for the optimization problem
+
+            # Constraint 4: Set λ to zero for specific reactions in the Eliminations ∩ DCE_LinearCombination set:
+            con4 = @constraint(model_local, [j in Eliminations_noBlocked ∩ DCE_LinearCombination], λ[j] == 0.0)
+
+            # Constraint 5: Set λ to be non-negative for the remaining reactions in DCE_LinearCombination:
+            con5 = @constraint(model_local, [j in DCE_LinearCombination], λ[j] >= 0.0)
+
+            # Constraint 6: Force λ for the current reaction (i) to be -1:
+            con6 = @constraint(model_local, -1.0 - Tolerance <= λ[i] <= -1.0 + Tolerance)
+
+            # Solve the optimization problem for the current setup:
+            optimize!(model_local)
+
+            # Check the optimization result
+            status = termination_status(model_local)
+
+            # Get the values of the λ variables after solving the optimization problem:
+            λ_vec = value.(λ)
+
+            # Create an empty array to store the indices of the non-zero λ values:
+            cols = Array{Int64}([])
+
+            # Loop through the λ vector and check for values above the defined tolerance:
+            for i = 1:length(λ_vec)
+                if λ_vec[i] > Tolerance
+                    # Find the column index of the corresponding reaction in A_cols_reduced:
+                    index = Reaction_Ids_noBlocked[i]
+                    index_final = findfirst(x -> x == index, A_cols_reduced)
+                    # Update the corresponding value in matrix A for the current row:
+                    # Assign your value
+                    if status == MOI.OPTIMAL
+                        A[row, index_final] = λ_vec[i]
+                    end
+                end
+            end
+
+            ## Condition 4: Remove all constraints in con4 from the model once used
+
+            constraint_refs_con4 = [con4[i] for i in eachindex(con4)]
+            for i ∈ constraint_refs_con4
+                delete(model_local, i)  # Remove the constraint from the model
+                unregister(model_local, :i)  # Unregister the constraint for clean-up
+            end
+
+            ## Condition 5: Remove all constraints in con5 from the model once used
+
+            constraint_refs_con5 = [con5[i] for i in eachindex(con5)]
+            for i ∈ constraint_refs_con5
+                delete(model_local, i)  # Remove the constraint from the model
+                unregister(model_local, :i)  # Unregister the constraint for clean-up
+            end
+
+            ## Condition 6: Remove the current λ constraint (con6) from the model
+
+            delete(model_local, con6)  # Remove the specific λ[i] == -1 constraint
+            unregister(model_local, :con6)  # Unregister this constraint for clean-up
+
+            #printstyled("#-------------------------------------------------------------------------------------------#\n"; color=:red)
+        end
+    end
+
+    for key ∈ sort(collect(keys(FC_Clusters_coefficients)))
+        if FC_Clusters_coefficients[key][1] in remove_list_DC
+            for (row, coefficient) in zip(FC_Clusters_coefficients[key][2], FC_Clusters_coefficients[key][3])
+                if coefficient != 1.0
+                    A[row, :] = (1 / coefficient) .* A[FC_Clusters_coefficients[key][1], :]
+                end
+            end
+        end
+    end
 
     # Get the number of rows and columns in matrix A:
     row_A, col_A = size(A)
@@ -520,33 +589,6 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         reduction_map[c] = index, nonzero_indices
         # Incrementing the counter c by 1:
         c += 1
-    end
-
-    ## Genes
-
-    for i ∈ model.reactions
-        # Iterate through the sorted reduction_map (which maps reactions to a list of associated reactions):
-        for (key, value) ∈ sort(reduction_map)
-            # Check if the current reaction matches the first element in the reduction_map's value list:
-            if i.first == Reactions[value[1]]
-                # Loop through the second element of the value list, which contains a set of reactions:
-                for j ∈ value[2]
-                    # Check if the gene association for the current reaction and the related reaction is not empty:
-                    if !isnothing(i.second.gene_association_dnf) && !isnothing(model.reactions[Reactions[j]].gene_association_dnf) && (j != value[1])
-
-                        # Combine the original expression with the new one using "And" logic:
-                        new_terms = ["(" * join(group, " && ") * ")" for group in model.reactions[Reactions[j]].gene_association_dnf]
-
-                        # Wrap the original expression in parentheses and combine with the new terms:
-                        original_expr = ["(" * join(group, " && ") * ")" for group in i.second.gene_association_dnf]
-                        combined_expr = ["(" * join(original_expr, " || ") * ") && (" * join(new_terms, " || ") * ")"]
-
-                        # Update the gene association:
-                        i.second.gene_association_dnf = [combined_expr]
-                    end
-                end
-            end
-        end
     end
 
     ## Update lb & Up
@@ -616,44 +658,7 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
         end
     end
 
-    ## Update Genes
-
-    # Initialize an empty list to store final gene associations:
-    Genes_final = []
-
-    # Iterate through each reaction to collect gene associations:
-    for i ∈ model.reactions
-        # If the reaction has a non-empty gene association, append it to Genes_final:
-        if !isnothing(i.second.gene_association_dnf)
-            append!(Genes_final, i.second.gene_association_dnf)
-        end
-    end
-
-    # Remove duplicate genes from Genes_final:
-    Genes_final = unique(Genes_final)
-
-    # Regular expression to match genes (e.g., G1, G2, ...)
-    gene_pattern = r"G\d+"
-
-    # Flatten the nested structure and extract unique genes
-    flattened_genes = reduce(vcat, Genes_final) # Flatten the nested arrays
-    Genes_reduced = unique([match.match for line in flattened_genes for match in eachmatch(gene_pattern, line)])
-
-    # Sort the genes if needed
-    Genes_reduced = sort(Genes_reduced)
-
-    # Determine the genes that need to be removed by finding the difference:
-    Genes_removal = setdiff(Genes, Genes_reduced)
-
-    # Filter out genes in the model that are present in Genes_removal:
-    filter!(pair -> !(pair.first in Genes_removal), model.genes)
-
     S_reduced, Metabolites_reduced, Reactions_reduced, Genes_reduced, m_reduced, n_reduced, n_genes_reduced, lb_reduced, ub_reduced, c_vector_reduced = dataOfModel(model, 0)
-
-    # Find the index of the first occurrence where the element in c_vector is equal to 1.0 in Reduced Network:
-    index_c_reduced = findfirst(x -> x == 1.0, c_vector_reduced)
-
-    c_vector_reduced = A' * c_vector
 
     for i ∈ model.reactions
         index_Reactions_reduced = findfirst(x -> x == i.first, Reactions_reduced)
@@ -667,17 +672,20 @@ function quantomeReducer(model, ModelName, SolverName::String="HiGHS", OctuplePr
     # Read the JSON file
     data = JSON.parsefile("../src/QuantomeRedNet/ReducedNetworks/$ReducedModelName.json")
 
-    # Process reactions to fix gene_reaction_rule
-    for reaction in data["reactions"]
-        # Fix invalid gene_reaction_rule entries
-        if haskey(reaction, "gene_reaction_rule")
-            rule = reaction["gene_reaction_rule"]
+    # Process reactions
+    if haskey(data, "reactions")
+        for reaction in data["reactions"]
+            if haskey(reaction, "gene_reaction_rule") && !isempty(reaction["gene_reaction_rule"])
+                rule = reaction["gene_reaction_rule"]
 
-            # Replace "()" with an empty string
-            if rule == "()"
-                reaction["gene_reaction_rule"] = ""
+                # Replace "()" with an empty string
+                if rule == "()"
+                    reaction["gene_reaction_rule"] = ""
+                else
+                    # Replace "&&" with "and" and "||" with "or"
+                    reaction["gene_reaction_rule"] = replace(rule, "&&" => "and", "||" => "or")
+                end
             end
-
         end
     end
 

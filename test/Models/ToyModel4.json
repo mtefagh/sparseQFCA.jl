@@ -10,8 +10,8 @@
    "annotation": {}
   },
   {
-   "compartment": "inside",
-   "name": "M2_c",
+   "compartment": "outside",
+   "name": "M1_e",
    "formula": null,
    "id": "m2",
    "charge": null,
@@ -19,28 +19,10 @@
    "annotation": {}
   },
   {
-   "compartment": "inside",
-   "name": "M3_c",
+   "compartment": "outside",
+   "name": "M2_e",
    "formula": null,
    "id": "m3",
-   "charge": null,
-   "notes": {},
-   "annotation": {}
-  },
-  {
-   "compartment": "inside",
-   "name": "M4_c",
-   "formula": null,
-   "id": "m4",
-   "charge": null,
-   "notes": {},
-   "annotation": {}
-  },
-  {
-   "compartment": "outside",
-   "name": "M1_e",
-   "formula": null,
-   "id": "m5",
    "charge": null,
    "notes": {},
    "annotation": {}
@@ -49,7 +31,7 @@
    "compartment": "outside",
    "name": "M3_e",
    "formula": null,
-   "id": "m6",
+   "id": "m4",
    "charge": null,
    "notes": {},
    "annotation": {}
@@ -57,27 +39,40 @@
  ],
  "reactions": [
   {
-   "name": "exchange m5",
+   "name": "exchange M1e",
    "metabolites": {
-    "m5": -1.0
+    "m2": -1.0
    },
-   "lower_bound": -1000.0,
+   "lower_bound": -5.0,
    "id": "EX_1",
    "notes": {},
-   "gene_reaction_rule": "(G7)",
+   "gene_reaction_rule": "(G4)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
   },
   {
-   "name": "exchange m6",
+   "name": "exchange M2e",
    "metabolites": {
-    "m6": -1.0
+    "m3": -1.0
    },
-   "lower_bound": -20.0,
+   "lower_bound": -7.0,
    "id": "EX_2",
    "notes": {},
-   "gene_reaction_rule": "(G8)",
+   "gene_reaction_rule": "(G5)",
+   "annotation": {},
+   "upper_bound": 1000.0,
+   "objective_coefficient": 0.0
+  },
+  {
+   "name": "exchange M3e",
+   "metabolites": {
+    "m4": -1.0
+   },
+   "lower_bound": -1000.0,
+   "id": "EX_3",
+   "notes": {},
+   "gene_reaction_rule": "(G6)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 1.0
@@ -85,13 +80,13 @@
   {
    "name": "transport m1",
    "metabolites": {
-    "m5": -1.0,
+    "m2": -1.0,
     "m1": 1.0
    },
    "lower_bound": 0.0,
    "id": "M1t",
    "notes": {},
-   "gene_reaction_rule": "(G1 and G2) or (G3)",
+   "gene_reaction_rule": "(G1)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -99,13 +94,13 @@
   {
    "name": "transport m2",
    "metabolites": {
-    "m2": -1.0,
-    "m5": 1.0
+    "m3": 1.0,
+    "m1": -1.0
    },
    "lower_bound": 0.0,
    "id": "M2t",
    "notes": {},
-   "gene_reaction_rule": "(G4) or (G1 and G7) or (G3 and G5)",
+   "gene_reaction_rule": "(G2)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -113,13 +108,13 @@
   {
    "name": "transport m3",
    "metabolites": {
-    "m6": 1.0,
-    "m3": -1.0
+    "m4": 1.0,
+    "m1": -1.0
    },
-   "lower_bound": -1000.0,
+   "lower_bound": 0.0,
    "id": "M3t",
    "notes": {},
-   "gene_reaction_rule": "(G6)",
+   "gene_reaction_rule": "(G3)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -127,42 +122,13 @@
   {
    "name": "rxn1",
    "metabolites": {
-    "m4": 1.0,
-    "m1": -1.0
+    "m3": -1.0,
+    "m2": 1.0
    },
-   "lower_bound": -1000.0,
+   "lower_bound": 0.0,
    "id": "rxn1",
    "notes": {},
-   "gene_reaction_rule": "(G9)",
-   "annotation": {},
-   "upper_bound": 1000.0,
-   "objective_coefficient": 0.0
-  },
-  {
-   "name": "rxn2",
-   "metabolites": {
-    "m3": 1.0,
-    "m2": 1.0,
-    "m1": -2.0
-   },
-   "lower_bound": 0.0,
-   "id": "rxn2",
-   "notes": {},
-   "gene_reaction_rule": "(G2) or (G3)",
-   "annotation": {},
-   "upper_bound": 1000.0,
-   "objective_coefficient": 0.0
-  },
-  {
-   "name": "rxn3",
-   "metabolites": {
-    "m3": 1.0,
-    "m2": -1.0
-   },
-   "lower_bound": 0.0,
-   "id": "rxn3",
-   "notes": {},
-   "gene_reaction_rule": "(G3 and G4) or (G5 and G6)",
+   "gene_reaction_rule": "(G7)",
    "annotation": {},
    "upper_bound": 1000.0,
    "objective_coefficient": 0.0
@@ -208,18 +174,6 @@
   {
    "name": null,
    "id": "G7",
-   "notes": {},
-   "annotation": {}
-  },
-  {
-   "name": null,
-   "id": "G8",
-   "notes": {},
-   "annotation": {}
-  },
-  {
-   "name": null,
-   "id": "G9",
    "notes": {},
    "annotation": {}
   }
